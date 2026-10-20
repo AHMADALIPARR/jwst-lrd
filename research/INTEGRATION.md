@@ -50,3 +50,23 @@ None recorded yet.
 Ingested on t001-ingest-fortran, not merged yet. Both products come from the MAST cone search at the cited QSO1 Image A position (Furtak et al. 2023, ApJ 952, 142, Table 1); the header-coordinate check is still pending.
 - jw02561-o002_s000013123_nirspec_clear-prism_x1d.fits: obsid 300843505, 10941120 bytes, sha256 09bcd9077647ebf4fdaa766807de832bf6a94b92e3ed73fdb8a3c0281ae50c31, CAL_VER 3.0.0, DATE-OBS 2023-07-31
 - jw02561-o006_s000024175_nirspec_clear-prism_x1d.fits: obsid 230168921, 6347520 bytes, sha256 c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7
+
+## Status at 2026-10-19 22:58 PT (Hilbert)
+Repo: github.com/AHMADALIPARR/jwst-lrd (public). License text is AGPL-3.0-only everywhere (c1bc485).
+
+| Gate | Head | Hilbert re-run | Review |
+|---|---|---|---|
+| 001-003 ingest+Fortran | 69ee34a | 59 PASS | HCALC Alloy, pending |
+| 004 ledger | f30ae12 | blocked (record size) | positional fix plus Alloy gaps assigned |
+| 008 Hamiltonian | 737348b | 40 PASS | Alloy: NOT PASS (B1: epoch_exhausted-before-infeasible untested), repair assigned |
+| 009 AIR | c9dba36 | 29 PASS / 1 UNAV | Alloy, pending. Real input reads the wrong fixture, repair assigned |
+| 010 capability (Rust, rationale accepted) | db02c80 | 67 PASS | Lean: NOT PASS (2 major: stale STATUS; persist-failure path), repair assigned |
+| 013 Futhark | eeb1e78 | 58 PASS / 2 UNAV at 1a9dd6e | Alloy: NOT PASS (B1 crash counted as pass; B2 mutation claim), repair assigned |
+| 014 LLVM + validation | e4253a5 | 129 PASS; 31 PASS / 9 UNAV (MATLAB and SAS licensed) | Alloy, pending |
+| Alloy bounded models (004/010/006) | 5cee510 | not re-run (about 12 min) | 36/36 expected; bounded, not proofs |
+
+Integration branch ec8ffb7 (t001+futhark+t008+t009+t010): 157 PASS / 2 FAIL / 3 UNAV. Both FAILs are tests/run_all.sh launching bash suites with `sh`; the repair is assigned to Foundry J Spec.
+
+Fixture finding: 09bcd907 (obsid 300843505) has all-negative FLUX and is provenance only. The primary is c0b87857 (obsid 230168921). The Fortran gives z = 7.04221 ± 0.00027 against a published 7.0451, a discrepancy that remains open.
+
+Missions: BLIND-PROTOCOL.md (four blind fitters) and MISSION-QSO1-DCBH-001.md (12 roles). The May 2026 and September 2026 papers are not yet retrieved.
