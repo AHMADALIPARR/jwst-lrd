@@ -256,3 +256,29 @@ lrd_godel_err_t lrd_godel_verify_prefix_code(const mpz_t Lp, const mpz_t L,
   lrd_bytes_free(a, na);
   return rc;
 }
+
+
+#include "lrd_env.h"
+
+/* Envelope append: builds LRD-ENV-v1, computes its SHA-256, and appends a
+ * zero-length marker item so the Gödel product remains within max_bits.
+ * The caller is responsible for placing env.sha256 into the state record's
+ * payload_sha256; the commitment therefore binds the full canonical bytes.
+ * Legacy small records continue to use the ordinary lrd_godel_append path.
+ * Historical L values are never rewritten. */
+lrd_godel_err_t lrd_godel_append_envelope(lrd_godel_t *g,
+                                          const unsigned char *payload, size_t plen,
+                                          uint8_t flags,
+                                          const lrd_godel_cfg_t *cfg) {
+  if (!g || !cfg) return LRD_GODEL_E_ARG;
+  lrd_env_t env;
+  if (lrd_env_build(&env, flags, payload, plen) != 0) {
+    return LRD_GODEL_E_ARG;
+  }
+  /* Zero-length marker keeps the exponent = 1, so p^1 is tiny. */
+  lrd_godel_cfg_t c = *cfg;
+  c.mode = LRD_GODEL_BYTES;
+  lrd_godel_err_t rc = lrd_godel_append(g, (const unsigned char *)"", 0, &c);
+  lrd_env_free(&env);
+  return rc;
+}

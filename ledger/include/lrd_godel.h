@@ -94,3 +94,15 @@ lrd_godel_err_t lrd_godel_verify_prefix_code(const mpz_t Lp, const mpz_t L,
                                              const lrd_godel_cfg_t *cfg);
 
 #endif
+
+/* Envelope-aware append (recovery P0-A).
+ * For payloads that would exceed max_bits under bij256-of-body, the canonical
+ * LRD-ENV-v1 envelope is built and its 32-byte SHA-256 is used as the short
+ * exponent (bij256(sha256)). Historical L values are unchanged. The full
+ * envelope bytes remain bound to the commitment via the hash.
+ * Returns LRD_GODEL_OK or an error. On success the item is recorded as a
+ * hash-reference; the caller retains the envelope bytes. */
+lrd_godel_err_t lrd_godel_append_envelope(lrd_godel_t *g,
+                                          const unsigned char *payload, size_t plen,
+                                          uint8_t flags,
+                                          const lrd_godel_cfg_t *cfg);

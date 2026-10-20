@@ -32,6 +32,6 @@ Guardian review: HCALC Alloy.
 ## Rules
 - Do not claim LambdaCDM has been falsified unless an independently justified statistical test against the specified model establishes it.
 - Never substitute a published mass for independently reproduced kinematics.
-- Every paper cited must be one that was actually retrieved, given with its DOI or arXiv ID. The May 2026 and September 2026 papers are unverified until Agent 01 finds them.
+- Every paper cited must be one that was actually retrieved, given with its DOI or arXiv ID. The May 2026 dynamical-mass paper (Juodžbalis et al. 2026, Nature 653 1017, doi:10.1038/s41586-026-10579-4, arXiv:2508.21748) has been retrieved; see research/CITATIONS.md. September 2026 papers remain to be identified and retrieved.
 - Cosmological parameters are declared inputs, kept apart from measured quantities.
 - Each module has tests/<module>/run.sh printing PASS, FAIL and UNAVAILABLE lines. Commit to your own branch and run `git push origin <your-branch>`. Never push main or integration, and never force-push.
