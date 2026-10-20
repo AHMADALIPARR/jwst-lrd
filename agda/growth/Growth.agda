@@ -21,17 +21,18 @@
 --     (Benchmark submodule): with the declared rational bounds
 --       Dt >= 576/1000 Gyr   (solver: 0.5760588... Gyr, Planck 2018)
 --       t_Edd <= 4505/10000 Gyr (CODATA 2018: 0.45049041... Gyr)
---     the total exponent obeys E >= 23/2, the 64-step Euler factor at
---     E = 23/2 is a closed rational, and 1300 * factor >= 5e7 is checked
+--     the total exponent obeys E >= 23/2, the 16-step Euler factor at
+--     E = 23/2 is a closed rational, and 9000 * factor >= 5e7 is checked
 --     by the decidable rational order. Hence, under assumption A-GR-1
---     below, any seed >= 1300 Msun reaches 5e7 Msun for the benchmark
---     tuple. (64 steps is a deliberate coarseness: finer discretizations
---     (512, 1024 steps) make Agda's conversion checker exhaust its heap
---     normalizing the rational arithmetic on this machine -- observed,
---     see agda/growth/STATUS.md -- while 64 steps keeps the certified
---     numbers small. The Euler factor underestimates exp(E) more at
---     fewer steps, so the certified seed is conservative: the solver's
---     numerical threshold is ~502 Msun.)
+--     below, any seed >= 9000 Msun reaches 5e7 Msun for the benchmark
+--     tuple. (16 steps is a deliberate coarseness: finer discretizations
+--     make Agda's conversion checker exhaust its heap normalizing the
+--     rational arithmetic on this machine -- observed at 64 steps with
+--     heaps of 3.5-6 GB, see agda/growth/STATUS.md -- while 16 steps
+--     keeps the certified numbers small (the closed factor's numerator
+--     and denominator stay under ~28 digits). The Euler factor
+--     underestimates exp(E) more at fewer steps, so the certified seed
+--     is conservative: the solver's numerical threshold is ~502 Msun.)
 --     The solver's numerical minimum (~502 Msun) and the directive's
 --     (~497 Msun) both lie below this certified sufficient bound, as they
 --     must; 497 is NOT used anywhere in this file.
@@ -170,33 +171,34 @@ module Benchmark where
   eLo-cert : eLo * tEddHi ≤ (+ 9 / 1) * dtLo
   eLo-cert = toWitness tt
 
-  -- Per-step multiplier at E = eLo in 64 steps: 1 + (23/2)/64 = 151/128.
+  -- Per-step multiplier at E = eLo in 16 steps: 1 + (23/2)/16 = 55/32.
   step : ℚ
-  step = + 151 / 128
+  step = + 55 / 32
 
   step≥1 : 1ℚ ≤ step
   step≥1 = toWitness tt
 
   -- The certified Euler factor (closed rational; Agda normalizes it).
   factorCert : ℚ
-  factorCert = factorOf step 64
+  factorCert = factorOf step 16
 
-  -- The same factor computed by the squaring chain (6 multiplications
-  -- instead of 64); the closed check below is done on this form.
+  -- The same factor computed by the squaring chain (4 multiplications
+  -- instead of 16); the closed check below is done on this form.
   factorCertFast : ℚ
-  factorCertFast = sqPow step 6
+  factorCertFast = sqPow step 4
 
   factorCert≡fast : factorCert ≡ factorCertFast
-  factorCert≡fast = sym (sqPow≡pow step 6)
+  factorCert≡fast = sym (sqPow≡pow step 4)
 
-  -- The certified sufficient seed: 1300 Msun.
+  -- The certified sufficient seed: 9000 Msun (9000 * factor = 52197041
+  -- >= 5e7; margin +4.4 percent over the target).
   seedBound : ℚ
-  seedBound = + 1300 / 1
+  seedBound = + 9000 / 1
 
   target : ℚ
   target = + 50000000 / 1
 
-  -- Closed check, decided by Agda's normalization: 5e7 <= 1300 * factorCert.
+  -- Closed check, decided by Agda's normalization: 5e7 <= 9000 * factorCert.
   certFast : target ≤ seedBound * factorCertFast
   certFast = toWitness tt
 
