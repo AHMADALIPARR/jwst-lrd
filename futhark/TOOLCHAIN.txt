@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: AGPL-3.0-only; also subject to SNAPKITTY_OPAQUE_LICENSE.md
+
+Futhark subsystem toolchain (recorded 2026-10-19 22:33 PDT)
+
+Futhark
+  Source: NOT downloaded by this track. futhark was already installed on the
+  shared box from the Debian trixie archive (see the shared checkout's
+  build/logs/apt-install.log: "Get:129 http://deb.debian.org/debian trixie/main
+  amd64 futhark amd64 0.25.27-1+b1 [12.3 MB]"). The task said to install from
+  the official release tarball only if futhark was missing, so no tarball was
+  fetched and there is no tarball sha256 to record.
+  Debian package: futhark 0.25.27-1+b1 (source haskell-futhark 0.25.27-1)
+  Binary: /usr/bin/futhark
+  sha256(/usr/bin/futhark) = 83784b16d83dc1c553a37cde27ee9e489563fd6db36d6ea963605e78c39266a2
+  md5 (dpkg md5sums)       = 4e1d32ec14d09f23834e71ab35d28877
+  `futhark --version`:
+    Futhark 0.25.27.
+    Compiled with GHC 9.6.6.
+    
+    Copyright (C) DIKU, University of Copenhagen, released under the ISC license.
+    This is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+C compiler (futhark c / multicore backends)
+  gcc (Debian 14.2.0-19) 14.2.0   (Debian package gcc-14 14.2.0-19)
+
+Fortran compiler (tests/futhark/fortran-ref)
+  GNU Fortran (Debian 14.2.0-19) 14.2.0   (Debian package gfortran-14 14.2.0-19)
+
+Glue
+  /bin/sh = dash 0.5.12-12; GNU Make 4.4.1; coreutils 9.7-3 (od, head, tail, dd);
+  bc 1.07.1 (used by run.sh only to print the z grid)
+Host: Linux 6.12.94+ x86_64
