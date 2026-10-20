@@ -74,3 +74,4 @@ Agda mirrors this ABI in `agda/Core/State.agda`. The proof obligations for each 
 - A subsystem may expose a wrapper with extra explicit arguments (for example `air_transition(public, inputs, proof)`). The wrapper must reduce to an `lrd_transition_fn` with the context bound.
 - The ledger header `ledger/abi/lrd_state.h` has been on main since 7c0c393 (627fda7). Merge main to pick it up.
 - A branch that Hilbert has re-tested but that has not yet been reviewed goes into the `integration` branch (worktree /workspace/jwst-lrd-integration). It reaches main only after review.
+- v1.2 (2026-10-19): `payload_sha256` for an LRD-ARR-v1 payload is the SHA-256 of the raw `.f64` bytes only, excluding the `.hdr`. Masking is always an explicit, logged step that writes a mask array. Kernels reject non-finite or non-positive sigma rather than masking it silently. License text is AGPL-3.0-only everywhere (Ahmad).

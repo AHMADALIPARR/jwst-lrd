@@ -9,8 +9,8 @@ Objective: independently reconstruct which seed masses and growth histories are 
 | 01 | Observation reconstruction: paper, methods, supplement, MAST IDs, calibration versions, lensing, velocity and uncertainty models | Foundry J Spec | t017-obsrecon | - |
 | 02 | Dynamical mass: rotation curve; point-mass, extended and composite fits; inclination, lensing, PSF and LSF uncertainty | Foundry J Core | t018-dynmass | 01 |
 | 03 | Cosmological clock: age at z = 7.04 under declared parameters, and seed formation windows. LRD-IR to LLVM, checked against a Fortran reference | Alapeno Silicon | t019-clock | - |
-| 04 | Growth solver: Eddington and super-Eddington growth in Fortran; sweeps over seed, z_form, duty cycle, efficiency and rate; minimum seed mass | QSO1 Growth | t020-growth | 03 |
-| 05 | Direct-collapse scenarios: formation conditions, mass ranges, gas supply, metallicity, growth limits. Not assumed to be confirmed | QSO1 Growth | t021-dcbh | 04 |
+| 04 | Growth solver: Eddington and super-Eddington growth in Fortran; sweeps over seed, z_form, duty cycle, efficiency and rate; minimum seed mass | QSO1 Growth (9dac1eb4) | qso1-dcbh-001-growth | 03 |
+| 05 | Direct-collapse scenarios: formation conditions, mass ranges, gas supply, metallicity, growth limits. Not assumed to be confirmed | QSO1 DCBH (c72dcba8) | t021-dcbh | 04 |
 | 06 | Hamiltonian constraints on growth: time, gas and observation compatibility; reject infeasible trajectories | Foundry J Verify | t022-growth-hamiltonian | 04, t008 |
 | 07 | Agda: growth-transition specification and interval constraints. The measured mass is carried as an uncertain value with provenance, never as an axiom | HCALC Lean | t023-agda-growth | 04 |
 | 08 | Curry: light-seed, heavy-seed, super-Eddington, primordial-black-hole and composite histories, with counterexamples | HCALC Spec | t024-curry-growth | 04, 05 |
