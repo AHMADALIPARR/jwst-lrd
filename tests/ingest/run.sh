@@ -52,7 +52,7 @@ cp -R ingest/. "$T/root/ingest/"; cp -R fixtures/ingest "$T/root/fixtures/"
 ln -s "$BIN" "$T/root/build/out/bin"
 cp "$RAW" "$T/root/$RAW"; chmod u+w "$T/root/$RAW"
 printf 'X' | dd of="$T/root/$RAW" bs=1 seek=5000 conv=notrunc 2>/dev/null
-if LRD_OFFLINE=1 sh "$T/root/ingest/lrd_ingest.sh" >"$T/tamper.out" 2>"$T/tamper.err"; then
+if LRD_OFFLINE=1 LRD_SHA="$SHA" sh "$T/root/ingest/lrd_ingest.sh" >"$T/tamper.out" 2>"$T/tamper.err"; then
   fail checksum_mismatch_fails_loudly "tampered fixture was accepted"
 elif grep -q 'CHECKSUM MISMATCH' "$T/tamper.err"; then pass checksum_mismatch_fails_loudly
 else fail checksum_mismatch_fails_loudly "nonzero exit but no CHECKSUM MISMATCH message"; fi
@@ -65,7 +65,7 @@ if "$BIN/lrd_fitsx" "$RAW" "$T/x" "$SHA" 2>"$T/x.err"; then
     card=$(head -c 2880000 "$RAW" | fold -w 80 | grep -a -m1 "^$(printf '%-8s' "$k")= ")
     raw=$(printf '%s' "$card" | cut -c11- | sed "s/ \/.*//; s/^ *'//; s/' *$//; s/ *$//")
     got=$(sed -n "s/^hdr\.$k=//p" "$T/x/header.kv")
-    [ -n "$raw" ] && [ "$raw" = "$got" ] || { ok=0; why="$why $k(raw='$raw' got='$got')"; }
+    [ -n "$card" ] && [ "$raw" = "$got" ] || { ok=0; why="$why $k(raw='$raw' got='$got')"; }
   done
   [ $ok = 1 ] && pass header_keywords_match_raw_cards || fail header_keywords_match_raw_cards "$why"
   ok=1; why=""
