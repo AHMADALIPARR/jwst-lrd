@@ -184,13 +184,18 @@ static inline void lrd_decision_reject(lrd_decision_t *d, const char *reason) {
 }
 
 /* ---------------------------------------------------------------- ABI layout checks */
-_Static_assert(sizeof(uint64_t) == 8, "LRD-STATE-v1: seq is 64-bit");
-_Static_assert(sizeof(((lrd_state_t *)0)->commit) == 65, "LRD-STATE-v1: commit is char[65]");
-_Static_assert(sizeof(((lrd_state_t *)0)->payload_sha256) == 65, "LRD-STATE-v1: payload is char[65]");
-_Static_assert(sizeof(((lrd_decision_t *)0)->new_commit) == 65, "LRD-STATE-v1: new_commit is char[65]");
-_Static_assert(sizeof(LRD_REC_MAGIC) - 1u == LRD_REC_MAGIC_LEN, "LRD-REC-v1 magic length");
-_Static_assert(sizeof(LRD_COMMIT_DOMAIN) == LRD_COMMIT_DOMAIN_LEN, "commit domain incl. NUL");
-_Static_assert(sizeof(LRD_GENESIS_COMMIT) - 1u == LRD_HEX256_LEN, "genesis commit length");
+#ifdef __cplusplus
+#define LRD_STATIC_ASSERT(cond, msg) static_assert(cond, msg)
+#else
+#define LRD_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#endif
+LRD_STATIC_ASSERT(sizeof(uint64_t) == 8, "LRD-STATE-v1: seq is 64-bit");
+LRD_STATIC_ASSERT(sizeof(((lrd_state_t *)0)->commit) == 65, "LRD-STATE-v1: commit is char[65]");
+LRD_STATIC_ASSERT(sizeof(((lrd_state_t *)0)->payload_sha256) == 65, "LRD-STATE-v1: payload is char[65]");
+LRD_STATIC_ASSERT(sizeof(((lrd_decision_t *)0)->new_commit) == 65, "LRD-STATE-v1: new_commit is char[65]");
+LRD_STATIC_ASSERT(sizeof(LRD_REC_MAGIC) - 1u == LRD_REC_MAGIC_LEN, "LRD-REC-v1 magic length");
+LRD_STATIC_ASSERT(sizeof(LRD_COMMIT_DOMAIN) == LRD_COMMIT_DOMAIN_LEN, "commit domain incl. NUL");
+LRD_STATIC_ASSERT(sizeof(LRD_GENESIS_COMMIT) - 1u == LRD_HEX256_LEN, "genesis commit length");
 
 #ifdef __cplusplus
 }
