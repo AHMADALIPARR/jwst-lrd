@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# LRD-STATE-v1 observation chain plan: <raw sha256> <obs_science_use> <obs_quality_flag>
+# Ingestion order (o002 was ingested first, commit e464186; o006 second, commit 4c4ad10).
+09bcd9077647ebf4fdaa766807de832bf6a94b92e3ed73fdb8a3c0281ae50c31 provenance_only flux_globally_negative
+c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 primary none

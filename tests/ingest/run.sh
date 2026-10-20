@@ -154,4 +154,72 @@ for d in fixtures/ingest/*/; do
   echo "$s $fn $src ra=$ra dec=$de sep_arcsec=$sep cone_arcsec=$(awk -v r="$CONE_RADIUS_DEG" 'BEGIN{printf "%.3f", r*3600}')" >> build/out/ingest/separations.txt
   [ "$verdict" = OK ] && pass "pointing_within_cone_$s" || fail "pointing_within_cone_$s" "separation ${sep}\" > cone"
 done
+
+# 12. LRD-STATE-v1 observation chain (fixtures/state/observation, ledger/abi/lrd_state.h).
+SD=fixtures/state/observation
+if [ ! -f "$SD/HEAD" ]; then fail obs_chain_present "missing $SD/HEAD"; else
+  pass obs_chain_present
+  # (a) reproducible from the stored fixtures
+  if sh ingest/emit_obs_chain.sh "$T/chain" >/dev/null 2>"$T/chain.err"; then
+    ok=1; for f in "$SD"/*; do cmp -s "$f" "$T/chain/$(basename "$f")" || { ok=0; why="$why $(basename "$f")"; }; done
+    [ $ok = 1 ] && pass obs_chain_reproducible || fail obs_chain_reproducible "differs:$why"
+  else fail obs_chain_reproducible "$(tail -1 "$T/chain.err")"; fi
+  # (b) independent check with the lrd_rec serializer: new_commit = commit{commit,kind,payload_sha256,seq},
+  #     state.commit = previous new_commit (64 zeros at genesis), seq = prev + 1, decision ACCEPT/ok.
+  field() { grep -a "^[0-9]*:$2[0-9]*:" "$1" | sed "s/^[0-9]*:$2[0-9]*://"; }
+  prev=0000000000000000000000000000000000000000000000000000000000000000; pseq=0; ok=1; why=""
+  for s in "$SD"/[0-9][0-9][0-9][0-9].state.rec; do
+    n=$(basename "$s" .state.rec); p="$SD/$n.proposal.rec"; d="$SD/$n.decision.rec"
+    c=$(field "$s" commit); k=$(field "$s" kind); pl=$(field "$s" payload_sha256); q=$(field "$s" seq)
+    nc=$(printf 'commit=%s\nkind=%s\npayload_sha256=%s\nseq=%s\n' "$c" "$k" "$pl" "$q" | "$BIN/lrd_rec" "$T/s.rec")
+    cmp -s "$T/s.rec" "$s" || { ok=0; why="$why $n:state-bytes"; }
+    [ "$nc" = "$(field "$d" new_commit)" ] || { ok=0; why="$why $n:new_commit"; }
+    [ "$(field "$d" decision)" = ACCEPT ] && [ "$(field "$d" reason)" = ok ] || { ok=0; why="$why $n:decision"; }
+    [ "$c" = "$prev" ] && [ "$(field "$p" prev_commit)" = "$prev" ] || { ok=0; why="$why $n:prev"; }
+    [ "$q" = $((pseq+1)) ] && [ "$(field "$p" seq)" = "$q" ] || { ok=0; why="$why $n:seq"; }
+    [ "$k" = observation ] && [ "$(field "$p" payload_sha256)" = "$pl" ] && [ -f "fixtures/raw/$pl.fits" ] || { ok=0; why="$why $n:payload"; }
+    [ "$(field "$p" obs_manifest_commit)" = "$(cat "fixtures/ingest/$pl/manifest.commit")" ] || { ok=0; why="$why $n:manifest"; }
+    prev=$nc; pseq=$q
+  done
+  [ "$prev" = "$(cat "$SD/HEAD")" ] || { ok=0; why="$why HEAD"; }
+  [ $ok = 1 ] && pass obs_chain_commitments_independent || fail obs_chain_commitments_independent "$why"
+  # (c) flags: o002 provenance-only and flagged; o006 primary
+  [ "$(field "$SD/0001.proposal.rec" payload_sha256)" = 09bcd9077647ebf4fdaa766807de832bf6a94b92e3ed73fdb8a3c0281ae50c31 ] \
+    && [ "$(field "$SD/0001.proposal.rec" obs_science_use)" = provenance_only ] \
+    && [ "$(field "$SD/0001.proposal.rec" obs_quality_flag)" = flux_globally_negative ] \
+    && [ "$(field "$SD/0002.proposal.rec" payload_sha256)" = c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 ] \
+    && [ "$(field "$SD/0002.proposal.rec" obs_science_use)" = primary ] \
+    && pass obs_chain_flags || fail obs_chain_flags "science_use/quality flags not as planned"
+  # (d) rejections construct no state
+  rej() { # name expected-reason cur proposal
+    rm -f "$T/rj.state"
+    out=$("$BIN/lrd_obs" apply fixtures "$3" "$4" "$T/rj.dec" "$T/rj.state"); r=$?
+    if [ $r = 1 ] && [ ! -e "$T/rj.state" ] && [ "$(field "$T/rj.dec" reason)" = "$2" ] && [ "$(field "$T/rj.dec" decision)" = REJECT ] \
+       && ! grep -aq new_commit "$T/rj.dec"; then pass "$1"; else fail "$1" "exit $r: $out"; fi
+  }
+  rej obs_reject_stale_seq stale_seq genesis "$SD/0002.proposal.rec"
+  rej obs_reject_replay_stale_seq stale_seq "$SD/0002.state.rec" "$SD/0002.proposal.rec"
+  mkprop() { # cur payload out [field overrides on stdin]
+    "$BIN/lrd_obs" propose "$1" "$2" "$3"; }
+  base() { printf 'obs_manifest_commit=%s\nobs_mast_obsid=230168921\nobs_product=x1d.fits\nobs_quality_flag=none\nobs_science_use=primary\n' \
+           "$(cat fixtures/ingest/c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7/manifest.commit)"; }
+  base | mkprop genesis c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 "$T/p_ok.rec"
+  # bad_prev: correct seq for cur=0001 (seq 2) but prev_commit of genesis
+  sed 's/^3:seq1:1$/3:seq1:2/' "$T/p_ok.rec" > "$T/p_badprev.rec"
+  rej obs_reject_bad_prev bad_prev "$SD/0001.state.rec" "$T/p_badprev.rec"
+  base | mkprop genesis 1111111111111111111111111111111111111111111111111111111111111111 "$T/p_nopl.rec"
+  rej obs_reject_bad_payload_missing_raw bad_payload genesis "$T/p_nopl.rec"
+  printf 'obs_manifest_commit=%s\nobs_mast_obsid=230168921\nobs_product=x1d.fits\nobs_quality_flag=none\nobs_science_use=primary\n' \
+    2222222222222222222222222222222222222222222222222222222222222222 | mkprop genesis c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 "$T/p_man.rec"
+  rej obs_reject_bad_payload_manifest bad_payload genesis "$T/p_man.rec"
+  sed 's/^4:kind11:observation$/4:kind9:air_proof/' "$T/p_ok.rec" > "$T/p_kind.rec"
+  rej obs_reject_wrong_kind wrong_kind genesis "$T/p_kind.rec"
+  base | grep -v obs_science_use | mkprop genesis c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 "$T/p_mal.rec"
+  rej obs_reject_malformed_missing_field malformed genesis "$T/p_mal.rec"
+  sed 's/^3:seq1:1$/3:seq2:01/' "$T/p_ok.rec" > "$T/p_lz.rec"
+  rej obs_reject_malformed_noncanonical malformed genesis "$T/p_lz.rec"
+  # (e) the valid control proposal is accepted
+  if "$BIN/lrd_obs" apply fixtures genesis "$T/p_ok.rec" "$T/ok.dec" "$T/ok.state" >/dev/null && [ -f "$T/ok.state" ]; then
+    pass obs_accept_control; else fail obs_accept_control "valid proposal rejected: $(tr '\n' ' ' < "$T/ok.dec")"; fi
+fi
 [ "$FAILS" -eq 0 ]

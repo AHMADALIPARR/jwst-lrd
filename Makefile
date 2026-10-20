@@ -15,7 +15,7 @@ FFLAGS  ?= -O2 -Wall -std=f2018 -fimplicit-none
 OUT     := build/out
 BIN     := $(OUT)/bin
 
-INGEST_BINS := $(BIN)/lrd_fetch $(BIN)/lrd_sha256 $(BIN)/lrd_rec $(BIN)/lrd_fitsx
+INGEST_BINS := $(BIN)/lrd_fetch $(BIN)/lrd_sha256 $(BIN)/lrd_rec $(BIN)/lrd_fitsx $(BIN)/lrd_obs
 
 .PHONY: all toolchain build ingest fortran fixtures test clean rebuild
 all: build
@@ -41,6 +41,9 @@ $(BIN)/lrd_sha256: ingest/src/lrd_sha256.c $(BIN)/sha256.o | $(BIN)
 
 $(BIN)/lrd_rec: ingest/src/lrd_rec.c | $(BIN)
 	$(CC) $(CFLAGS) -std=c11 -D_POSIX_C_SOURCE=200809L -o $@ $< -lcrypto
+
+$(BIN)/lrd_obs: ingest/src/lrd_obs.c $(BIN)/sha256.o ledger/abi/lrd_state.h | $(BIN)
+	$(CC) $(CFLAGS) -std=c11 -D_POSIX_C_SOURCE=200809L -Iledger/abi -o $@ ingest/src/lrd_obs.c $(BIN)/sha256.o -lcrypto
 
 $(BIN)/lrd_fitsx: ingest/src/lrd_fitsx.c | $(BIN)
 	$(CC) $(CFLAGS) -std=c11 -o $@ $< -lcfitsio -lm

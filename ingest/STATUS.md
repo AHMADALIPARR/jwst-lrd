@@ -104,3 +104,22 @@ exit=0
   modified portions. Files carry `AGPL-3.0-only` + a pointer to the SnapKitty license; Hilbert should reconcile.
 - CONTRACTS/brief mention docs/STATUS; there is no docs/ in the repo and I do not own it, so the
   "archive polling, not telemetry" statement is here at the top.
+
+## LRD-STATE-v1 observation transitions (added after merging main @ fe40382, header from 7c0c393)
+- `ingest/src/lrd_obs.c` includes `ledger/abi/lrd_state.h` unmodified. It implements an `lrd_transition_fn`
+  for `kind=observation`, with the fixtures directory bound as context (CONTRACTS v1.1 wrapper rule).
+- Chain (`ingest/emit_obs_chain.sh`, plan `ingest/obs_chain.plan`, in ingestion order), files under
+  `fixtures/state/observation/`:
+  - `0001.{proposal,decision,state}.rec`: payload 09bcd907… (o002), `obs_science_use=provenance_only`,
+    `obs_quality_flag=flux_globally_negative`, new_commit 2bd1c79e23141f7bb24d985c822edfbd47499d57202105e94f370324eb3fdece
+  - `0002.{proposal,decision,state}.rec`: payload c0b87857… (o006), `obs_science_use=primary`, `obs_quality_flag=none`,
+    new_commit 0de2e8bc22c14fa0040c6664ff5c6514bf6e0a5ef4495af7d68ea082c8391dfb (= `HEAD`)
+- payload_sha256 = sha256 of the raw FITS (the raw ID). Kind-specific fields: `obs_manifest_commit`, `obs_mast_obsid`,
+  `obs_product`, `obs_quality_flag`, `obs_science_use` (exactly these, each once).
+- new_commit = LRD-REC-v1 commitment of `{commit=prev_commit, kind, payload_sha256, seq}` (v1.1).
+- Check order: malformed → wrong_kind → stale_seq → bad_prev → bad_payload (raw file missing or hash differs, or
+  manifest commitment differs) → ACCEPT/ok. A REJECT never writes a state file.
+- **Assumption to confirm with the ledger owner:** genesis is a virtual state with seq 0 whose commitment is 64 zeros,
+  so the first proposal has `prev_commit=0^64, seq=1`. This matches the ledger track's own test (`test_godel.c`).
+- Tests (tests/ingest): reproducibility, commitments re-derived independently with `lrd_rec`, flags,
+  and rejections (stale_seq ×2, bad_prev, bad_payload ×2, wrong_kind, malformed ×2) plus an accept control.
