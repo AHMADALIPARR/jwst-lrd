@@ -1,0 +1,9 @@
+# Read-only vendored copy of ledger/abi/lrd_state.h (owned by the ledger track). DO NOT EDIT.
+# Re-vendor with: git -C /workspace/jwst-lrd show t004-ledger:ledger/abi/lrd_state.h > abi/vendor/lrd_state.h
+# Drift is checked by scripts/abi_drift_check.sh (run from tests/capability/run.sh).
+source_branch=t004-ledger
+source_commit=627fda784a3c73451c5e5d68b13a51ff04c106f3
+source_branch_head_at_vendoring=216833f7889f2811ee602252365c470a8f899138
+source_path=ledger/abi/lrd_state.h
+git_blob=79c15be3c85276fd6d053bdceab168b335b6dd2c
+sha256=563d0ea4bc82442f302be397721e26697916efccff8d4f194d190d3b4f515920

@@ -1,0 +1,29 @@
+[authority] pid=1633656 loaded counter=0 head=e08f43ac8aa96f72b8ead46d524b9f412d1e22d87845b547473ca91425f71092 worker_sock=/tmp/lrdcap-int.ZoVeeD/w.sock admin_sock=/tmp/lrdcap-int.ZoVeeD/authority/admin.sock
+[authority] ready
+[authority] ISSUE cap_id=a77b21777209d45cb1941ec83f88c0a1 scope=read cap_seq=0 expiry=1792475228
+[authority] ISSUE cap_id=66d6f2dd1edec06bc54276b1ee273c7a scope=transition cap_seq=1 expiry=1792475228
+[authority] SUBMIT seq=1 prev=e08f43ac8aa96f72b8ead46d524b9f412d1e22d87845b547473ca91425f71092 -> ACCEPT reason=ok new_commit=214fc18ca240bb7d440845893fb2bdc44d1ec88c664adb15f83496b262896c51 counter=1
+[authority] ISSUE cap_id=10c23c556bd494fecd5548039ca09eb0 scope=transition cap_seq=2 expiry=1792475228
+[authority] SUBMIT seq=2 prev=214fc18ca240bb7d440845893fb2bdc44d1ec88c664adb15f83496b262896c51 -> ACCEPT reason=ok new_commit=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82 counter=2
+[authority] ISSUE cap_id=8eebc668c7907bf47509962d39dfe7b4 scope=transition cap_seq=3 expiry=1792475228
+[authority] SUBMIT seq=3 prev=3bf1aa588fdb953a2ff671f1a0968a3c6c2857e0a6fbb9b1fadf4b22eedd4fe4 -> REJECT reason=bad_prev authority_head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[authority] ISSUE cap_id=830232b51246c826509a9c1f6f811ccc scope=read cap_seq=2 expiry=1792475228
+[authority] ISSUE cap_id=98d9920297861e13fdba925069d3b96c scope=transition cap_seq=3 expiry=1792475228
+[authority] SUBMIT seq=3 prev=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef -> REJECT reason=bad_prev authority_head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[authority] ISSUE cap_id=af9bf91a59da8f1509a13b0fd2cc5291 scope=read cap_seq=2 expiry=1792475228
+[authority] ISSUE cap_id=838d1d3cfa0627c09421d18b659adf9f scope=transition cap_seq=3 expiry=1792475228
+[authority] SUBMIT seq=3 prev=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82 -> ACCEPT reason=ok new_commit=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf counter=3
+[authority] pid=1633724 loaded counter=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf worker_sock=/tmp/lrdcap-int.ZoVeeD/w.sock admin_sock=/tmp/lrdcap-int.ZoVeeD/authority/admin.sock
+[authority] ready
+[authority] SUBMIT seq=3 prev=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82 -> REJECT reason=replay 
+[authority] ISSUE cap_id=5569e404ceb444fac8ba6444e19e6be0 scope=historical_read cap_seq=3 expiry=1792475228
+[authority] HISTORY seq=1 -> ACCEPT reason=ok (read-only)
+[authority] SUBMIT seq=4 prev=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf -> REJECT reason=bad_scope cap_scope=historical_read
+[authority] ISSUE cap_id=18db4ad441232f2081c042c5d4bdddc7 scope=transition cap_seq=4 expiry=1792475228
+[authority] SUBMIT seq=3 prev=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf -> REJECT reason=stale_seq authority_seq=3
+[authority] ISSUE cap_id=8c39b553cb099532c436c27dc2680e21 scope=transition cap_seq=4 expiry=1792475228
+[authority] SUBMIT seq=4 prev=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf -> REJECT reason=bad_mac 
+[authority] ISSUE cap_id=63c93267ead123047a46c430e1c0b1fe scope=transition cap_seq=4 expiry=1792475228
+[authority] SUBMIT seq=4 prev=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf -> REJECT reason=bad_witness 
+[authority] ISSUE cap_id=0e494a19fbec33d094c90b9379dea173 scope=transition cap_seq=4 expiry=1792475228
+[authority] SUBMIT seq=4 prev=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf -> ACCEPT reason=ok new_commit=113304e661fa9cf693f6e0968e8d4d96f35939022ba7ba022c26a31dafa895bf counter=4

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
+[package]
+name = "lrd-capability"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque"
+description = "TASK 010: cryptographic linear addressing and proof-gated state transitions (zero external crates)"
+publish = false
+
+[dependencies]
+
+[profile.release]
+debug = false
+opt-level = 3
+
+[profile.dev]
+opt-level = 2
