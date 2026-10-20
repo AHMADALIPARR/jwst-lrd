@@ -70,3 +70,9 @@ Integration branch ec8ffb7 (t001+futhark+t008+t009+t010): 157 PASS / 2 FAIL / 3 
 Fixture finding: 09bcd907 (obsid 300843505) has all-negative FLUX and is provenance only. The primary is c0b87857 (obsid 230168921). The Fortran gives z = 7.04221 ± 0.00027 against a published 7.0451, a discrepancy that remains open.
 
 Missions: BLIND-PROTOCOL.md (four blind fitters) and MISSION-QSO1-DCBH-001.md (12 roles). The May 2026 and September 2026 papers are not yet retrieved.
+
+## Handoff at 2026-10-19 23:01 PT (Hilbert)
+- AIR/STARK passed HCALC Alloy's review (c9dba36, 8 minor). Its merge to main is held: its mirror header failed against the -only ledger header. Alapeno RTL is removing the mirror and including ledger/abi/lrd_state.h from main.
+- The -only lrd_state.h is on main at 38570a9, sha256 d5ff6110...ea33.
+- Topology t-topology 7f71e07 is pushed and reports 270 PASS. Hilbert's re-run was interrupted, so the count is unverified. Review owner: HCALC Spec.
+- Next: re-run each repaired branch, merge the ones that pass review, and trace the real QSO1 fixture c0b87857 end to end.
