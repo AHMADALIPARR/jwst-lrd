@@ -90,3 +90,6 @@ Test counts below are from independent re-runs:
 | `research/assets/` | Illustrations, not data |
 
 Each subsystem is developed on its own branch and merged to `main` after independent re-test and review.
+
+## Production status (2026-10-20)
+Integration branch includes a clean merge of current main. Key observational paper (Juodžbalis et al. 2026, Nature) has been retrieved for the QSO1-DCBH-001 mission. Remaining work: complete pending reviews (Alloy/Lean), resolve listed blockers in research/INTEGRATION.md (ledger record size, capability design reconciliation, real-fixture end-to-end, etc.), and finish specialized mission agent deliverables once rate limits clear. All claims require independent re-test by Hilbert.
