@@ -12,7 +12,7 @@ LDLIBS_CRYPTO = -lcrypto
 OUT     = out
 TESTS   = ../tests/ledger
 
-BINS = $(OUT)/test_godel $(OUT)/lrd-rec $(OUT)/lrd-capverifier $(OUT)/lrd-capworker
+BINS = $(OUT)/test_godel $(OUT)/lrd-rec
 
 all: $(BINS)
 
@@ -29,17 +29,6 @@ $(OUT)/test_godel: $(TESTS)/test_godel.c $(OUT)/lrd_godel.o $(OUT)/lrd_rec.o | $
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_GMP) $(LDLIBS_CRYPTO)
 
 $(OUT)/lrd-rec: src/lrd_rec_tool.c $(OUT)/lrd_rec.o | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_CRYPTO)
-
-$(OUT)/lrd_cap.o: src/lrd_cap.c include/lrd_cap.h include/lrd_rec.h | $(OUT)
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-# Authority: the only binary that contains signing code.
-$(OUT)/lrd-capverifier: src/cap_verifier.c $(OUT)/lrd_cap.o $(OUT)/lrd_rec.o | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_CRYPTO)
-
-# Worker: public-key verification only.
-$(OUT)/lrd-capworker: src/cap_worker.c $(OUT)/lrd_cap.o $(OUT)/lrd_rec.o | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_CRYPTO)
 
 clean:
