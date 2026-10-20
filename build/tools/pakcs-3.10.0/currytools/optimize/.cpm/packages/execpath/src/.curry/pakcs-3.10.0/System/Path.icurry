@@ -1,0 +1,13 @@
+interface System.Path where {
+import Prelude;
+dirsInPath 0 :: Prelude.IO [[Prelude.Char]];
+fileInPath 1 :: [Prelude.Char] -> Prelude.IO Prelude.Bool;
+getFileInPath
+1
+::
+[Prelude.Char] -> Prelude.IO (Prelude.Maybe [Prelude.Char]);
+hiding data Prelude.IO a;
+hiding data Prelude.Char;
+hiding data Prelude.Bool;
+hiding data Prelude.Maybe a
+}

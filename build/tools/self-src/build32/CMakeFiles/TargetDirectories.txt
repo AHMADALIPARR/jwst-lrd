@@ -1,0 +1,11 @@
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/CMakeFiles/edit_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/CMakeFiles/rebuild_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/CMakeFiles/makeDeps.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/CMakeFiles/create_vmDate.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/CMakeFiles/Self.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/CMakeFiles/edit_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/CMakeFiles/rebuild_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/src/CMakeFiles/edit_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/src/CMakeFiles/rebuild_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/_glue/CMakeFiles/edit_cache.dir
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/vm/_glue/CMakeFiles/rebuild_cache.dir

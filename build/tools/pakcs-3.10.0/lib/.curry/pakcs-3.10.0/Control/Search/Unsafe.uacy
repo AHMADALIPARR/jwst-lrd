@@ -1,0 +1,16 @@
+{- AbstractCurry 3.0 -}
+CurryProg "Control.Search.Unsafe"
+[]
+Nothing
+ []
+ []
+ []
+ [CFunc ("Control.Search.Unsafe","allValues") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","[]")) (CTVar (0,"a"))))) [],
+  CFunc ("Control.Search.Unsafe","allValuesDFS") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","[]")) (CTVar (0,"a"))))) [CRule [CPVar (0,"x")] (CSimpleRhs (CApply (CSymbol ("Control.Search.Unsafe","allValues")) (CVar (0,"x"))) [])],
+  CFunc ("Control.Search.Unsafe","oneValue") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","Maybe")) (CTVar (0,"a"))))) [],
+  CFunc ("Control.Search.Unsafe","oneValueDFS") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","Maybe")) (CTVar (0,"a"))))) [CRule [CPVar (0,"x")] (CSimpleRhs (CApply (CSymbol ("Control.Search.Unsafe","oneValue")) (CVar (0,"x"))) [])],
+  CFunc ("Control.Search.Unsafe","someValue") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTVar (0,"a")))) [CRule [CPVar (0,"x")] (CSimpleRhs (CCase CRigid (CApply (CSymbol ("Control.Search.Unsafe","oneValue")) (CVar (0,"x"))) [(CPComb ("Prelude","Just") [CPVar (1,"v")],CSimpleRhs (CVar (1,"v")) []),(CPComb ("Prelude","Nothing") [],CSimpleRhs (CSymbol ("Prelude","failed")) [])]) [])],
+  CFunc ("Control.Search.Unsafe","isFail") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTCons ("Prelude","Bool")))) [CRule [CPVar (0,"x")] (CSimpleRhs (CCase CRigid (CApply (CSymbol ("Control.Search.Unsafe","oneValue")) (CVar (0,"x"))) [(CPComb ("Prelude","Nothing") [],CSimpleRhs (CSymbol ("Prelude","True")) []),(CPComb ("Prelude","Just") [CPVar (1,"_")],CSimpleRhs (CSymbol ("Prelude","False")) [])]) [])],
+  CFunc ("Control.Search.Unsafe","rewriteAll") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","[]")) (CTVar (0,"a"))))) [],
+  CFunc ("Control.Search.Unsafe","rewriteSome") 1 Public (CQualType (CContext []) (CFuncType (CTVar (0,"a")) (CTApply (CTCons ("Prelude","Maybe")) (CTVar (0,"a"))))) []]
+ []

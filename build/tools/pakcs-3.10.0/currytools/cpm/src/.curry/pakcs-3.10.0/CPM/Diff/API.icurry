@@ -1,0 +1,499 @@
+interface CPM.Diff.API where {
+import AbstractCurry.Types;
+import CPM.Config;
+import CPM.ErrorLogger;
+import CPM.Package;
+import CPM.PackageCache.Global;
+import CPM.Repository;
+import Prelude;
+data Difference a = Addition a | Removal a | Change a a;
+type Differences =
+  (Prelude.Maybe (Difference [Prelude.Char]),
+   [Difference AbstractCurry.Types.CFuncDecl],
+   [Difference AbstractCurry.Types.CTypeDecl],
+   [Difference AbstractCurry.Types.COpDecl]);
+compareApiModule
+7
+::
+CPM.Package.Package -> [Prelude.Char] -> [CPM.Package.Package] ->
+CPM.Package.Package -> [Prelude.Char] -> [CPM.Package.Package] ->
+[Prelude.Char] ->
+Prelude.IO (Prelude.Maybe (Difference [Prelude.Char]),
+            [Difference AbstractCurry.Types.CFuncDecl],
+            [Difference AbstractCurry.Types.CTypeDecl],
+            [Difference AbstractCurry.Types.COpDecl]);
+compareModulesFromPackageAndDir
+7
+::
+CPM.Config.Config -> CPM.Repository.Repository ->
+CPM.PackageCache.Global.GlobalCache -> [Prelude.Char] ->
+[Prelude.Char] ->
+(Prelude.Int, Prelude.Int, Prelude.Int,
+ Prelude.Maybe [Prelude.Char]) ->
+Prelude.Maybe [[Prelude.Char]] ->
+CPM.ErrorLogger.ErrorLogger [([Prelude.Char],
+                              (Prelude.Maybe (Difference [Prelude.Char]),
+                               [Difference AbstractCurry.Types.CFuncDecl],
+                               [Difference AbstractCurry.Types.CTypeDecl],
+                               [Difference AbstractCurry.Types.COpDecl]))];
+compareModulesFromPackages
+8
+::
+CPM.Config.Config -> CPM.Repository.Repository ->
+CPM.PackageCache.Global.GlobalCache -> [Prelude.Char] ->
+(Prelude.Int, Prelude.Int, Prelude.Int,
+ Prelude.Maybe [Prelude.Char]) ->
+[Prelude.Char] ->
+(Prelude.Int, Prelude.Int, Prelude.Int,
+ Prelude.Maybe [Prelude.Char]) ->
+Prelude.Maybe [[Prelude.Char]] ->
+CPM.ErrorLogger.ErrorLogger [([Prelude.Char],
+                              (Prelude.Maybe (Difference [Prelude.Char]),
+                               [Difference AbstractCurry.Types.CFuncDecl],
+                               [Difference AbstractCurry.Types.CTypeDecl],
+                               [Difference AbstractCurry.Types.COpDecl]))];
+compareModulesInDirs
+6
+::
+CPM.Config.Config -> CPM.Repository.Repository ->
+CPM.PackageCache.Global.GlobalCache -> [Prelude.Char] ->
+[Prelude.Char] -> Prelude.Maybe [[Prelude.Char]] ->
+CPM.ErrorLogger.ErrorLogger [([Prelude.Char],
+                              (Prelude.Maybe (Difference [Prelude.Char]),
+                               [Difference AbstractCurry.Types.CFuncDecl],
+                               [Difference AbstractCurry.Types.CTypeDecl],
+                               [Difference AbstractCurry.Types.COpDecl]))];
+getBaseTemp 0 :: Prelude.IO [Prelude.Char];
+showDifferences
+3
+::
+[(Prelude.Maybe (Difference [Prelude.Char]),
+  [Difference AbstractCurry.Types.CFuncDecl],
+  [Difference AbstractCurry.Types.CTypeDecl],
+  [Difference AbstractCurry.Types.COpDecl])] ->
+(Prelude.Int, Prelude.Int, Prelude.Int,
+ Prelude.Maybe [Prelude.Char]) ->
+(Prelude.Int, Prelude.Int, Prelude.Int,
+ Prelude.Maybe [Prelude.Char]) ->
+[Prelude.Char];
+instance Prelude.Data a => Prelude.Data (Difference a) {
+  (===) 2;
+  aValue 0
+};
+hiding data Prelude.Maybe a;
+hiding data Prelude.Char;
+hiding data AbstractCurry.Types.CFuncDecl;
+hiding data AbstractCurry.Types.CTypeDecl;
+hiding data AbstractCurry.Types.COpDecl;
+hiding data CPM.Package.Package;
+hiding data Prelude.IO a;
+hiding data CPM.Config.Config;
+hiding data CPM.Repository.Repository;
+hiding data CPM.PackageCache.Global.GlobalCache;
+hiding data Prelude.Int;
+hiding data CPM.ErrorLogger.ErrorLogger a;
+hiding class Prelude.Data a;
+instance Prelude.Show AbstractCurry.Types.CFuncDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CFuncDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CFuncDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CFuncDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CTypeDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CTypeDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CTypeDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CTypeDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.COpDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.COpDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.COpDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.COpDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show CPM.Package.Package {
+  showsPrec 2
+} {-# MODULE CPM.Package #-};
+instance Prelude.Eq CPM.Package.Package {
+  (==) 2
+} {-# MODULE CPM.Package #-};
+instance Prelude.Data CPM.Package.Package {
+  (===) 2;
+  aValue 0
+} {-# MODULE CPM.Package #-};
+instance Prelude.Data CPM.Config.Config {
+  (===) 2;
+  aValue 0
+} {-# MODULE CPM.Config #-};
+instance Prelude.Data CPM.Repository.Repository {
+  (===) 2;
+  aValue 0
+} {-# MODULE CPM.Repository #-};
+instance Prelude.Data CPM.PackageCache.Global.GlobalCache {
+  (===) 2;
+  aValue 0
+} {-# MODULE CPM.PackageCache.Global #-};
+instance Prelude.MonadFail CPM.ErrorLogger.ErrorLogger {
+  fail 1
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Monad CPM.ErrorLogger.ErrorLogger {
+  (>>=) 2;
+  return 1
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Functor CPM.ErrorLogger.ErrorLogger {
+  fmap 2
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Applicative CPM.ErrorLogger.ErrorLogger {
+  (<*>) 2;
+  pure 0
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Alternative CPM.ErrorLogger.ErrorLogger {
+  (<|>) 2;
+  empty 0
+} {-# MODULE CPM.ErrorLogger #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f,
+          Prelude.Data g) => Prelude.Data (a, b, c, d, e, f, g) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f) => Prelude.Data (a,
+                                                                           b, c, d, e, f) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e) => Prelude.Data (a, b, c, d, e) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d) => Prelude.Data (a, b, c, d) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b,
+          Prelude.Data c) => Prelude.Data (a, b, c) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a,
+          Prelude.Data b) => Prelude.Data (Prelude.Either a b) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b) => Prelude.Data (a, b) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data (Prelude.Maybe a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data [a] {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Ordering {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Int {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.IOError {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Float {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Char {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Bool {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data () {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+hiding class Prelude.Show a;
+hiding class Prelude.Read a;
+hiding class Prelude.Eq a;
+hiding class Prelude.Monad a => (Prelude.MonadFail :: (* -> *) ->
+                                                      Constraint) a;
+hiding class Prelude.Applicative a => (Prelude.Monad :: (* -> *) ->
+                                                        Constraint) a;
+hiding class (Prelude.Functor :: (* -> *) -> Constraint) a;
+hiding class Prelude.Functor a => (Prelude.Applicative :: (* ->
+                                                           *) ->
+                                                          Constraint) a;
+hiding class Prelude.Applicative a => (Prelude.Alternative :: (* ->
+                                                               *) ->
+                                                              Constraint) a;
+hiding data Prelude.Either a b;
+hiding data Prelude.Ordering;
+hiding data Prelude.IOError;
+hiding data Prelude.Float;
+hiding data Prelude.Bool;
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e, Prelude.Show f) => Prelude.Show (a,
+                                                                           b, c, d, e, f) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e) => Prelude.Show (a, b, c, d, e) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d) => Prelude.Show (a, b, c, d) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b,
+          Prelude.Show c) => Prelude.Show (a, b, c) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a,
+          Prelude.Show b) => Prelude.Show (Prelude.Either a b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b) => Prelude.Show (a, b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show (Prelude.Maybe a) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show [a] {
+  showsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Ordering {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Int {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.IOError {
+  show 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Float {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Char {
+  showList 1;
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Bool {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show () {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e, Prelude.Read f) => Prelude.Read (a,
+                                                                           b, c, d, e, f) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e) => Prelude.Read (a, b, c, d, e) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d) => Prelude.Read (a, b, c, d) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b,
+          Prelude.Read c) => Prelude.Read (a, b, c) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a,
+          Prelude.Read b) => Prelude.Read (Prelude.Either a b) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b) => Prelude.Read (a, b) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read (Prelude.Maybe a) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read [a] {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Ordering {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Int {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Float {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Char {
+  readList 1;
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Bool {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read () {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e, Prelude.Eq f) => Prelude.Eq (a, b, c, d, e, f) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e) => Prelude.Eq (a, b, c, d, e) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c,
+          Prelude.Eq d) => Prelude.Eq (a, b, c, d) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b,
+          Prelude.Eq c) => Prelude.Eq (a, b, c) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a,
+          Prelude.Eq b) => Prelude.Eq (Prelude.Either a b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b) => Prelude.Eq (a, b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq (Prelude.Maybe a) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq [a] {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Ordering {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Int {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.IOError {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Float {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Char {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Bool {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq () {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail Prelude.Maybe {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail Prelude.IO {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail [] {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.Monad (Prelude.Either a) {
+  (>>=) 2;
+  return 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad ((->) a) {
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.Maybe {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.IO {
+  (>>) 0;
+  (>>=) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad [] {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor (Prelude.Either a) {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor ((->) a) {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.Maybe {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.IO {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor [] {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative (Prelude.Either a) {
+  (<*>) 0;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative ((->) a) {
+  liftA2 4;
+  (<*>) 3;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.Maybe {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.IO {
+  liftA2 0;
+  (<*>) 0;
+  (*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative [] {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 1
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative Prelude.Maybe {
+  (<|>) 2;
+  empty 0
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative Prelude.IO {
+  (<|>) 2;
+  empty 0
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative [] {
+  (<|>) 0;
+  empty 0
+} {-# MODULE Prelude #-}
+}

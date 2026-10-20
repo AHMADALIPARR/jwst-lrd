@@ -1,0 +1,563 @@
+interface AbstractCurry.Pretty where {
+import AbstractCurry.Types;
+import Prelude;
+import Text.PrettyImpl;
+data LayoutChoice = PreferNestedLayout | PreferFilledLayout;
+data Options;
+data Qualification;
+defaultOptions 0 :: Options;
+ppCExpr
+0
+::
+Options -> AbstractCurry.Types.CExpr -> Text.PrettyImpl.Doc;
+ppCFuncDecl
+2
+::
+Options -> AbstractCurry.Types.CFuncDecl -> Text.PrettyImpl.Doc;
+ppCFuncDeclWithoutSig
+2
+::
+Options -> AbstractCurry.Types.CFuncDecl -> Text.PrettyImpl.Doc;
+ppCFuncSignature
+3
+::
+Options -> ([Prelude.Char], [Prelude.Char]) ->
+AbstractCurry.Types.CQualTypeExpr -> Text.PrettyImpl.Doc;
+ppCLiteral
+2
+::
+Options -> AbstractCurry.Types.CLiteral -> Text.PrettyImpl.Doc;
+ppCOpDecl
+2
+::
+Options -> AbstractCurry.Types.COpDecl -> Text.PrettyImpl.Doc;
+ppCPattern
+0
+::
+Options -> AbstractCurry.Types.CPattern -> Text.PrettyImpl.Doc;
+ppCQualTypeExpr
+2
+::
+Options -> AbstractCurry.Types.CQualTypeExpr ->
+Text.PrettyImpl.Doc;
+ppCRhs
+3
+::
+Text.PrettyImpl.Doc -> Options -> AbstractCurry.Types.CRhs ->
+Text.PrettyImpl.Doc;
+ppCRule
+3
+::
+Options -> ([Prelude.Char], [Prelude.Char]) ->
+AbstractCurry.Types.CRule -> Text.PrettyImpl.Doc;
+ppCRules
+3
+::
+Options -> ([Prelude.Char], [Prelude.Char]) ->
+[AbstractCurry.Types.CRule] -> Text.PrettyImpl.Doc;
+ppCStatement
+2
+::
+Options -> AbstractCurry.Types.CStatement -> Text.PrettyImpl.Doc;
+ppCTypeDecl
+2
+::
+Options -> AbstractCurry.Types.CTypeDecl -> Text.PrettyImpl.Doc;
+ppCTypeExpr
+0
+::
+Options -> AbstractCurry.Types.CTypeExpr -> Text.PrettyImpl.Doc;
+ppCurryProg
+2
+::
+Options -> AbstractCurry.Types.CurryProg -> Text.PrettyImpl.Doc;
+ppExports
+5
+::
+Options -> [AbstractCurry.Types.CClassDecl] ->
+[AbstractCurry.Types.CInstanceDecl] ->
+[AbstractCurry.Types.CTypeDecl] ->
+[AbstractCurry.Types.CFuncDecl] -> Text.PrettyImpl.Doc;
+ppFunc
+0
+::
+([Prelude.Char], [Prelude.Char]) -> Text.PrettyImpl.Doc;
+ppImports 2 :: Options -> [[Prelude.Char]] -> Text.PrettyImpl.Doc;
+ppMName 0 :: [Prelude.Char] -> Text.PrettyImpl.Doc;
+ppQFunc
+1
+::
+Options -> ([Prelude.Char], [Prelude.Char]) -> Text.PrettyImpl.Doc;
+ppQType
+1
+::
+Options -> ([Prelude.Char], [Prelude.Char]) -> Text.PrettyImpl.Doc;
+ppType
+0
+::
+([Prelude.Char], [Prelude.Char]) -> Text.PrettyImpl.Doc;
+prettyCurryProg
+2
+::
+Options -> AbstractCurry.Types.CurryProg -> [Prelude.Char];
+setFullQualification 1 :: Options -> Options;
+setImportQualification 1 :: Options -> Options;
+setIndentWith 2 :: Prelude.Int -> Options -> Options;
+setLayoutChoice 2 :: LayoutChoice -> Options -> Options;
+setModName 2 :: [Prelude.Char] -> Options -> Options;
+setNoQualification 1 :: Options -> Options;
+setOnDemandQualification
+2
+::
+[AbstractCurry.Types.CurryProg] -> Options -> Options;
+setPageWith 2 :: Prelude.Int -> Options -> Options;
+setShowLocalSigs 2 :: Prelude.Bool -> Options -> Options;
+showCProg 0 :: AbstractCurry.Types.CurryProg -> [Prelude.Char];
+instance Prelude.Data LayoutChoice {
+  (===) 2;
+  aValue 0
+};
+instance Prelude.Data Options {
+  (===) 2;
+  aValue 0
+};
+instance Prelude.Eq Qualification {
+  (==) 2
+};
+instance Prelude.Data Qualification {
+  (===) 2;
+  aValue 0
+};
+hiding data AbstractCurry.Types.CExpr;
+hiding data Text.PrettyImpl.Doc;
+hiding data AbstractCurry.Types.CFuncDecl;
+hiding data Prelude.Char;
+hiding data AbstractCurry.Types.CQualTypeExpr;
+hiding data AbstractCurry.Types.CLiteral;
+hiding data AbstractCurry.Types.COpDecl;
+hiding data AbstractCurry.Types.CPattern;
+hiding data AbstractCurry.Types.CRhs;
+hiding data AbstractCurry.Types.CRule;
+hiding data AbstractCurry.Types.CStatement;
+hiding data AbstractCurry.Types.CTypeDecl;
+hiding data AbstractCurry.Types.CTypeExpr;
+hiding data AbstractCurry.Types.CurryProg;
+hiding data AbstractCurry.Types.CClassDecl;
+hiding data AbstractCurry.Types.CInstanceDecl;
+hiding data Prelude.Int;
+hiding data Prelude.Bool;
+hiding class Prelude.Data a;
+hiding class Prelude.Eq a;
+instance Prelude.Show AbstractCurry.Types.CExpr {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CExpr {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CExpr {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CExpr {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CFuncDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CFuncDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CFuncDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CFuncDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CQualTypeExpr {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CQualTypeExpr {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CQualTypeExpr {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CQualTypeExpr {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CLiteral {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CLiteral {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CLiteral {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CLiteral {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.COpDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.COpDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.COpDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.COpDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CPattern {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CPattern {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CPattern {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CPattern {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CRhs {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CRhs {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CRhs {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CRhs {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CRule {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CRule {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CRule {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CRule {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CStatement {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CStatement {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CStatement {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CStatement {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CTypeDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CTypeDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CTypeDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CTypeDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CTypeExpr {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CTypeExpr {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CTypeExpr {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CTypeExpr {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CurryProg {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CurryProg {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CurryProg {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CurryProg {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CClassDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CClassDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CClassDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CClassDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Show AbstractCurry.Types.CInstanceDecl {
+  showsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Read AbstractCurry.Types.CInstanceDecl {
+  readsPrec 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Eq AbstractCurry.Types.CInstanceDecl {
+  (==) 2
+} {-# MODULE AbstractCurry.Types #-};
+instance Prelude.Data AbstractCurry.Types.CInstanceDecl {
+  (===) 2;
+  aValue 0
+} {-# MODULE AbstractCurry.Types #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f,
+          Prelude.Data g) => Prelude.Data (a, b, c, d, e, f, g) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f) => Prelude.Data (a,
+                                                                           b, c, d, e, f) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e) => Prelude.Data (a, b, c, d, e) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d) => Prelude.Data (a, b, c, d) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b,
+          Prelude.Data c) => Prelude.Data (a, b, c) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a,
+          Prelude.Data b) => Prelude.Data (Prelude.Either a b) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b) => Prelude.Data (a, b) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data (Prelude.Maybe a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data [a] {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Ordering {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Int {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.IOError {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Float {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Char {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Bool {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data () {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e, Prelude.Eq f) => Prelude.Eq (a, b, c, d, e, f) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e) => Prelude.Eq (a, b, c, d, e) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c,
+          Prelude.Eq d) => Prelude.Eq (a, b, c, d) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b,
+          Prelude.Eq c) => Prelude.Eq (a, b, c) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a,
+          Prelude.Eq b) => Prelude.Eq (Prelude.Either a b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b) => Prelude.Eq (a, b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq (Prelude.Maybe a) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq [a] {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Ordering {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Int {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.IOError {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Float {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Char {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Bool {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq () {
+  (==) 2
+} {-# MODULE Prelude #-};
+hiding class Prelude.Show a;
+hiding class Prelude.Read a;
+hiding data Prelude.Either a b;
+hiding data Prelude.Maybe a;
+hiding data Prelude.Ordering;
+hiding data Prelude.IOError;
+hiding data Prelude.Float;
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e, Prelude.Show f) => Prelude.Show (a,
+                                                                           b, c, d, e, f) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e) => Prelude.Show (a, b, c, d, e) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d) => Prelude.Show (a, b, c, d) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b,
+          Prelude.Show c) => Prelude.Show (a, b, c) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a,
+          Prelude.Show b) => Prelude.Show (Prelude.Either a b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b) => Prelude.Show (a, b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show (Prelude.Maybe a) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show [a] {
+  showsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Ordering {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Int {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.IOError {
+  show 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Float {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Char {
+  showList 1;
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Bool {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show () {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e, Prelude.Read f) => Prelude.Read (a,
+                                                                           b, c, d, e, f) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e) => Prelude.Read (a, b, c, d, e) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d) => Prelude.Read (a, b, c, d) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b,
+          Prelude.Read c) => Prelude.Read (a, b, c) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a,
+          Prelude.Read b) => Prelude.Read (Prelude.Either a b) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b) => Prelude.Read (a, b) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read (Prelude.Maybe a) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read [a] {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Ordering {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Int {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Float {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Char {
+  readList 1;
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Bool {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read () {
+  readsPrec 1
+} {-# MODULE Prelude #-}
+}

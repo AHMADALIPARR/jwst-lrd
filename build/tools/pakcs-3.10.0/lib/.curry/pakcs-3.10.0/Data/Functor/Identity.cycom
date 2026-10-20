@@ -1,0 +1,10 @@
+[ ((Span (Position 1 1) (Position 1 77)), LineComment "-----------------------------------------------------------------------------")
+, ((Span (Position 2 1) (Position 2 65)), LineComment "--- This simple module defines the identify functor and monad and")
+, ((Span (Position 3 1) (Position 3 65)), LineComment "--- has been adapted from the same Haskell module (by Andy Gill).")
+, ((Span (Position 4 1) (Position 4 60)), LineComment "--- It defines a a trivial type constructor `Identity` which")
+, ((Span (Position 5 1) (Position 5 72)), LineComment "--- can be used with functions parameterized by functor or monad classes")
+, ((Span (Position 6 1) (Position 6 57)), LineComment "--- or as a simple base to specialize monad transformers.")
+, ((Span (Position 7 1) (Position 7 77)), LineComment "-----------------------------------------------------------------------------")
+, ((Span (Position 11 1) (Position 11 66)), LineComment "--- The `Identity` type constructor with `Functor`, `Applicative`,")
+, ((Span (Position 12 1) (Position 12 26)), LineComment "--- and `Monad` instances.")
+]

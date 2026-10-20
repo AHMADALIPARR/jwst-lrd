@@ -1,0 +1,20 @@
+interface Text.CSV where {
+import Prelude;
+readCSV 0 :: [Prelude.Char] -> [[[Prelude.Char]]];
+readCSVFile 0 :: [Prelude.Char] -> Prelude.IO [[[Prelude.Char]]];
+readCSVFileWithDelims
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> Prelude.IO [[[Prelude.Char]]];
+readCSVWithDelims
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> [[[Prelude.Char]]];
+showCSV 1 :: [[[Prelude.Char]]] -> [Prelude.Char];
+writeCSVFile
+2
+::
+[Prelude.Char] -> [[[Prelude.Char]]] -> Prelude.IO ();
+hiding data Prelude.Char;
+hiding data Prelude.IO a
+}

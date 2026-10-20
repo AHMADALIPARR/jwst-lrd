@@ -1,0 +1,31 @@
+{
+  "name": "directory",
+  "version": "3.0.0",
+  "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
+  "synopsis": "Library for accessing the directory structure of the underlying operating system.",
+  "category": [ "System" ],
+  "license": "BSD-3-Clause",
+  "licenseFile": "LICENSE",
+  "dependencies": {
+        "base"    : ">= 3.0.0, < 4.0.0",
+        "filepath": ">= 3.0.0, < 4.0.0",
+        "time"    : ">= 3.0.0, < 4.0.0"
+  },
+    "compilerCompatibility": {
+        "pakcs"   : ">= 3.0.0, < 4.0.0",
+        "kics2"   : ">= 3.0.0, < 4.0.0",
+        "curry2go": ">= 1.0.0",
+        "kmcc"    : ">= 0.1.0"
+  },
+  "exportedModules": [
+        "System.Directory"
+  ],
+  "testsuite": {
+      "src-dir": "test",
+      "modules":  [ "TestDirectory" ]
+  },
+  "source": {
+        "git": "https://github.com/curry-packages/directory.git",
+        "tag": "$version"
+  }
+}

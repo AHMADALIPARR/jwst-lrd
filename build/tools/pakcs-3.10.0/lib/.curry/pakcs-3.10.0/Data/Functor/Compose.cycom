@@ -1,0 +1,8 @@
+[ ((Span (Position 1 1) (Position 1 77)), LineComment "-----------------------------------------------------------------------------")
+, ((Span (Position 2 1) (Position 2 71)), LineComment "--- This simple module defines the compose functor known from Haskell's")
+, ((Span (Position 3 1) (Position 3 74)), LineComment "--- base libraries. The compose functor is the composition of two functors")
+, ((Span (Position 4 1) (Position 4 34)), LineComment "--- which always is a functor too.")
+, ((Span (Position 5 1) (Position 5 77)), LineComment "-----------------------------------------------------------------------------")
+, ((Span (Position 11 1) (Position 11 58)), LineComment "--- The compose functor is the composition of two functors")
+, ((Span (Position 12 1) (Position 12 34)), LineComment "--- which always is a functor too.")
+]

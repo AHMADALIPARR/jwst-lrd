@@ -1,0 +1,246 @@
+interface Text.Pretty where {
+import Prelude;
+import Text.PrettyImpl;
+infixl 5 $$;
+infixl 5 <$!$>;
+infixl 5 <$$>;
+infixl 5 <$+$>;
+infixl 6 <+>;
+infixl 5 <//>;
+infixl 5 </>;
+infixl 6 <>;
+class Pretty a {
+  pretty :: a -> Text.PrettyImpl.Doc;
+  prettyList 0 :: [a] -> Text.PrettyImpl.Doc
+};
+data Text.PrettyImpl.Doc;
+($$)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<$!$>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<$$>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<$+$>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<+>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<//>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(</>)
+0
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+(<>)
+2
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+align 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+angles 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+at 0 :: Text.PrettyImpl.Doc;
+backslash 0 :: Text.PrettyImpl.Doc;
+bar 0 :: Text.PrettyImpl.Doc;
+bgBlack 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgBlue 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgCyan 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgGreen 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgMagenta 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgRed 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgWhite 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bgYellow 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+black 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+blinkRapid 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+blinkSlow 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+blue 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bold 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+bool 1 :: Prelude.Bool -> Text.PrettyImpl.Doc;
+bquotes 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+braces 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+brackets 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+cat 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+char 1 :: Prelude.Char -> Text.PrettyImpl.Doc;
+colon 0 :: Text.PrettyImpl.Doc;
+combine
+3
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+comma 0 :: Text.PrettyImpl.Doc;
+compose
+2
+::
+(Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+ Text.PrettyImpl.Doc) ->
+[Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+crossout 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+cyan 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+dot 0 :: Text.PrettyImpl.Doc;
+doubleArrow 0 :: Text.PrettyImpl.Doc;
+doubleColon 0 :: Text.PrettyImpl.Doc;
+dquote 0 :: Text.PrettyImpl.Doc;
+dquotes 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+empty 0 :: Text.PrettyImpl.Doc;
+enclose
+3
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+encloseSep
+4
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+Text.PrettyImpl.Doc;
+encloseSepSpaced
+3
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+Text.PrettyImpl.Doc;
+equals 0 :: Text.PrettyImpl.Doc;
+faint 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+fill
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+fillBreak
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+fillCat 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+fillEncloseSep
+4
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+Text.PrettyImpl.Doc;
+fillEncloseSepSpaced
+3
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+Text.PrettyImpl.Doc;
+fillSep 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+float 1 :: Prelude.Float -> Text.PrettyImpl.Doc;
+green 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+group 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+hEncloseSep
+4
+::
+Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc ->
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+Text.PrettyImpl.Doc;
+hang
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+hardline 0 :: Text.PrettyImpl.Doc;
+hcat 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+hsep 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+indent
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+int 1 :: Prelude.Int -> Text.PrettyImpl.Doc;
+inverse 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+isEmpty 1 :: Text.PrettyImpl.Doc -> Prelude.Bool;
+italic 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+langle 0 :: Text.PrettyImpl.Doc;
+larrow 0 :: Text.PrettyImpl.Doc;
+lbrace 0 :: Text.PrettyImpl.Doc;
+lbracket 0 :: Text.PrettyImpl.Doc;
+line 0 :: Text.PrettyImpl.Doc;
+linebreak 0 :: Text.PrettyImpl.Doc;
+linesep 0 :: [Prelude.Char] -> Text.PrettyImpl.Doc;
+list 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+listSpaced 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+lparen 0 :: Text.PrettyImpl.Doc;
+magenta 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+nest
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+pPrint 0 :: Text.PrettyImpl.Doc -> [Prelude.Char];
+parens 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+parensIf
+2
+::
+Prelude.Bool -> Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+punctuate
+2
+::
+Text.PrettyImpl.Doc -> [Text.PrettyImpl.Doc] ->
+[Text.PrettyImpl.Doc];
+rangle 0 :: Text.PrettyImpl.Doc;
+rarrow 0 :: Text.PrettyImpl.Doc;
+rbrace 0 :: Text.PrettyImpl.Doc;
+rbracket 0 :: Text.PrettyImpl.Doc;
+red 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+rparen 0 :: Text.PrettyImpl.Doc;
+semi 0 :: Text.PrettyImpl.Doc;
+semiBraces 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+semiBracesSpaced 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+sep 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+set 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+setSpaced 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+softbreak 0 :: Text.PrettyImpl.Doc;
+softline 0 :: Text.PrettyImpl.Doc;
+space 0 :: Text.PrettyImpl.Doc;
+squote 0 :: Text.PrettyImpl.Doc;
+squotes 0 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+string 0 :: [Prelude.Char] -> Text.PrettyImpl.Doc;
+text 1 :: [Prelude.Char] -> Text.PrettyImpl.Doc;
+tilde 0 :: Text.PrettyImpl.Doc;
+tupled 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+tupledSpaced 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+underline 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+vcat 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+vsep 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+vsepBlank 0 :: [Text.PrettyImpl.Doc] -> Text.PrettyImpl.Doc;
+white 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+yellow 1 :: Text.PrettyImpl.Doc -> Text.PrettyImpl.Doc;
+Text.PrettyImpl.showWidth
+2
+::
+Prelude.Int -> Text.PrettyImpl.Doc -> [Prelude.Char];
+instance (Pretty a, Pretty b) => Pretty (a, b) {
+  pretty 1
+};
+instance Pretty a => Pretty [a] {
+  pretty 0
+};
+instance Pretty Text.PrettyImpl.Doc {
+  pretty 0
+};
+instance Pretty Prelude.Int {
+  pretty 0
+};
+instance Pretty Prelude.Float {
+  pretty 0
+};
+instance Pretty Prelude.Char {
+  prettyList 0;
+  pretty 0
+};
+instance Pretty Prelude.Bool {
+  pretty 0
+};
+instance Pretty () {
+  pretty 1
+};
+hiding data Prelude.Bool;
+hiding data Prelude.Char;
+hiding data Prelude.Int;
+hiding data Prelude.Float
+}

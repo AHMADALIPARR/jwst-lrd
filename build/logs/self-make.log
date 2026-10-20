@@ -1,0 +1,27 @@
+[  0%] Building CXX object vm/CMakeFiles/makeDeps.dir/build_support/makeDeps.cpp.o
+[  1%] Creating /home/hatch/workspace/jwst-lrd/build/tools/self-src/build32/incls/vmDate.cpp
+[  1%] Built target create_vmDate
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/vm/build_support/makeDeps.cpp: In member function 'void FileName::check_length()':
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/vm/build_support/makeDeps.cpp:398:22: warning: '%s' directive writing up to 8191 bytes into a region of size between 1 and 8192 [-Wformat-overflow=]
+  398 |     sprintf( buf, "%s%s%s is too long; %d >= %d\n",
+      |                      ^~
+/home/hatch/workspace/jwst-lrd/build/tools/self-src/vm/build_support/makeDeps.cpp:398:19: note: directive argument in the range [32, 2147483647]
+  398 |     sprintf( buf, "%s%s%s is too long; %d >= %d\n",
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/stdio.h:980,
+                 from /home/hatch/workspace/jwst-lrd/build/tools/self-src/vm/build_support/makeDeps.cpp:65:
+In function 'int sprintf(char*, const char*, ...)',
+    inlined from 'void FileName::check_length()' at /home/hatch/workspace/jwst-lrd/build/tools/self-src/vm/build_support/makeDeps.cpp:398:12:
+/usr/include/i386-linux-gnu/bits/stdio2.h:30:34: note: '__builtin___sprintf_chk' output between 24 and 24605 bytes into a destination of size 8192
+   30 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   31 |                                   __glibc_objsize (__s), __fmt,
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   32 |                                   __va_arg_pack ());
+      |                                   ~~~~~~~~~~~~~~~~~
+[  2%] Linking CXX executable makeDeps
+[  2%] Built target makeDeps
+[  2%] Generating ../incls/_precompiled.hh
+make[2]: *** [vm/CMakeFiles/Self.dir/build.make:79: incls/_precompiled.hh] Segmentation fault
+make[1]: *** [CMakeFiles/Makefile2:188: vm/CMakeFiles/Self.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2
