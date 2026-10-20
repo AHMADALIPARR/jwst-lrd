@@ -1,0 +1,7 @@
+interface CASS.PackageConfig where {
+import Prelude;
+packageExecutable 0 :: [Prelude.Char];
+packagePath 0 :: [Prelude.Char];
+packageVersion 0 :: [Prelude.Char];
+hiding data Prelude.Char
+}

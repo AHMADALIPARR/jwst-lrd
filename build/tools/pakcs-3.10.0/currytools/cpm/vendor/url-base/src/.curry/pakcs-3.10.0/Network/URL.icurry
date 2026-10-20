@@ -1,0 +1,14 @@
+interface Network.URL where {
+import Prelude;
+param2urlencoded
+1
+::
+([Prelude.Char], [Prelude.Char]) -> [Prelude.Char];
+params2urlencoded
+1
+::
+[([Prelude.Char], [Prelude.Char])] -> [Prelude.Char];
+string2urlencoded 1 :: [Prelude.Char] -> [Prelude.Char];
+urlencoded2string 1 :: [Prelude.Char] -> [Prelude.Char];
+hiding data Prelude.Char
+}

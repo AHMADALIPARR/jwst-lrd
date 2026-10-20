@@ -1,0 +1,5 @@
+[ ((Span (Position 3 1) (Position 3 64)), LineComment "--- Returns the current cpu time of the process in milliseconds.")
+, ((Span (Position 7 1) (Position 7 68)), LineComment "--- Returns the current elapsed time of the process in milliseconds.")
+, ((Span (Position 8 1) (Position 8 73)), LineComment "--- This operation is not supported in KiCS2 (there it always returns 0),")
+, ((Span (Position 9 1) (Position 9 48)), LineComment "--- but only included for compatibility reasons.")
+]

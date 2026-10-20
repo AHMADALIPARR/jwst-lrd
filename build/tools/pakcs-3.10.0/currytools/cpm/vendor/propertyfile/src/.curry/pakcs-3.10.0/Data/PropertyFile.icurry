@@ -1,0 +1,25 @@
+interface Data.PropertyFile where {
+import Prelude;
+getPropertiesFromFile
+2
+::
+[Prelude.Char] -> [[Prelude.Char]] ->
+Prelude.IO [Prelude.Maybe [Prelude.Char]];
+getPropertyFromFile
+2
+::
+[Prelude.Char] -> [Prelude.Char] ->
+Prelude.IO (Prelude.Maybe [Prelude.Char]);
+readPropertyFile
+1
+::
+[Prelude.Char] -> Prelude.IO [([Prelude.Char], [Prelude.Char])];
+updatePropertyFile
+3
+::
+[Prelude.Char] -> [Prelude.Char] -> [Prelude.Char] ->
+Prelude.IO ();
+hiding data Prelude.Char;
+hiding data Prelude.IO a;
+hiding data Prelude.Maybe a
+}

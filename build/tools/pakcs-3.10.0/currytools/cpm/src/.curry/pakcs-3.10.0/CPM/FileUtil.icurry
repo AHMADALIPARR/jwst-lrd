@@ -1,0 +1,54 @@
+interface CPM.FileUtil where {
+import Prelude;
+checkAndGetVisibleDirectoryContents
+1
+::
+[Prelude.Char] -> Prelude.IO [[Prelude.Char]];
+cleanTempDir 0 :: Prelude.IO ();
+copyDirectory
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> Prelude.IO ();
+copyDirectoryFollowingSymlinks
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> Prelude.IO ();
+createSymlink
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> Prelude.IO Prelude.Int;
+getRealPath 1 :: [Prelude.Char] -> Prelude.IO [Prelude.Char];
+ifFileExists
+3
+::
+[Prelude.Char] -> Prelude.IO a -> Prelude.IO a -> Prelude.IO a;
+inDirectory 2 :: [Prelude.Char] -> Prelude.IO a -> Prelude.IO a;
+inTempDir 1 :: Prelude.IO a -> Prelude.IO a;
+isSymlink 1 :: [Prelude.Char] -> Prelude.IO Prelude.Bool;
+joinSearchPath 0 :: [[Prelude.Char]] -> [Prelude.Char];
+linkTarget 1 :: [Prelude.Char] -> Prelude.IO [Prelude.Char];
+quote 1 :: [Prelude.Char] -> [Prelude.Char];
+recreateDirectory 1 :: [Prelude.Char] -> Prelude.IO ();
+removeDirectoryComplete 1 :: [Prelude.Char] -> Prelude.IO ();
+removeSymlink 1 :: [Prelude.Char] -> Prelude.IO Prelude.Int;
+safeReadFile
+1
+::
+[Prelude.Char] ->
+Prelude.IO (Prelude.Either Prelude.IOError [Prelude.Char]);
+tempDir 0 :: Prelude.IO [Prelude.Char];
+whenFileExists
+2
+::
+[Prelude.Char] -> Prelude.IO () -> Prelude.IO ();
+writeFileIfNotExists
+2
+::
+[Prelude.Char] -> [Prelude.Char] -> Prelude.IO ();
+hiding data Prelude.Char;
+hiding data Prelude.IO a;
+hiding data Prelude.Int;
+hiding data Prelude.Bool;
+hiding data Prelude.Either a b;
+hiding data Prelude.IOError
+}

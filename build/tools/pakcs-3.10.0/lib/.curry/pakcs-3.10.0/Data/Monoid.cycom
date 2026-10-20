@@ -1,0 +1,12 @@
+[ ((Span (Position 1 1) (Position 1 79)), LineComment "-------------------------------------------------------------------------------")
+, ((Span (Position 2 1) (Position 2 24)), LineComment "-- | Version: April 2025")
+, ((Span (Position 3 1) (Position 3 2)), LineComment "--")
+, ((Span (Position 4 1) (Position 4 47)), LineComment "-- Library with some useful `Monoid` instances.")
+, ((Span (Position 5 1) (Position 5 79)), LineComment "-------------------------------------------------------------------------------")
+, ((Span (Position 11 1) (Position 11 30)), LineComment "-- | Boolean monoid under (&&)")
+, ((Span (Position 19 1) (Position 19 30)), LineComment "-- | Boolean monoid under (||)")
+, ((Span (Position 27 1) (Position 27 27)), LineComment "-- | Monoid under addition.")
+, ((Span (Position 46 1) (Position 46 33)), LineComment "-- | Monoid under multiplication.")
+, ((Span (Position 65 1) (Position 65 52)), LineComment "-- | Maybe monoid returning the leftmost Just value.")
+, ((Span (Position 84 1) (Position 84 53)), LineComment "-- | Maybe monoid returning the rightmost Just value.")
+]

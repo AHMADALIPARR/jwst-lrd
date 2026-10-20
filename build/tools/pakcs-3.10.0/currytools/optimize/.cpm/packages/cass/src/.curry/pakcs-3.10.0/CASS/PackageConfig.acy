@@ -1,0 +1,12 @@
+{- AbstractCurry 3.0 -}
+CurryProg "CASS.PackageConfig"
+["Curry.Compiler.Distribution","System.FilePath"]
+Nothing
+ []
+ []
+ []
+ [CFunc ("CASS.PackageConfig","packageVersion") 0 Public (CQualType (CContext []) (CTApply (CTCons ("Prelude","[]")) (CTCons ("Prelude","Char")))) [CRule [] (CSimpleRhs (CLit (CStringc "3.0.0")) [])],
+  CFunc ("CASS.PackageConfig","packagePath") 0 Public (CQualType (CContext []) (CTApply (CTCons ("Prelude","[]")) (CTCons ("Prelude","Char")))) [CRule [] (CSimpleRhs (CApply (CApply (CSymbol ("System.FilePath","</>")) (CSymbol ("Curry.Compiler.Distribution","installDir"))) (CApply (CApply (CSymbol ("System.FilePath","</>")) (CLit (CStringc "currytools"))) (CApply (CApply (CSymbol ("System.FilePath","</>")) (CLit (CStringc "optimize"))) (CApply (CApply (CSymbol ("System.FilePath","</>")) (CLit (CStringc ".cpm"))) (CApply (CApply (CSymbol ("System.FilePath","</>")) (CLit (CStringc "packages"))) (CLit (CStringc "cass"))))))) [])],
+  CFunc ("CASS.PackageConfig","packageExecutable") 0 Public (CQualType (CContext []) (CTApply (CTCons ("Prelude","[]")) (CTCons ("Prelude","Char")))) [CRule [] (CSimpleRhs (CLit (CStringc "")) [])],
+  CFunc ("CASS.PackageConfig","packageLoadPath") 0 Public (CQualType (CContext []) (CTApply (CTCons ("Prelude","[]")) (CTCons ("Prelude","Char")))) [CRule [] (CSimpleRhs (CLit (CStringc "")) [])]]
+ []

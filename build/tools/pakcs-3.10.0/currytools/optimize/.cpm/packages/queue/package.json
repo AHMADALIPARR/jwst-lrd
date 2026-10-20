@@ -1,0 +1,22 @@
+{
+    "name": "queue",
+    "version": "3.0.0",
+    "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
+    "synopsis": "Library with double-ended queues supporting access at both ends in constant amortized time",
+    "category": [ "Data" ],
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE",
+    "dependencies": {
+        "base"    : ">= 3.0.0, < 4.0.0",
+        "random"  : ">= 3.0.0, < 4.0.0"
+    },
+    "exportedModules": [ "Data.Queue" ],
+    "testsuite": {
+        "src-dir": "test",
+        "modules": [ "TestQueue" ]
+    },
+    "source": {
+      "git": "https://github.com/curry-packages/queue.git",
+      "tag": "$version"
+    }
+}

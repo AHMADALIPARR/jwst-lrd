@@ -1,0 +1,1204 @@
+interface Database.CDBI.ER where {
+import Data.Time;
+import Database.CDBI.Connection;
+import Database.CDBI.Criteria;
+import Database.CDBI.Description;
+import Database.CDBI.QueryTypes;
+import Prelude;
+infixl 1 Database.CDBI.Connection.>+;
+infixl 1 Database.CDBI.Connection.>+=;
+data Database.CDBI.Connection.Connection;
+data Database.CDBI.Connection.DBAction a;
+type Database.CDBI.Connection.SQLResult a =
+  Prelude.Either Database.CDBI.Connection.DBError a;
+data Database.CDBI.Criteria.Condition
+  = Con Database.CDBI.Criteria.Constraint
+  | Fun [Prelude.Char] Database.CDBI.Criteria.Specifier
+        Database.CDBI.Criteria.Constraint
+  | HAnd [Database.CDBI.Criteria.Condition]
+  | HOr [Database.CDBI.Criteria.Condition]
+  | Neg Database.CDBI.Criteria.Condition;
+data Database.CDBI.Criteria.Constraint
+  = IsNull (Database.CDBI.Criteria.Value ())
+  | IsNotNull (Database.CDBI.Criteria.Value ())
+  | BinaryRel Database.CDBI.Criteria.RelOp
+              (Database.CDBI.Criteria.Value ()) (Database.CDBI.Criteria.Value ())
+  | Between (Database.CDBI.Criteria.Value ())
+            (Database.CDBI.Criteria.Value ()) (Database.CDBI.Criteria.Value ())
+  | IsIn (Database.CDBI.Criteria.Value ())
+         [Database.CDBI.Criteria.Value ()]
+  | Not Database.CDBI.Criteria.Constraint
+  | And [Database.CDBI.Criteria.Constraint]
+  | Or [Database.CDBI.Criteria.Constraint]
+  | Exists [Prelude.Char] Prelude.Int
+           Database.CDBI.Criteria.Constraint
+  | None
+  {-# HIDING IsNull, IsNotNull, BinaryRel, Between, IsIn #-};
+data Database.CDBI.Criteria.Criteria
+  = Criteria Database.CDBI.Criteria.Constraint
+             (Prelude.Maybe Database.CDBI.Criteria.GroupBy);
+data Database.CDBI.Criteria.Option;
+data Database.CDBI.Criteria.Specifier = Distinct | All;
+data Database.CDBI.Criteria.Value a;
+data Database.CDBI.Description.ColumnDescription a;
+data Database.CDBI.Description.CombinedDescription a;
+data Database.CDBI.Description.EntityDescription a;
+type Database.CDBI.Description.Table = [Prelude.Char];
+data Database.CDBI.QueryTypes.FiveColumnSelect a b c d e
+  = FiveCS Database.CDBI.Criteria.Specifier
+           (Database.CDBI.QueryTypes.ColumnSingleCollection a,
+            Database.CDBI.QueryTypes.ColumnSingleCollection b,
+            Database.CDBI.QueryTypes.ColumnSingleCollection c,
+            Database.CDBI.QueryTypes.ColumnSingleCollection d,
+            Database.CDBI.QueryTypes.ColumnSingleCollection e)
+           Database.CDBI.QueryTypes.TableClause
+           Database.CDBI.Criteria.Criteria;
+data Database.CDBI.QueryTypes.FourColumnSelect a b c d
+  = FourCS Database.CDBI.Criteria.Specifier
+           (Database.CDBI.QueryTypes.ColumnSingleCollection a,
+            Database.CDBI.QueryTypes.ColumnSingleCollection b,
+            Database.CDBI.QueryTypes.ColumnSingleCollection c,
+            Database.CDBI.QueryTypes.ColumnSingleCollection d)
+           Database.CDBI.QueryTypes.TableClause
+           Database.CDBI.Criteria.Criteria;
+data Database.CDBI.QueryTypes.Join;
+data Database.CDBI.QueryTypes.SetOp = Union | Intersect | Except;
+data Database.CDBI.QueryTypes.SingleColumnSelect a
+  = SingleCS Database.CDBI.Criteria.Specifier
+             (Database.CDBI.QueryTypes.ColumnSingleCollection a)
+             Database.CDBI.QueryTypes.TableClause
+             Database.CDBI.Criteria.Criteria;
+data Database.CDBI.QueryTypes.SixColumnSelect a b c d e f
+  = SixCS Database.CDBI.Criteria.Specifier
+          (Database.CDBI.QueryTypes.ColumnSingleCollection a,
+           Database.CDBI.QueryTypes.ColumnSingleCollection b,
+           Database.CDBI.QueryTypes.ColumnSingleCollection c,
+           Database.CDBI.QueryTypes.ColumnSingleCollection d,
+           Database.CDBI.QueryTypes.ColumnSingleCollection e,
+           Database.CDBI.QueryTypes.ColumnSingleCollection f)
+          Database.CDBI.QueryTypes.TableClause
+          Database.CDBI.Criteria.Criteria;
+data Database.CDBI.QueryTypes.TableClause
+  = TC [Prelude.Char] Prelude.Int
+       (Prelude.Maybe (Database.CDBI.QueryTypes.Join,
+                       Database.CDBI.QueryTypes.TableClause));
+data Database.CDBI.QueryTypes.TripleColumnSelect a b c
+  = TripleCS Database.CDBI.Criteria.Specifier
+             (Database.CDBI.QueryTypes.ColumnSingleCollection a,
+              Database.CDBI.QueryTypes.ColumnSingleCollection b,
+              Database.CDBI.QueryTypes.ColumnSingleCollection c)
+             Database.CDBI.QueryTypes.TableClause
+             Database.CDBI.Criteria.Criteria;
+data Database.CDBI.QueryTypes.TupleColumnSelect a b
+  = TupleCS Database.CDBI.Criteria.Specifier
+            (Database.CDBI.QueryTypes.ColumnSingleCollection a,
+             Database.CDBI.QueryTypes.ColumnSingleCollection b)
+            Database.CDBI.QueryTypes.TableClause
+            Database.CDBI.Criteria.Criteria;
+(Database.CDBI.Connection.>+)
+2
+::
+Database.CDBI.Connection.DBAction a ->
+Database.CDBI.Connection.DBAction b ->
+Database.CDBI.Connection.DBAction b;
+(Database.CDBI.Connection.>+=)
+2
+::
+Database.CDBI.Connection.DBAction a ->
+(a -> Database.CDBI.Connection.DBAction b) ->
+Database.CDBI.Connection.DBAction b;
+Database.CDBI.Connection.begin
+0
+::
+Database.CDBI.Connection.DBAction ();
+Database.CDBI.Connection.commit
+0
+::
+Database.CDBI.Connection.DBAction ();
+Database.CDBI.Connection.connectSQLite
+1
+::
+[Prelude.Char] -> Prelude.IO Database.CDBI.Connection.Connection;
+Database.CDBI.Connection.disconnect
+1
+::
+Database.CDBI.Connection.Connection -> Prelude.IO ();
+Database.CDBI.Connection.printSQLResults
+1
+::
+Prelude.Show a => Prelude.Either Database.CDBI.Connection.DBError
+                                 [a] ->
+                  Prelude.IO ();
+Database.CDBI.Connection.rollback
+0
+::
+Database.CDBI.Connection.DBAction ();
+Database.CDBI.Connection.runInTransaction
+1
+::
+Database.CDBI.Connection.DBAction a ->
+Database.CDBI.Connection.DBAction a;
+Database.CDBI.Connection.runWithDB
+2
+::
+[Prelude.Char] -> Database.CDBI.Connection.DBAction a ->
+Prelude.IO (Prelude.Either Database.CDBI.Connection.DBError a);
+Database.CDBI.Connection.setForeignKeyCheck
+1
+::
+Prelude.Bool -> Database.CDBI.Connection.DBAction ();
+(Database.CDBI.Criteria../=.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..<->.)
+0
+::
+Database.CDBI.Criteria.Value a ->
+[Database.CDBI.Criteria.Value a] ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..<.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..<=.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..=.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..>.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..>=.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+(Database.CDBI.Criteria..~.)
+0
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.ascOrder
+1
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Option;
+Database.CDBI.Criteria.avgFloatCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value Prelude.Float ->
+Database.CDBI.Criteria.Value Prelude.Float ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.avgIntCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value Prelude.Int ->
+Database.CDBI.Criteria.Value Prelude.Float ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.between
+3
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.bool
+0
+::
+Prelude.Bool -> Database.CDBI.Criteria.Value Prelude.Bool;
+Database.CDBI.Criteria.char
+0
+::
+Prelude.Char -> Database.CDBI.Criteria.Value Prelude.Char;
+Database.CDBI.Criteria.col
+1
+::
+Database.CDBI.Description.Column a ->
+Database.CDBI.Criteria.Value a;
+Database.CDBI.Criteria.colNum
+2
+::
+Database.CDBI.Description.Column a -> Prelude.Int ->
+Database.CDBI.Criteria.Value a;
+Database.CDBI.Criteria.colVal
+2
+::
+Database.CDBI.Description.Column a ->
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.ColVal;
+Database.CDBI.Criteria.condition
+1
+::
+Database.CDBI.Criteria.Constraint ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.countCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Value Prelude.Int ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.date
+0
+::
+Data.Time.ClockTime ->
+Database.CDBI.Criteria.Value Data.Time.ClockTime;
+Database.CDBI.Criteria.descOrder
+1
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Option;
+Database.CDBI.Criteria.emptyCriteria
+0
+::
+Database.CDBI.Criteria.Criteria;
+Database.CDBI.Criteria.equal
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.float
+0
+::
+Prelude.Float -> Database.CDBI.Criteria.Value Prelude.Float;
+Database.CDBI.Criteria.greaterThan
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.greaterThanEqual
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.groupBy
+2
+::
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.GroupByTail ->
+Database.CDBI.Criteria.GroupBy;
+Database.CDBI.Criteria.groupByCol
+2
+::
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.GroupByTail ->
+Database.CDBI.Criteria.GroupByTail;
+Database.CDBI.Criteria.having
+1
+::
+Database.CDBI.Criteria.Condition ->
+Database.CDBI.Criteria.GroupByTail;
+Database.CDBI.Criteria.int
+0
+::
+Prelude.Int -> Database.CDBI.Criteria.Value Prelude.Int;
+Database.CDBI.Criteria.isIn
+2
+::
+Database.CDBI.Criteria.Value a ->
+[Database.CDBI.Criteria.Value a] ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.isNotNull
+1
+::
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.isNull
+1
+::
+Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.lessThan
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.lessThanEqual
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.like
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.maxCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.minCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.noHave
+0
+::
+Database.CDBI.Criteria.GroupByTail;
+Database.CDBI.Criteria.notEqual
+2
+::
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+Database.CDBI.Criteria.Constraint;
+Database.CDBI.Criteria.string
+0
+::
+[Prelude.Char] -> Database.CDBI.Criteria.Value [Prelude.Char];
+Database.CDBI.Criteria.sumFloatCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value Prelude.Float ->
+Database.CDBI.Criteria.Value Prelude.Float ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Criteria.sumIntCol
+4
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Criteria.Value Prelude.Int ->
+Database.CDBI.Criteria.Value Prelude.Int ->
+(Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Value () ->
+ Database.CDBI.Criteria.Constraint) ->
+Database.CDBI.Criteria.Condition;
+Database.CDBI.Description.addDescription
+5
+::
+Database.CDBI.Description.EntityDescription a -> Prelude.Int ->
+(a -> b -> b) -> (b -> a) ->
+Database.CDBI.Description.CombinedDescription b ->
+Database.CDBI.Description.CombinedDescription b;
+Database.CDBI.Description.combineDescriptions
+6
+::
+Database.CDBI.Description.EntityDescription a -> Prelude.Int ->
+Database.CDBI.Description.EntityDescription b -> Prelude.Int ->
+(a -> b -> c) -> (c -> (a, b)) ->
+Database.CDBI.Description.CombinedDescription c;
+deleteEntries
+2
+::
+Database.CDBI.Description.EntityDescription a ->
+Prelude.Maybe Database.CDBI.Criteria.Constraint ->
+Database.CDBI.Connection.DBAction ();
+deleteEntry
+4
+::
+Database.CDBI.Description.EntityDescription a ->
+Database.CDBI.Description.Column b ->
+(a -> Database.CDBI.Criteria.Value b) -> a ->
+Database.CDBI.Connection.DBAction ();
+deleteEntryR
+5
+::
+Database.CDBI.Description.EntityDescription a ->
+Database.CDBI.Description.Column b ->
+Database.CDBI.Criteria.Value b ->
+Database.CDBI.Description.Column c ->
+Database.CDBI.Criteria.Value c ->
+Database.CDBI.Connection.DBAction ();
+getAllEntries
+1
+::
+Database.CDBI.Description.EntityDescription a ->
+Database.CDBI.Connection.DBAction [a];
+getColumn
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.SingleColumnSelect a] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [a];
+getColumnFiveTuple
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.FiveColumnSelect a b c d e] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [(a, b, c, d, e)];
+getColumnFourTuple
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.FourColumnSelect a b c d] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [(a, b, c, d)];
+getColumnSixTuple
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.SixColumnSelect a b c d e f] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [(a, b, c, d, e, f)];
+getColumnTriple
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.TripleColumnSelect a b c] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [(a, b, c)];
+getColumnTuple
+4
+::
+[Database.CDBI.QueryTypes.SetOp] ->
+[Database.CDBI.QueryTypes.TupleColumnSelect a b] ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [(a, b)];
+getCondEntries
+2
+::
+Database.CDBI.Description.EntityDescription a ->
+(a -> Prelude.Bool) -> Database.CDBI.Connection.DBAction [a];
+getEntries
+5
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Description.EntityDescription a ->
+Database.CDBI.Criteria.Criteria ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [a];
+getEntriesCombined
+6
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Description.CombinedDescription a ->
+[Database.CDBI.QueryTypes.Join] ->
+Database.CDBI.Criteria.Criteria ->
+[Database.CDBI.Criteria.Option] -> Prelude.Maybe Prelude.Int ->
+Database.CDBI.Connection.DBAction [a];
+getEntriesWithColVal
+3
+::
+Database.CDBI.Description.EntityDescription a ->
+Database.CDBI.Description.Column b ->
+Database.CDBI.Criteria.Value b ->
+Database.CDBI.Connection.DBAction [a];
+getEntryWithKey
+4
+::
+Prelude.Show c => Database.CDBI.Description.EntityDescription a ->
+                  Database.CDBI.Description.Column b ->
+                  (c -> Database.CDBI.Criteria.Value b) -> c ->
+                  Database.CDBI.Connection.DBAction a;
+insertEntries
+2
+::
+Database.CDBI.Description.EntityDescription a -> [a] ->
+Database.CDBI.Connection.DBAction ();
+insertEntry
+2
+::
+Database.CDBI.Description.EntityDescription a -> a ->
+Database.CDBI.Connection.DBAction ();
+insertEntryCombined
+2
+::
+Database.CDBI.Description.CombinedDescription a -> a ->
+Database.CDBI.Connection.DBAction ();
+insertNewEntry
+4
+::
+Database.CDBI.Description.EntityDescription a -> (a -> b -> a) ->
+(Prelude.Int -> b) -> a -> Database.CDBI.Connection.DBAction a;
+readDatabaseKey
+3
+::
+[Prelude.Char] -> (Prelude.Int -> a) -> [Prelude.Char] ->
+Prelude.Maybe a;
+restoreDBTerms
+3
+::
+Prelude.Read a => Database.CDBI.Description.EntityDescription a ->
+                  [Prelude.Char] -> [Prelude.Char] -> Prelude.IO ();
+restoreEntries
+2
+::
+Database.CDBI.Description.EntityDescription a -> [a] ->
+Database.CDBI.Connection.DBAction ();
+runJustTransactionOnDB
+2
+::
+[Prelude.Char] -> Database.CDBI.Connection.DBAction a ->
+Prelude.IO a;
+runQueryOnDB
+2
+::
+[Prelude.Char] -> Database.CDBI.Connection.DBAction a ->
+Prelude.IO a;
+runTransactionOnDB
+2
+::
+[Prelude.Char] -> Database.CDBI.Connection.DBAction a ->
+Prelude.IO (Prelude.Either Database.CDBI.Connection.DBError a);
+saveDBTerms
+3
+::
+Prelude.Show a => Database.CDBI.Description.EntityDescription a ->
+                  [Prelude.Char] -> [Prelude.Char] -> Prelude.IO ();
+showDatabaseKey
+3
+::
+[Prelude.Char] -> (a -> Prelude.Int) -> a -> [Prelude.Char];
+updateEntries
+3
+::
+Database.CDBI.Description.EntityDescription a ->
+[Database.CDBI.Criteria.ColVal] ->
+Database.CDBI.Criteria.Constraint ->
+Database.CDBI.Connection.DBAction ();
+updateEntry
+2
+::
+Database.CDBI.Description.EntityDescription a -> a ->
+Database.CDBI.Connection.DBAction ();
+updateEntryCombined
+2
+::
+Database.CDBI.Description.CombinedDescription a -> a ->
+Database.CDBI.Connection.DBAction ();
+Database.CDBI.QueryTypes.avg
+2
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char],
+ Database.CDBI.Description.ColumnDescription Prelude.Float);
+Database.CDBI.QueryTypes.caseResultBool
+0
+::
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> Prelude.Bool);
+Database.CDBI.QueryTypes.caseResultChar
+0
+::
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> Prelude.Char);
+Database.CDBI.QueryTypes.caseResultFloat
+0
+::
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> Prelude.Float);
+Database.CDBI.QueryTypes.caseResultInt
+0
+::
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> Prelude.Int);
+Database.CDBI.QueryTypes.caseResultString
+0
+::
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> [Prelude.Char]);
+Database.CDBI.QueryTypes.caseThen
+4
+::
+Database.CDBI.Criteria.Condition ->
+Database.CDBI.Criteria.Value a -> Database.CDBI.Criteria.Value a ->
+(Database.CDBI.Connection.SQLType,
+ Database.CDBI.Connection.SQLValue -> a) ->
+Database.CDBI.QueryTypes.ColumnSingleCollection a;
+Database.CDBI.QueryTypes.count
+2
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char],
+ Database.CDBI.Description.ColumnDescription Prelude.Int);
+Database.CDBI.QueryTypes.crossJoin
+0
+::
+Database.CDBI.QueryTypes.Join;
+Database.CDBI.QueryTypes.fiveCol
+5
+::
+Database.CDBI.QueryTypes.ColumnSingleCollection a ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b ->
+Database.CDBI.QueryTypes.ColumnSingleCollection c ->
+Database.CDBI.QueryTypes.ColumnSingleCollection d ->
+Database.CDBI.QueryTypes.ColumnSingleCollection e ->
+(Database.CDBI.QueryTypes.ColumnSingleCollection a,
+ Database.CDBI.QueryTypes.ColumnSingleCollection b,
+ Database.CDBI.QueryTypes.ColumnSingleCollection c,
+ Database.CDBI.QueryTypes.ColumnSingleCollection d,
+ Database.CDBI.QueryTypes.ColumnSingleCollection e);
+Database.CDBI.QueryTypes.fourCol
+4
+::
+Database.CDBI.QueryTypes.ColumnSingleCollection a ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b ->
+Database.CDBI.QueryTypes.ColumnSingleCollection c ->
+Database.CDBI.QueryTypes.ColumnSingleCollection d ->
+(Database.CDBI.QueryTypes.ColumnSingleCollection a,
+ Database.CDBI.QueryTypes.ColumnSingleCollection b,
+ Database.CDBI.QueryTypes.ColumnSingleCollection c,
+ Database.CDBI.QueryTypes.ColumnSingleCollection d);
+Database.CDBI.QueryTypes.innerJoin
+1
+::
+Database.CDBI.Criteria.Constraint -> Database.CDBI.QueryTypes.Join;
+Database.CDBI.QueryTypes.maxV
+1
+::
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char], Database.CDBI.Description.ColumnDescription a);
+Database.CDBI.QueryTypes.minV
+1
+::
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char], Database.CDBI.Description.ColumnDescription a);
+Database.CDBI.QueryTypes.none
+1
+::
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char], Database.CDBI.Description.ColumnDescription a);
+Database.CDBI.QueryTypes.singleCol
+3
+::
+Database.CDBI.Description.ColumnDescription a -> Prelude.Int ->
+(Database.CDBI.Description.ColumnDescription a ->
+ ([Prelude.Char], Database.CDBI.Description.ColumnDescription b)) ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b;
+Database.CDBI.QueryTypes.sixCol
+6
+::
+Database.CDBI.QueryTypes.ColumnSingleCollection a ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b ->
+Database.CDBI.QueryTypes.ColumnSingleCollection c ->
+Database.CDBI.QueryTypes.ColumnSingleCollection d ->
+Database.CDBI.QueryTypes.ColumnSingleCollection e ->
+Database.CDBI.QueryTypes.ColumnSingleCollection f ->
+(Database.CDBI.QueryTypes.ColumnSingleCollection a,
+ Database.CDBI.QueryTypes.ColumnSingleCollection b,
+ Database.CDBI.QueryTypes.ColumnSingleCollection c,
+ Database.CDBI.QueryTypes.ColumnSingleCollection d,
+ Database.CDBI.QueryTypes.ColumnSingleCollection e,
+ Database.CDBI.QueryTypes.ColumnSingleCollection f);
+Database.CDBI.QueryTypes.sum
+2
+::
+Database.CDBI.Criteria.Specifier ->
+Database.CDBI.Description.ColumnDescription a ->
+([Prelude.Char],
+ Database.CDBI.Description.ColumnDescription Prelude.Float);
+Database.CDBI.QueryTypes.tripleCol
+3
+::
+Database.CDBI.QueryTypes.ColumnSingleCollection a ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b ->
+Database.CDBI.QueryTypes.ColumnSingleCollection c ->
+(Database.CDBI.QueryTypes.ColumnSingleCollection a,
+ Database.CDBI.QueryTypes.ColumnSingleCollection b,
+ Database.CDBI.QueryTypes.ColumnSingleCollection c);
+Database.CDBI.QueryTypes.tupleCol
+2
+::
+Database.CDBI.QueryTypes.ColumnSingleCollection a ->
+Database.CDBI.QueryTypes.ColumnSingleCollection b ->
+(Database.CDBI.QueryTypes.ColumnSingleCollection a,
+ Database.CDBI.QueryTypes.ColumnSingleCollection b);
+instance Prelude.MonadFail Database.CDBI.Connection.DBAction {
+  fail 1
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Monad Database.CDBI.Connection.DBAction {
+  return 1;
+  (>>) 2;
+  (>>=) 2
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Functor Database.CDBI.Connection.DBAction {
+  fmap 2
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Applicative Database.CDBI.Connection.DBAction {
+  (<*>) 2;
+  pure 0
+} {-# MODULE Database.CDBI.Connection #-};
+hiding data Prelude.Either a b;
+hiding data Database.CDBI.Connection.DBError;
+hiding data Prelude.Char;
+instance Prelude.Data Database.CDBI.Criteria.Condition {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+hiding data Database.CDBI.Criteria.RelOp;
+hiding data Prelude.Int;
+instance Prelude.Data Database.CDBI.Criteria.Constraint {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+hiding data Prelude.Maybe a;
+hiding data Database.CDBI.Criteria.GroupBy;
+instance Prelude.Data Database.CDBI.Criteria.Criteria {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance Prelude.Data Database.CDBI.Criteria.Option {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance Prelude.Data Database.CDBI.Criteria.Specifier {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance Prelude.Data (Database.CDBI.Criteria.Value a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+hiding data Database.CDBI.QueryTypes.ColumnSingleCollection a;
+instance Prelude.Data Database.CDBI.QueryTypes.Join {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.QueryTypes #-};
+instance Prelude.Data Database.CDBI.QueryTypes.SetOp {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.QueryTypes #-};
+instance Prelude.Data Database.CDBI.QueryTypes.TableClause {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.QueryTypes #-};
+hiding data Prelude.IO a;
+hiding class Prelude.Show a;
+hiding data Prelude.Bool;
+hiding data Prelude.Float;
+hiding data Database.CDBI.Description.Column a;
+hiding data Database.CDBI.Criteria.ColVal;
+hiding data Data.Time.ClockTime;
+hiding data Database.CDBI.Criteria.GroupByTail;
+hiding class Prelude.Read a;
+hiding data Database.CDBI.Connection.SQLType;
+hiding data Database.CDBI.Connection.SQLValue;
+hiding class Prelude.Monad a => (Prelude.MonadFail :: (* -> *) ->
+                                                      Constraint) a;
+hiding class Prelude.Applicative a => (Prelude.Monad :: (* -> *) ->
+                                                        Constraint) a;
+hiding class (Prelude.Functor :: (* -> *) -> Constraint) a;
+hiding class Prelude.Functor a => (Prelude.Applicative :: (* ->
+                                                           *) ->
+                                                          Constraint) a;
+instance Prelude.Show Database.CDBI.Connection.DBError {
+  showsPrec 2
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Eq Database.CDBI.Connection.DBError {
+  (==) 2
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Data Database.CDBI.Connection.DBError {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Connection #-};
+hiding class Prelude.Data a;
+instance Prelude.Data Database.CDBI.Criteria.RelOp {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance Prelude.Data Database.CDBI.Criteria.GroupBy {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e, Prelude.Show f) => Prelude.Show (a,
+                                                                           b, c, d, e, f) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d, Prelude.Show e) => Prelude.Show (a, b, c, d, e) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b, Prelude.Show c,
+          Prelude.Show d) => Prelude.Show (a, b, c, d) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b,
+          Prelude.Show c) => Prelude.Show (a, b, c) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a,
+          Prelude.Show b) => Prelude.Show (Prelude.Either a b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Show a, Prelude.Show b) => Prelude.Show (a, b) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show (Prelude.Maybe a) {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show a => Prelude.Show [a] {
+  showsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Ordering {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Int {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.IOError {
+  show 1
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Float {
+  showsPrec 0
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Char {
+  showList 1;
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show Prelude.Bool {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Show () {
+  showsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data (Database.CDBI.Description.Column a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Description #-};
+instance Prelude.Data Database.CDBI.Criteria.ColVal {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance Prelude.Show Data.Time.ClockTime {
+  showsPrec 2
+} {-# MODULE Data.Time #-};
+instance Prelude.Read Data.Time.ClockTime {
+  readsPrec 2
+} {-# MODULE Data.Time #-};
+instance Prelude.Ord Data.Time.ClockTime {
+  (<=) 2
+} {-# MODULE Data.Time #-};
+instance Prelude.Eq Data.Time.ClockTime {
+  (==) 2
+} {-# MODULE Data.Time #-};
+instance Prelude.Data Data.Time.ClockTime {
+  (===) 2;
+  aValue 0
+} {-# MODULE Data.Time #-};
+instance Prelude.Data Database.CDBI.Criteria.GroupByTail {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Criteria #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e, Prelude.Read f) => Prelude.Read (a,
+                                                                           b, c, d, e, f) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d, Prelude.Read e) => Prelude.Read (a, b, c, d, e) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b, Prelude.Read c,
+          Prelude.Read d) => Prelude.Read (a, b, c, d) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b,
+          Prelude.Read c) => Prelude.Read (a, b, c) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a,
+          Prelude.Read b) => Prelude.Read (Prelude.Either a b) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Read a, Prelude.Read b) => Prelude.Read (a, b) {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read (Prelude.Maybe a) {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read a => Prelude.Read [a] {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Ordering {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Int {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Float {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Char {
+  readList 1;
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Read Prelude.Bool {
+  readsPrec 2
+} {-# MODULE Prelude #-};
+instance Prelude.Read () {
+  readsPrec 1
+} {-# MODULE Prelude #-};
+instance Prelude.Data Database.CDBI.Connection.SQLType {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Show Database.CDBI.Connection.SQLValue {
+  showsPrec 2
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.Data Database.CDBI.Connection.SQLValue {
+  (===) 2;
+  aValue 0
+} {-# MODULE Database.CDBI.Connection #-};
+instance Prelude.MonadFail Prelude.Maybe {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail Prelude.IO {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail [] {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.Monad (Prelude.Either a) {
+  (>>=) 2;
+  return 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad ((->) a) {
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.Maybe {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.IO {
+  (>>) 0;
+  (>>=) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad [] {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor (Prelude.Either a) {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor ((->) a) {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.Maybe {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.IO {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor [] {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative (Prelude.Either a) {
+  (<*>) 0;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative ((->) a) {
+  liftA2 4;
+  (<*>) 3;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.Maybe {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.IO {
+  liftA2 0;
+  (<*>) 0;
+  (*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative [] {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 1
+} {-# MODULE Prelude #-};
+hiding class Prelude.Eq a;
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f,
+          Prelude.Data g) => Prelude.Data (a, b, c, d, e, f, g) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f) => Prelude.Data (a,
+                                                                           b, c, d, e, f) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e) => Prelude.Data (a, b, c, d, e) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d) => Prelude.Data (a, b, c, d) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b,
+          Prelude.Data c) => Prelude.Data (a, b, c) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a,
+          Prelude.Data b) => Prelude.Data (Prelude.Either a b) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b) => Prelude.Data (a, b) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data (Prelude.Maybe a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data [a] {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Ordering {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Int {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.IOError {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Float {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Char {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Bool {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data () {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+hiding data Prelude.Ordering;
+hiding data Prelude.IOError;
+hiding class Prelude.Eq a => Prelude.Ord a;
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e, Prelude.Eq f) => Prelude.Eq (a, b, c, d, e, f) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c, Prelude.Eq d,
+          Prelude.Eq e) => Prelude.Eq (a, b, c, d, e) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b, Prelude.Eq c,
+          Prelude.Eq d) => Prelude.Eq (a, b, c, d) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b,
+          Prelude.Eq c) => Prelude.Eq (a, b, c) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a,
+          Prelude.Eq b) => Prelude.Eq (Prelude.Either a b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Eq a, Prelude.Eq b) => Prelude.Eq (a, b) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq (Prelude.Maybe a) {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq a => Prelude.Eq [a] {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Ordering {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Int {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.IOError {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Float {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Char {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq Prelude.Bool {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Eq () {
+  (==) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Ord a, Prelude.Ord b, Prelude.Ord c,
+          Prelude.Ord d, Prelude.Ord e) => Prelude.Ord (a, b, c, d, e) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Ord a, Prelude.Ord b, Prelude.Ord c,
+          Prelude.Ord d) => Prelude.Ord (a, b, c, d) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Ord a, Prelude.Ord b,
+          Prelude.Ord c) => Prelude.Ord (a, b, c) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Ord a,
+          Prelude.Ord b) => Prelude.Ord (Prelude.Either a b) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Ord a, Prelude.Ord b) => Prelude.Ord (a, b) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord a => Prelude.Ord (Prelude.Maybe a) {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord a => Prelude.Ord [a] {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord Prelude.Ordering {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord Prelude.Int {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord Prelude.Float {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord Prelude.Char {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord Prelude.Bool {
+  (<=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Ord () {
+  (<=) 2
+} {-# MODULE Prelude #-}
+}

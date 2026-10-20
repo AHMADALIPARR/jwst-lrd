@@ -1,0 +1,611 @@
+\section{CASS: A Generic Curry Analysis Server System}
+\label{sec-cass}
+
+CASS\index{CASS}\index{analyzing programs}\index{program!analysis}
+(Curry Analysis Server System)
+is a tool for the analysis of Curry programs.
+CASS is generic so that various kinds of analyses (e.g., groundness,
+non-determinism, demanded arguments) can be easily integrated into CASS.
+In order to analyze larger applications consisting of dozens or hundreds
+of modules, CASS supports a modular and incremental analysis of
+programs. Moreover, it can be used by different programming tools,
+like documentation generators, analysis environments, program
+optimizers, as well as Eclipse-based development environments. For
+this purpose, CASS can also be invoked as a server system to get a
+language-independent access to its functionality. CASS is completely
+implemented Curry as a master/worker architecture to exploit parallel
+or distributed execution environments.
+The general design and architecture of CASS is described
+in \cite{HanusSkrlac14}.
+In the following, CASS is presented from a perspective
+of a programmer who is interested to analyze Curry programs.
+
+\subsection{Installation}
+
+The current implementation of CASS is a package
+managed by the Curry Package Manager CPM.
+Thus, to install the newest version of CASS, use the following commands:
+%
+\begin{curry}
+> cypm update
+> cypm install cass
+\end{curry}
+%
+This downloads the newest package, compiles it, and places
+the executable \code{cass} into the directory \code{\$HOME/.cpm/bin}.
+Hence it is recommended to add this directory to your path
+in order to execute CASS as described below.
+
+\subsection{Using CASS to Analyze Programs}
+
+CASS is intended to analyze various operational properties
+of Curry programs. Currently, it contains more than a dozen
+program analyses for various properties.
+Since most of these analyses are based on abstract interpretations,
+they usually approximate program properties.
+To see the list of all available analyses, use the help option of CASS:
+\begin{curry}
+> cass -h
+Usage: $\ldots$
+$\vdots$
+Registered analyses names:
+$\ldots$
+Demand          : Demanded arguments
+Deterministic   : Deterministic operations
+$\vdots$
+\end{curry}
+More information about the meaning of the various analyses
+can be obtained by adding the short name of the analysis:
+\begin{curry}
+> cass -h Deterministic
+$\ldots$
+\end{curry}
+For instance, consider the following Curry module \code{Rev.curry}:
+\begin{curry}
+append :: [a] -> [a] -> [a]
+append []     ys = ys
+append (x:xs) ys = x : append xs ys
+
+rev :: [a] -> [a]
+rev []     = []
+rev (x:xs) = append (rev xs) [x]
+
+nth :: [a] -> Int -> a
+nth (x:xs) n | n == 0 = x
+             | n > 0  = nth xs (n - 1)
+\end{curry}
+%
+CASS supports three different usage modes to analyze this program.
+
+\subsubsection{Batch Mode}
+
+In the batch mode, CASS is started as a separate application
+via the shell command \code{cass},
+where the analysis name and the name of the module to be analyzed
+must be provided:\footnote{More output is generated when
+the property \code{debugLevel} is changed in the configuration file
+\code{.cassrc} which is installed in the user's home directory
+when CASS is started for the first time.}
+\begin{curry}
+> cass Demand Rev
+append : demanded arguments: 1
+nth : demanded arguments: 1,2
+rev : demanded arguments: 1
+\end{curry}
+The \code{Demand} analysis shows the list of argument positions
+(e.g., 1 for the first argument) which are demanded in order
+to reduce an application of the operation to some constructor-rooted value.
+Here we can see that both arguments of \code{nth} are demanded
+whereas only the first argument of \code{append} is demanded.
+This information could be used in a Curry compiler
+to produce more efficient target code.
+
+The batch mode is useful to test a new analysis and get the information
+in human-readable form so that one can experiment
+with different abstractions or analysis methods.
+
+\subsubsection{API Mode}
+
+The API mode is intended to use analysis information in some
+application implemented in Curry. Since CASS is implemented in Curry,
+one can import the modules of the CASS implementation and
+use the CASS interface operations to start an analysis and use the
+computed results. For instance, CASS provides an operation
+(defined in module \code{CASS.Server})
+\begin{curry}
+analyzeGeneric :: Analysis a -> String -> IO (Either (ProgInfo a) String)
+\end{curry}
+to apply an analysis (first argument) to some module (whose name is
+given in the second argument). The result is either the analysis
+information computed for this module or an error message in case of
+some execution error.
+
+In order to use CASS via the API mode in a Curry program,
+one has to use the package \code{cass} by the Curry package manager CPM
+(the subsequent explanation assumes familiarity with the basic
+features of CPM):
+\begin{enumerate}
+\item
+Add the dependency on package \code{cass} and also on
+package \code{cass-analysis}, which contains some base definitions,
+in the package specification file \code{package.json}.
+\item
+Install these dependencies by \ccode{cypm install}.
+\end{enumerate}
+Then you can import in your application the modules
+provided by CASS.
+
+The module \code{Analysis.ProgInfo} (from package \code{cass-analysis})
+contains operations to access the analysis information computed by CASS.
+For instance, the operation
+\begin{curry}
+lookupProgInfo:: QName -> ProgInfo a -> Maybe a
+\end{curry}
+returns the information about a given qualified name in the
+analysis information, if it exists.
+As a simple example, consider the demand analysis which is implemented
+in the module \code{Analysis.Demandedness} by the following operation:
+\begin{curry}
+demandAnalysis :: Analysis DemandedArgs
+\end{curry}
+\code{DemendedArgs} is just a type synonym for \code{[Int]}.
+We can use this analysis in the following simple program:
+\begin{currynomath}
+import CASS.Server           ( analyzeGeneric )
+import Analysis.ProgInfo     ( lookupProgInfo )
+import Analysis.Demandedness ( demandAnalysis )
+
+demandedArgumentsOf :: String -> String -> IO [Int]
+demandedArgumentsOf modname fname = do
+  deminfo <- analyzeGeneric demandAnalysis modname >>= return . either id error
+  return $ maybe [] id (lookupProgInfo (modname,fname) deminfo)
+\end{currynomath} %$
+Of course, in a realistic program, the program analysis
+is performed only once and the computed information \code{deminfo}
+is passed around to access it several times.
+Nevertheless, we can use this simple program to compute the
+demanded arguments of \code{Rev.nth}:
+\begin{curry}
+$\ldots$> demandedArgumentsOf "Rev" "nth"
+[1,2]
+\end{curry}
+
+
+\subsubsection{Server Mode}
+
+The server mode of CASS can be used in an application implemented in
+some language that does not have a direct interface to Curry.
+In this case, one can connect to CASS via
+some socket using a simple communication protocol that is specified
+in the file \code{Protocol.txt} (in package \code{cass})
+and sketched below.
+
+To start CASS in the server mode, one has to execute the command
+\begin{curry}
+> cass --server [ -p <port> ]
+\end{curry}
+where an optional port number for the communication can be
+provided. Otherwise, a free port number is chosen and shown. In the
+server mode, CASS understands the following commands:
+\begin{curry}
+GetAnalysis
+SetCurryPath <dir1>:<dir2>:...
+AnalyzeModule          <analysis name> <output type> <module name>
+AnalyzeInterface       <analysis name> <output type> <module name>
+AnalyzeFunction        <analysis name> <output type> <module name> <function name>
+AnalyzeDataConstructor <analysis name> <output type> <module name> <constructor name>
+AnalyzeTypeConstructor <analysis name> <output type> <module name> <type name>
+StopServer
+\end{curry}
+The output type can be \code{Text}, \code{CurryTerm}, or \code{XML}.
+The answer to each request can have two formats:
+\begin{curry}
+error <error message>
+\end{curry}
+if an execution error occured, or
+\begin{curry}
+ok <n>
+<result text>
+\end{curry}
+where \code{<n>} is the number of lines of the result text.
+For instance, the answer to the command \code{GetAnalysis}
+is a list of all available analyses. The list has the form
+\begin{curry}
+<analysis name> <output type>
+\end{curry}
+For instance, a communication could be:
+\begin{curry}
+> GetAnalysis
+< ok 5
+< Deterministic curryterm
+< Deterministic text
+< Deterministic json
+< HigherOrder   curryterm
+< DependsOn     curryterm
+\end{curry}
+The command \code{SetCurryPath} instructs CASS to use the given
+directories to search for modules to be analyzed. This is necessary
+since the CASS server might be started in a different location than
+its client.
+
+Complete modules are analyzed by \code{AnalyzeModule}, whereas
+\code{AnalyzeInterface} returns only the analysis information of exported
+entities. Furthermore, the analysis results of individual functions,
+data or type constructors are returned with the remaining analysis
+commands. Finally, \code{StopServer} terminates the CASS server.
+
+For instance, if we start CASS by
+\begin{curry}
+> cass --server -p 12345
+\end{curry}
+we can communicate with CASS as follows (user inputs are prefixed by \ccode{>});
+\begin{curry}
+> telnet localhost 12345
+Connected to localhost.
+> GetAnalysis
+ok 198
+Functional text
+Functional short
+Functional curryterm
+Functional json
+Functional jsonterm
+Functional xml
+Overlapping text
+...
+> AnalyzeModule Demand text Rev
+ok 3
+append : demanded arguments: 1
+nth : demanded arguments: 1,2
+rev : demanded arguments: 1
+> AnalyzeModule Demand curryterm Rev
+ok 1
+[(("Rev","append"),"[1]"),(("Rev","nth"),"[1,2]"),(("Rev","rev"),"[1]")]
+> AnalyzeModule Demand json Rev
+ok 15
+[ {
+  "module": "Rev",
+  "name": "append",
+  "result": "demanded arguments: 1"
+}
+, {
+  "module": "Rev",
+  "name": "nth",
+  "result": "demanded arguments: 1,2"
+}
+, {
+  "module": "Rev",
+  "name": "rev",
+  "result": "demanded arguments: 1"
+} ]
+> AnalyzeModule Demand xml Rev
+ok 19
+<?xml version="1.0" standalone="yes"?>
+
+<results>
+  <operation>
+    <module>Rev</module>
+    <name>append</name>
+    <result>demanded arguments: 1</result>
+  </operation>
+  <operation>
+    <module>Rev</module>
+    <name>nth</name>
+    <result>demanded arguments: 1,2</result>
+  </operation>
+  <operation>
+    <module>Rev</module>
+    <name>rev</name>
+    <result>demanded arguments: 1</result>
+  </operation>
+</results>
+> StopServer
+ok 0
+Connection closed by foreign host.
+\end{curry}
+
+
+\subsection{Implementing Program Analyses}
+
+This section explains the implementation of program analyses
+available in CASS.
+Since CASS is implemented in Curry, a program analysis
+must also be implemented in Curry and added to the source code of CASS.
+Therefore, one has to download the source code
+which is easily done by the command
+\begin{curry}
+> cypm checkout cass
+\end{curry}
+This downloads the most recent version of CASS as a Curry package
+into the directory \code{cass}.
+
+Each program analysis accessible by CASS must be registered
+in the CASS module \code{CASS.Registry}.
+Such an analysis must contain an operation of type
+\begin{curry}
+Analysis a
+\end{curry}
+where \ccode{a} denotes the type of analysis results.
+Furthermore, the analysis must also contain a ``show'' operation of type
+\begin{curry}
+AOutFormat -> a -> String
+\end{curry}
+intended to show the analysis results in various formats.
+The type \code{AOutFormat} is defined in module
+\code{Analysis.Types} of package \code{cass-analysis} as
+\begin{curry}
+data AOutFormat = AText | ANote
+\end{curry}
+It is intended to specify the desired kind of output,
+e.g., \code{AText} for a longer standard
+textual representation or \code{ANote} for a short note
+(e.g., in the Curry Browser).
+
+Thus, in order to add a new analysis to CASS, one has to do the following
+steps:
+\begin{enumerate}
+\item
+Implement a corresponding analysis operation and show operation.
+\item
+Registering it in the module \code{CASS.Registry}
+(in the constant \code{registeredAnalysis}).
+\item
+Compile/install the modified CASS implementation.
+\end{enumerate}
+In the following, we explain these steps by some examples.
+%
+For instance, the \code{Overlapping} analysis should indicate
+whether a Curry operation is defined by overlapping rules.
+This analysis can be implemented as a function
+\begin{curry}
+overlapAnalysis :: Analysis Bool
+\end{curry}
+so that the analysis result is \code{False} if the analyzed
+operation is not defined by overlapping rules.
+
+In general, an analysis is implemented as a mapping from Curry operations,
+represented in FlatCurry, into the analysis result.
+Hence, to implement the \code{Overlapping} analysis, we define
+the following operation on function declarations in FlatCurry format:
+\begin{curry}
+import FlatCurry.Types
+$\ldots$
+isOverlappingFunction :: FuncDecl -> Bool
+isOverlappingFunction (Func _ _ _ _ (Rule _ e))   = orInExpr e
+isOverlappingFunction (Func f _ _ _ (External _)) = f == ("Prelude","?")
+
+-- Check an expression for occurrences of Or:
+orInExpr :: Expr -> Bool
+orInExpr (Var _)       = False
+orInExpr (Lit _)       = False
+orInExpr (Comb _ f es) = f == ("Prelude","?") || any orInExpr es
+orInExpr (Free _ e)    = orInExpr e
+orInExpr (Let bs e)    = any orInExpr (map snd bs) || orInExpr e
+orInExpr (Or _ _)      = True
+orInExpr (Case _ e bs) = orInExpr e || any orInBranch bs
+ where orInBranch (Branch _ be) = orInExpr be
+orInExpr (Typed e _)   = orInExpr e
+\end{curry}
+%
+In order to support the inclusion of different kinds of analyses in CASS,
+CASS offers several constructor operations for the abstract type
+\ccode{Analysis a}
+(which is defined in module \code{Analysis.Types}).
+Each analysis has a name provided as a first argument
+to these constructors. The name is used to store the
+analysis information persistently and to pass specific analysis tasks
+to analysis workers.
+For instance, a simple function analysis which depends only on a
+given function definition can be defined by the
+analysis constructor
+\begin{curry}
+simpleFuncAnalysis :: String -> (FuncDecl -> a) -> Analysis a
+\end{curry}
+The arguments are the analysis name and the actual analysis function.
+Hence, the ``overlapping rules'' analysis can be specified as
+\begin{curry}
+import Analysis.Types
+$\ldots$
+overlapAnalysis :: Analysis Bool
+overlapAnalysis = simpleFuncAnalysis "Overlapping" isOverlappingFunction
+\end{curry}
+In order to integrate this analysis into CASS, we also have to
+define an operation to show the analysis results in a human-readable form:
+%
+\begin{curry}
+showOverlap :: AOutFormat -> Bool -> String
+showOverlap _     True  = "overlapping"
+showOverlap AText False = "non-overlapping"
+showOverlap ANote False = ""
+\end{curry}
+%
+Here, the typical case of non-overlapping rules is not printed
+in case of short notes.
+
+Now we have all elements available in order to add this analysis to CASS.
+To support this easily, there is an operation
+%
+\begin{curry}
+cassAnalysis :: (Read a, Show a, Eq a)
+             => String -> Analysis a -> (AOutFormat -> a -> String)
+             -> RegisteredAnalysis
+\end{curry}
+%
+to transform an analysis with some title, an analysis operation,
+and a ``show'' operation into an analysis ready to be registered in CASS.
+The actually registered analyses are specified by the constant
+%
+\begin{curry}
+registeredAnalysis :: [RegisteredAnalysis]
+\end{curry}
+%
+defined in module \code{CASS.Registry}.
+Hence, the \code{Overlapping} can be integrated into CASS
+by adding it to the definition of \code{registeredAnalysis}, e.g.,
+%
+\begin{curry}
+registeredAnalysis :: [RegisteredAnalysis]
+registeredAnalysis =
+  [
+  $\vdots$
+  cassAnalysis "Overlapping rules" overlapAnalysis showOverlap
+  $\vdots$
+  ]
+\end{curry}
+%
+As a final step, we have to compile and install this extended
+version of CASS by executing
+\begin{curry}
+> cypm install
+\end{curry}
+in the downloaded package. After this step, one can executed
+\begin{curry}
+> cass --help
+\end{curry}
+to check whether the \code{Overlapping} analysis occurs in the list
+of registered analyses names.
+
+To show an example of a more complex kind of analysis, we consider
+a determinism analysis.
+Such an analysis could be based
+on an abstract domain described by the data type
+%
+\begin{curry}
+data Deterministic = NDet | Det
+  deriving (Eq, Read, Show)
+\end{curry}
+%
+Here, \code{Det} is interpreted as ``the operation always evaluates
+in a deterministic manner on ground constructor terms.''
+However, \code{NDet} is interpreted as ``the operation \emph{might}
+evaluate in different ways for given ground constructor terms.''
+The apparent imprecision is due to the approximation of the analysis.
+For instance, if the function \code{f} is defined by overlapping rules
+and the function \code{g} \emph{might} call \code{f}, then \code{g}
+is judged as non-deterministic (since it is generally undecidable
+whether \code{f} is actually called by \code{g} in some run of the
+program).
+
+The determinism analysis requires to examine the current
+function as well as all directly or indirectly called functions
+for overlapping rules.
+Due to recursive function definitions, this analysis cannot be done
+in one shot for a given function---it requires a fixpoint computation.
+CASS provides such fixpoint computations and simplifies
+its implementation by requiring only the implementation
+of an operation of type
+\begin{curry}
+FuncDecl -> [(QName,a)] -> a
+\end{curry}
+where \ccode{a} denotes the type of abstract values.
+The second argument of type \code{[(QName,a)]}
+represents the currently known analysis values
+for the functions \emph{directly} used in this function declaration.
+Hence, in the implementation one can assume that the analysis
+results of all functions occurring in the definition of
+the function to be analyzed are already known, although they
+will be approximated by a fixpoint computation performed by CASS.
+Technically, the abstract values must be a domain with some
+bottom element and the analysis operation must be monotone.
+Since this is not checked by CASS, we omit these details.
+
+In our example, the determinism analysis can be implemented
+by the following operation:
+\begin{curry}
+detFunc :: FuncDecl -> [(QName,Deterministic)] -> Deterministic
+detFunc (Func f _ _ _ (External _)) _           = f == ("Prelude","?")
+detFunc (Func f _ _ _ (Rule _ e))   calledFuncs =
+  if orInExpr e || freeVarInExpr e || any (==NDet) (map snd calledFuncs)
+    then NDet
+    else Det
+\end{curry}
+Thus, it computes the abstract value \code{NDet}
+if the function itself is defined by overlapping rules or
+contains free variables that might cause non-deterministic guessing
+(we omit the definition of \code{freeVarInExpr} since it is quite
+similar to \code{orInExpr}), or
+if it depends on some non-deterministic function.
+
+To support the integration of such fixpoint analyses in CASS,
+there exists the following analysis constructor:
+\begin{curry}
+dependencyFuncAnalysis :: String -> a -> (FuncDecl -> [(QName,a)] -> a)
+                       -> Analysis a
+\end{curry}
+Here, the second argument specifies the start value of the fixpoint analysis,
+i.e., the bottom element of the abstract domain.
+Hence, the complete determinism analysis can be specified as
+%
+\begin{curry}
+detAnalysis :: Analysis Deterministic
+detAnalysis = dependencyFuncAnalysis "Deterministic" Det detFunc
+\end{curry}
+%
+In order to register this analysis, we define a show function
+%
+\begin{curry}
+showDet :: AOutFormat -> Deterministic -> String
+showDet _     NDet = "non-deterministic"
+showDet AText Det  = "deterministic"
+showDet ANote Det  = ""
+\end{curry}
+%
+extend the definiton of \code{registeredAnalysis} by the line
+%
+\begin{curry}
+cassAnalysis "Deterministic operations" detAnalysis showDet
+\end{curry}
+%
+and compile and install the package.
+
+This simple definition is sufficient to execute this analysis with CASS,
+since the analysis system takes care of computing fixpoints,
+calling the analysis functions with appropriate values,
+analyzing imported modules, caching analysis results, etc.
+The actual analysis time depends on the size of modules and their imports,
+the size of the dependencies, and the
+number of fixpoint iterations (which depends also on the depth
+of the abstract domain).\footnote{CASS supports different
+methods to compute fixpoints, see
+the property \code{fixpoint} in the configuration file
+\code{.cassrc} which is installed in the user's home directory
+when CASS is started for the first time.
+This property can also be set in the command to invoke CASS.}
+Beyond the analysis time, it is also important that the analysis
+terminates, which is not ensured in general fixpoint computations.
+Termination can be achieved by using
+an abstract domain with finitely many values and defining
+the analysis function so that it is monotone w.r.t.\ some ordering
+on the abstract values.
+
+\paragraph{Required class instances.}
+Note that the type of an abstract domain are required to have
+instances of the type classes \code{Eq}, \code{Read}, \code{Show},
+and \code{ReadWrite}, since abstract values need to be compared
+(e.g., to check whether a fixpoint has been reached)
+and persistently stored (to support an incremental modular analysis).
+Whereas instances of \code{Eq}, \code{Read}, and \code{Show}
+can be automatically derived (via a \code{deriving} annotation
+as shown above),
+instances of \code{ReadWrite} (which support a compact data representation)
+can be generated by the tool \code{curry-rw-data}.
+This tool is available as a Curry package and can be installed by
+%
+\begin{curry}
+> cypm install rw-data-generator
+\end{curry}
+%
+Then, \code{ReadWrite} instances of all data types defined
+in a module \code{AnaMod} can be generated by the command
+%
+\begin{curry}
+> curry-rw-data AnaMod
+\end{curry}
+%
+This command generates a new module \code{AnaModRW} containing
+the instance definitions which might be inserted into
+the analysis implementation module \code{AnaMod}.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

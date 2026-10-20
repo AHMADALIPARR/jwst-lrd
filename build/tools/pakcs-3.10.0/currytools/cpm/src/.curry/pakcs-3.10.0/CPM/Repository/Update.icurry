@@ -1,0 +1,214 @@
+interface CPM.Repository.Update where {
+import CPM.Config;
+import CPM.ErrorLogger;
+import Prelude;
+addPackageToRepository
+4
+::
+CPM.Config.Config -> [Prelude.Char] -> Prelude.Bool ->
+Prelude.Bool -> CPM.ErrorLogger.ErrorLogger ();
+updateRepository
+5
+::
+CPM.Config.Config -> Prelude.Bool -> Prelude.Bool ->
+Prelude.Bool -> Prelude.Bool -> CPM.ErrorLogger.ErrorLogger ();
+hiding data CPM.Config.Config;
+hiding data Prelude.Char;
+hiding data Prelude.Bool;
+hiding data CPM.ErrorLogger.ErrorLogger a;
+instance Prelude.Data CPM.Config.Config {
+  (===) 2;
+  aValue 0
+} {-# MODULE CPM.Config #-};
+instance Prelude.MonadFail CPM.ErrorLogger.ErrorLogger {
+  fail 1
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Monad CPM.ErrorLogger.ErrorLogger {
+  (>>=) 2;
+  return 1
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Functor CPM.ErrorLogger.ErrorLogger {
+  fmap 2
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Applicative CPM.ErrorLogger.ErrorLogger {
+  (<*>) 2;
+  pure 0
+} {-# MODULE CPM.ErrorLogger #-};
+instance Prelude.Alternative CPM.ErrorLogger.ErrorLogger {
+  (<|>) 2;
+  empty 0
+} {-# MODULE CPM.ErrorLogger #-};
+hiding class Prelude.Data a;
+hiding class Prelude.Monad a => (Prelude.MonadFail :: (* -> *) ->
+                                                      Constraint) a;
+hiding class Prelude.Applicative a => (Prelude.Monad :: (* -> *) ->
+                                                        Constraint) a;
+hiding class (Prelude.Functor :: (* -> *) -> Constraint) a;
+hiding class Prelude.Functor a => (Prelude.Applicative :: (* ->
+                                                           *) ->
+                                                          Constraint) a;
+hiding class Prelude.Applicative a => (Prelude.Alternative :: (* ->
+                                                               *) ->
+                                                              Constraint) a;
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f,
+          Prelude.Data g) => Prelude.Data (a, b, c, d, e, f, g) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e, Prelude.Data f) => Prelude.Data (a,
+                                                                           b, c, d, e, f) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d, Prelude.Data e) => Prelude.Data (a, b, c, d, e) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b, Prelude.Data c,
+          Prelude.Data d) => Prelude.Data (a, b, c, d) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b,
+          Prelude.Data c) => Prelude.Data (a, b, c) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a,
+          Prelude.Data b) => Prelude.Data (Prelude.Either a b) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance (Prelude.Data a, Prelude.Data b) => Prelude.Data (a, b) {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data (Prelude.Maybe a) {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data a => Prelude.Data [a] {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Ordering {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Int {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.IOError {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Float {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Char {
+  aValue 0;
+  (===) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data Prelude.Bool {
+  (===) 2;
+  aValue 0
+} {-# MODULE Prelude #-};
+instance Prelude.Data () {
+  aValue 0;
+  (===) 2
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail Prelude.Maybe {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail Prelude.IO {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.MonadFail [] {
+  fail 1
+} {-# MODULE Prelude #-};
+instance Prelude.Monad (Prelude.Either a) {
+  (>>=) 2;
+  return 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad ((->) a) {
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.Maybe {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Monad Prelude.IO {
+  (>>) 0;
+  (>>=) 0
+} {-# MODULE Prelude #-};
+instance Prelude.Monad [] {
+  (>>) 0;
+  (>>=) 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor (Prelude.Either a) {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor ((->) a) {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.Maybe {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor Prelude.IO {
+  fmap 2
+} {-# MODULE Prelude #-};
+instance Prelude.Functor [] {
+  fmap 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative (Prelude.Either a) {
+  (<*>) 0;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative ((->) a) {
+  liftA2 4;
+  (<*>) 3;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.Maybe {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative Prelude.IO {
+  liftA2 0;
+  (<*>) 0;
+  (*>) 2;
+  pure 0
+} {-# MODULE Prelude #-};
+instance Prelude.Applicative [] {
+  liftA2 3;
+  (*>) 2;
+  (<*>) 2;
+  pure 1
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative Prelude.Maybe {
+  (<|>) 2;
+  empty 0
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative Prelude.IO {
+  (<|>) 2;
+  empty 0
+} {-# MODULE Prelude #-};
+instance Prelude.Alternative [] {
+  (<|>) 0;
+  empty 0
+} {-# MODULE Prelude #-};
+hiding data Prelude.Either a b;
+hiding data Prelude.Maybe a;
+hiding data Prelude.Ordering;
+hiding data Prelude.Int;
+hiding data Prelude.IOError;
+hiding data Prelude.Float;
+hiding data Prelude.IO a
+}

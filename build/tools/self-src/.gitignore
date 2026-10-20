@@ -1,0 +1,14 @@
+.DS_Store
+*.o
+*~
+*.snap
+*.snap.backup
+*.old
+*.file_status
+*.xcuserdatad
+*.xcworkspace
+*.xcuserstate
+*.OLD
+build/
+objects/glue/test*
+

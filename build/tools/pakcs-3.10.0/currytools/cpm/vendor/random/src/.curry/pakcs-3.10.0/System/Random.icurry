@@ -1,0 +1,11 @@
+interface System.Random where {
+import Prelude;
+getRandomSeed 0 :: Prelude.IO Prelude.Int;
+nextBoolean 1 :: Prelude.Int -> [Prelude.Bool];
+nextInt 1 :: Prelude.Int -> [Prelude.Int];
+nextIntRange 2 :: Prelude.Int -> Prelude.Int -> [Prelude.Int];
+shuffle 2 :: Prelude.Int -> [a] -> [a];
+hiding data Prelude.IO a;
+hiding data Prelude.Int;
+hiding data Prelude.Bool
+}
