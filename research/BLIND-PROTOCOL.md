@@ -7,7 +7,7 @@ Charter: preserve observations exactly. Verify computations independently. Keep 
 ## Data (frozen)
 - Primary: fixtures/raw/c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7.fits (obsid 230168921, jw02561-o006_s000024175_nirspec_clear-prism_x1d.fits, NIRSpec PRISM/CLEAR).
 - Arrays: the LRD-ARR-v1 WAVELENGTH (um), FLUX (Jy) and FLUX_ERROR (Jy) exported by ingest, on the `integration` branch.
-- Excluded: 09bcd907... (all-negative FLUX). It is kept only as provenance.
+- Excluded: 09bcd907... (FLUX predominantly negative: 363 of 398 finite values). It is kept only as provenance.
 - Nobody edits, rescales or cleans the raw arrays. Every transformation (unit conversion, masking, resampling) is a logged step with its own LRD-ARR-v1 output and sha256.
 
 ## Shared likelihood (identical for all fitters)
