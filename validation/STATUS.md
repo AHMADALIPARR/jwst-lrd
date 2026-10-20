@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only. Also licensed under the SnapKitty Opaque License; see LICENSE and SNAPKITTY_OPAQUE_LICENSE.md at the repository root. -->
 # validation/STATUS.md: TASK 014 cross-language differential harness
 
-Last run: 2026-10-19 22:49 PDT. Entry point `tests/validation/run.sh` -> `validation/harness.sh` (bash), comparator
+Last run: 2026-10-19 23:03 PDT. Entry point `tests/validation/run.sh` -> `validation/harness.sh` (bash), comparator
 `validation/lrdcmp.c` (C, via abi/lrd_num_abi), FP probe `validation/fp_probe.c`, programs `validation/programs/*.lrd`,
 tolerances `validation/tolerances.tsv` (= table in `validation/FP_POLICY.md`; equality is itself a test).
 
@@ -34,11 +34,11 @@ output cannot pass.
 
 ## Blockers
 - MATLAB and SAS are licensed and not installed. They stay UNAVAILABLE.
-- t001 Fortran publishes only fixed real-product outputs, so restframe and chi2 have no t001 Fortran reference.
+- t001 Fortran publishes only fixed real-product outputs, so synthetic restframe/convert/residuals/chi2 have no t001
+  Fortran reference. Real-data masked chi2 IS compared against the Fortran reference.kv values in tests/llvm/run.sh.
 - References track moving branches. The heads used are printed above and in the futhark/fortran_fut build test names.
 
-## Verbatim output of `bash tests/validation/run.sh` (after commit)
-Exit code: 0. Counts: PASS 31, FAIL 0, UNAVAILABLE 9.
+## Verbatim output of `bash tests/validation/run.sh` (after commit 38997017595aa22ae0ea648e5b4d12ca3302052a)
 ```
 PASS toolchain_llvm_pinned
 PASS tool_present_gfortran
@@ -81,11 +81,12 @@ PASS fortran_fut_vs_lrdc_convert_real
 UNAVAILABLE matlab_reference matlab not installed (licensed software); no matlab/ reference outputs in any worktree
 UNAVAILABLE sas_reference sas not installed (licensed software); no sas/ reference outputs in any worktree
 ```
+Exit code: 0
 
 ## Git state
-`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `b328cfde7836e06d5434b5f049a67f381885f02c`. That is the first t014 commit, which holds all t014 sources. This STATUS file is committed afterwards in a second, STATUS-only commit, so the branch head is one commit later than the hash above. A commit cannot contain its own hash.
+`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `38997017595aa22ae0ea648e5b4d12ca3302052a`. That commit holds all sources for this round (mask ops, masked real-data chi2, CONTRACTS v1.2 docs) on top of merge b2294fd (origin/main f83eb5b merged into t014-llvm). This STATUS file is committed afterwards in a STATUS-only commit, so the branch head is one commit later. A commit cannot contain its own hash.
 
-`git -C /workspace/jwst-lrd-t014 status --short`:
+`git status --short` at the time of this run:
 ```
 (clean: no output)
 ```

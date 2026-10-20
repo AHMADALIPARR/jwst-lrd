@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only. Also licensed under the SnapKitty Opaque License; see LICENSE and SNAPKITTY_OPAQUE_LICENSE.md at the repository root. -->
 # llvm/STATUS.md: TASK 014 (LRD-IR -> LLVM pipeline, LRD-NUM-ABI)
 
-Track: t014-llvm, worktree /workspace/jwst-lrd-t014. Last run: 2026-10-19 22:49 PDT.
+Track: t014-llvm, worktree /workspace/jwst-lrd-t014. Last run: 2026-10-19 23:03 PDT.
 
 ## What built
 - `llvm/lrdc/lrdc.c` (C17): the LRD-IR compiler. Parser, type checker, LLVM IR text emitter, and a driver that
@@ -26,13 +26,13 @@ Track: t014-llvm, worktree /workspace/jwst-lrd-t014. Last run: 2026-10-19 22:49 
 Line-based and SSA-like: `let x : T = op(args)`, plus `print`, `store`, `emit`, `assert`. Types are f64, i64, bool,
 arr<f64> (LRD-ARR-v1), mat<f64>, rec (LRD-REC-v1), and argument-only str (literals, `$N`). Ops: load, len, get,
 restframe, obsframe, redshift, redshift_arr, convert (um/nm/Angstrom, exact factors), all_finite, monotone_inc,
-in_range, and/or/not, residuals, chi2, mat, matmul, solve (LU with partial pivoting), flatten, ledger_proposal
+in_range, and/or/not, residuals, chi2, mask, mask_finite, mask_and, apply_mask, mat, matmul, solve (LU with partial pivoting), flatten, ledger_proposal
 (kind=ledger_append), gate (external verifier, ACCEPT-only). Elementwise kernels and chi2 are inline LLVM IR loops
 without fast-math or contract flags. Everything else calls the C runtime.
 
 ## Assumptions
-- payload_sha256 of a ledger proposal = SHA-256 of the payload array's little-endian binary64 bytes
-  (identical to `sha256sum <prefix>.f64`). CONTRACTS.md does not fix what the payload is.
+- payload_sha256 of a ledger proposal = SHA-256 of the raw `.f64` bytes only (little-endian binary64, `.hdr`
+  excluded), as defined in research/CONTRACTS.md v1.2. Identical to `sha256sum <prefix>.f64` (test ledger_proposal_commit_vs_sha256sum).
 - `ledger_proposal` requires seq >= 1. It cannot check "prev seq + 1" because it does not know the previous state.
   That check belongs to the verifier.
 - The gate checks the decision record strictly (magic, length prefixes, sorted keys, only decision/reason/new_commit,
@@ -40,12 +40,22 @@ without fast-math or contract flags. Everything else calls the C runtime.
   how new_commit was derived. The ACCEPT test stub uses SHA-256("LRD-COMMIT-v1\0" || proposal bytes), a
   choice made only for the stub.
 - New state record = {commit=new_commit, kind, payload_sha256, seq} from the proposal (LRD-STATE-v1 fields).
-- chi2 does not mask pixels: non-finite or <= 0 sigma is a runtime error. Real-data chi2 is therefore not run,
-  because flam_err is NaN on masked pixels.
+- Masking (CONTRACTS v1.2, research/BLIND-PROTOCOL.md) is an explicit op: `mask(flux, sigma, path)` excludes non-finite
+  flux, non-finite sigma and sigma <= 0, writes an LRD-ARR-v1 mask (unit 1) with kept/excluded counts in its header and
+  logs them on stdout. `mask_finite` (model window: the Fortran models are NaN outside the line window), `mask_and`
+  and `apply_mask` complete the chain. chi2 itself still rejects non-finite or <= 0 sigma (neg_chi2_zero_sigma,
+  neg_chi2_unmasked_nan_sigma).
+- Real-data masked chi2 (tests/llvm/programs/mask_chi2.lrd): mask from ingest FLUX/FLUX_ERROR (Jy), chi2 over the Fortran
+  flam, flam_err and model_<line> arrays. Kept pixels: 429 rows -> 408 after the protocol mask (21 excluded: NaN flux,
+  FLUX_ERROR = 0) -> 16 (Halpha) and 24 (Hbeta) after the model window, matching reference.kv n_rows=429, n_valid=408,
+  model.Halpha.n=16, model.Hbeta.n=24. chi2: Halpha 95.587821301959664, Hbeta 16.65575944028793, equal to the Fortran
+  reference.kv model.<line>.chi2_line values and to the independent C reference (ref masked_chi2). The protocol mask is
+  byte-identical to the Fortran mask.f64.
 - solve flags a matrix as singular when a pivot is 0 or <= n*DBL_EPSILON*max|A_ij|.
-- Real-data inputs come only from COMMITTED objects on t001-ingest-fortran (`git show`, head f6c4681 at run time):
+- Real-data inputs come only from COMMITTED objects on t001-ingest-fortran (`git show`; local branch head 04e2319 at the start of the last run and 641faff at its end, since another agent
+  is committing to it; the reference arrays and reference.kv used are identical to origin/t001-ingest-fortran feeb98b):
   fixtures/ingest/CURRENT wavelength, and the Fortran reference outputs fixtures/reference/<sha>/
-  {wavelength_ang, flam, model_Halpha, model_Hbeta, resid_Halpha, resid_Hbeta}. z = 7.0451 in
+  {wavelength_ang, flam, flam_err, mask, model_Halpha, model_Hbeta, resid_Halpha, resid_Hbeta, reference.kv}, plus ingest flux and flux_error. z = 7.0451 in
   tests/llvm/programs/real_full.lrd is Furtak et al. 2024 as cited in that branch's fortran/STATUS.md. It is only a
   transform parameter, compared against the C reference. It is not a new measurement.
 - All other array fixtures are SYNTHETIC: tests/llvm/helpers/gen_synth.c writes SYNTHETIC_* names, with
@@ -54,22 +64,21 @@ without fast-math or contract flags. Everything else calls the C runtime.
 ## Blockers / limits
 - None blocking. Not supported: see llvm/SUPPORT.md ("Not supported").
 - The real-data diff covers wavelength um->Angstrom (vs Fortran wavelength_ang) and residuals vs Fortran
-  resid_Halpha/resid_Hbeta. The Fortran track publishes no rest-frame or chi2 arrays to diff against.
+  resid_Halpha/resid_Hbeta, and masked chi2 vs the Fortran reference.kv chi2_line values. The Fortran track publishes
+  no rest-frame array to diff against.
 
 ## Deviations from the task text
 - The worktree was created with the exact contract command, but `main` had already moved from 6b9cef6 to
   db41431 (ledger header merged). So t014-llvm is based on db41431b8262a69bd791faef905c758a27879a86, not 6b9cef6.
 - License header: the user asked for `SPDX-License-Identifier: AGPL-3.0-only` plus a SnapKitty Opaque License line.
-  ledger/abi/lrd_state.h on main uses `AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque`. I followed the user's
-  wording, the same as the ingest/futhark/fortran tracks.
+  All files owned by this track say AGPL-3.0-only (CONTRACTS v1.2). ledger/ is not owned here and was not edited.
 - Scope widened by the parent: abi/ and validation/ are also owned by this track. Local commits were approved
   later (author/committer Nova Parr).
 - `real_jwst_diff` was expected to be UNAVAILABLE. While I worked, Foundry J Spec committed the real spectrum and
   Fortran reference outputs on t001-ingest-fortran, so the diff actually ran (see output).
 - tests/llvm/fixtures/*.ll golden files carry a 3-line license comment. The test compares everything after it.
 
-## Verbatim output of `bash tests/llvm/run.sh` (after commit)
-Exit code: 0. Counts: PASS 129, FAIL 0, UNAVAILABLE 0.
+## Verbatim output of `bash tests/llvm/run.sh` (after commit 38997017595aa22ae0ea648e5b4d12ca3302052a)
 ```
 PASS toolchain_clang
 PASS toolchain_llc
@@ -115,6 +124,13 @@ PASS run_residuals_vs_ref
 PASS run_chi2_vs_ref
 PASS verify_ll_chi2_hand
 PASS run_chi2_residuals_hand
+PASS verify_ll_mask_chi2
+PASS run_mask_logged_counts_hand
+PASS run_mask_array_mask_hand
+PASS run_mask_array_window_hand
+PASS run_mask_array_maskand_hand
+PASS run_mask_hdr_lrd_arr_v1
+PASS run_masked_chi2_vs_cref
 PASS verify_ll_matrix
 PASS run_matmul_vs_ref
 PASS run_solve_vs_cramer_ref
@@ -166,6 +182,13 @@ PASS neg_matmul_dimension
 PASS neg_missing_program_argument
 PASS neg_assert_false
 PASS neg_chi2_zero_sigma
+PASS neg_mask_path_type
+PASS neg_chi2_unmasked_nan_sigma
+PASS neg_apply_mask_not_01
+PASS neg_apply_mask_unit
+PASS neg_mask_length_mismatch
+PASS neg_mask_unit_mismatch
+PASS neg_mask_no_output_on_error
 PASS verify_ll_full
 PASS full_restframe_angstrom_vs_ref
 PASS full_residuals_vs_ref
@@ -184,12 +207,37 @@ PASS deterministic_ll_matrix
 PASS deterministic_ll_ledger
 PASS deterministic_ll_gate
 PASS deterministic_ll_full
+PASS deterministic_ll_mask_chi2
 PASS golden_ll_spectral
 PASS golden_ll_kernels
 PASS golden_ll_matrix
 PASS golden_ll_full
+PASS golden_ll_mask_chi2
 PASS real_jwst_restframe_lrdc_vs_cref
 PASS real_jwst_convert_lrdc_vs_cref
+  mask: mask n=429 kept=408 excluded=21 (nonfinite_flux=21 nonfinite_sigma=0 sigma_le_0=21; reasons may overlap)
+  mask_finite: window n=429 kept=16 excluded=413 (non-finite values)
+  mask_and: mw n=429 kept=16 excluded=413
+  n = 16
+  c = 95.587821301959664
+PASS real_jwst_mask_counts_Halpha
+PASS real_jwst_mask_vs_fortran_mask_Halpha
+  ref masked_chi2: n=429 base_kept=408 kept=16 chi2=95.587821301959664
+PASS real_jwst_masked_chi2_lrdc_vs_cref_Halpha
+  fortran reference.kv model.Halpha.chi2_line=9.5587821301959664E+001 model.Halpha.n=16
+PASS real_jwst_masked_chi2_lrdc_vs_fortran_Halpha
+  mask: mask n=429 kept=408 excluded=21 (nonfinite_flux=21 nonfinite_sigma=0 sigma_le_0=21; reasons may overlap)
+  mask_finite: window n=429 kept=24 excluded=405 (non-finite values)
+  mask_and: mw n=429 kept=24 excluded=405
+  n = 24
+  c = 16.65575944028793
+PASS real_jwst_mask_counts_Hbeta
+PASS real_jwst_mask_vs_fortran_mask_Hbeta
+  ref masked_chi2: n=429 base_kept=408 kept=24 chi2=16.65575944028793
+PASS real_jwst_masked_chi2_lrdc_vs_cref_Hbeta
+  fortran reference.kv model.Hbeta.chi2_line=1.6655759440287930E+001 model.Hbeta.n=24
+PASS real_jwst_masked_chi2_lrdc_vs_fortran_Hbeta
+PASS real_jwst_masked_chi2
 PASS verify_ll_real_full
 PASS real_jwst_diff_wavelength_ang_Halpha
 PASS real_jwst_diff_resid_Halpha
@@ -201,11 +249,12 @@ PASS real_jwst_restframe_z7_lrdc_vs_cref_Hbeta
 PASS real_jwst_ledger_gate_Hbeta
 PASS real_jwst_diff
 ```
+Exit code: 0
 
 ## Git state
-`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `b328cfde7836e06d5434b5f049a67f381885f02c`. That is the first t014 commit, which holds all t014 sources. This STATUS file is committed afterwards in a second, STATUS-only commit, so the branch head is one commit later than the hash above. A commit cannot contain its own hash.
+`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `38997017595aa22ae0ea648e5b4d12ca3302052a`. That commit holds all sources for this round (mask ops, masked real-data chi2, CONTRACTS v1.2 docs) on top of merge b2294fd (origin/main f83eb5b merged into t014-llvm). This STATUS file is committed afterwards in a STATUS-only commit, so the branch head is one commit later. A commit cannot contain its own hash.
 
-`git -C /workspace/jwst-lrd-t014 status --short`:
+`git status --short` at the time of this run:
 ```
 (clean: no output)
 ```
