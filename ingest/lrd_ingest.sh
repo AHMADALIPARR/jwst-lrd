@@ -70,8 +70,9 @@ if ! offline; then
     {\"paramName\":\"calib_level\",\"values\":[$SEL_CALIB_LEVEL]},
     {\"paramName\":\"dataRights\",\"values\":[\"PUBLIC\"]},
     {\"paramName\":\"dataproduct_type\",\"values\":[\"spectrum\"]}]}}" "$OUT/mast/filtered.json"
-  # Keep source-level (_s<id>) observations whose footprint bounding box contains the target;
-  # choose the earliest epoch (t_min) deterministically.
+  # Keep source-level (_s<id>) observations whose footprint bounding box contains the target.
+  # If SEL_OBS_ID is set (target.conf or env) it must be among the candidates; otherwise
+  # the earliest epoch (t_min) is chosen deterministically.
   jq -c --argjson ra "$RA" --argjson dec "$DEC" '
     [.data[] | select(.obs_id|test("_s[0-9]+_"))
      | . as $o | ($o.s_region | split(" ") | .[1:] | map(tonumber)) as $p
@@ -81,9 +82,15 @@ if ! offline; then
      | {obsid, obs_id, t_min, filters, target_name, proposal_id, proposal_pi, s_region}]
     | sort_by(.t_min)' "$OUT/mast/filtered.json" > "$OUT/mast/candidates.json"
   log "candidates: $(jq -c '[.[].obs_id]' "$OUT/mast/candidates.json")"
-  OBSID=$(jq -r '.[0].obsid // empty' "$OUT/mast/candidates.json")
-  [ -n "$OBSID" ] || die "no candidate observation contains the target"
-  OBS_ID=$(jq -r '.[0].obs_id' "$OUT/mast/candidates.json")
+  SEL=${LRD_SELECT_OBS_ID:-${SEL_OBS_ID:-}}
+  if [ -n "$SEL" ]; then
+    jq -c --arg s "$SEL" "[.[] | select(.obs_id==\$s)]" "$OUT/mast/candidates.json" > "$OUT/mast/selected.json"
+  else
+    jq -c ".[0:1]" "$OUT/mast/candidates.json" > "$OUT/mast/selected.json"
+  fi
+  OBSID=$(jq -r ".[0].obsid // empty" "$OUT/mast/selected.json")
+  [ -n "$OBSID" ] || die "selected obs_id '$SEL' not among discovered candidates"
+  OBS_ID=$(jq -r ".[0].obs_id" "$OUT/mast/selected.json")
   # Step 3: products (Mast.Caom.Products)
   mast "{\"service\":\"Mast.Caom.Products\",\"format\":\"json\",\"params\":{\"obsid\":\"$OBSID\"}}" "$OUT/mast/products.json"
   jq -c --arg g "$SEL_PRODUCT_SUBGROUP" --arg o "$OBSID" \
@@ -111,7 +118,7 @@ if ! offline; then
   chmod 0444 "$RAW"
   # Persist the discovery evidence (small JSON) alongside the fixture.
   D="$FIX/ingest/$SHA"; mkdir -p "$D/mast"
-  cp "$OUT/mast/candidates.json" "$OUT/mast/product.json" "$OUT/mast/cone_obs_ids.txt" "$D/mast/"
+  cp "$OUT/mast/candidates.json" "$OUT/mast/selected.json" "$OUT/mast/product.json" "$OUT/mast/cone_obs_ids.txt" "$D/mast/"
   jq -c --arg o "$OBSID" "[.data[] | select((.obsID|tostring)==\$o)]" "$OUT/mast/products.json" > "$D/mast/products_obsid.json"
   cat > "$D/source.kv" <<KV
 mast.obsid=$OBSID
@@ -136,8 +143,18 @@ mode=archive_polling_not_telemetry
 KV
   echo "$SHA" > "$FIX/ingest/CURRENT"
 else
-  [ -f "$FIX/ingest/CURRENT" ] || die "offline: no fixtures/ingest/CURRENT"
-  SHA=$(cat "$FIX/ingest/CURRENT")
+  if [ -z "${LRD_SHA:-}" ]; then
+    # Replay every stored product (each fixtures/ingest/<sha>/ with a source.kv).
+    nrep=0
+    for d in "$FIX"/ingest/*/; do
+      [ -f "$d/source.kv" ] || continue
+      LRD_SHA=$(basename "$d") sh "$0" || exit 1
+      nrep=$((nrep+1))
+    done
+    [ $nrep -gt 0 ] || die "offline: no stored products under fixtures/ingest/"
+    exit 0
+  fi
+  SHA=$LRD_SHA
   D="$FIX/ingest/$SHA"
   RAW="$FIX/raw/$SHA.fits"
   log "offline replay of $SHA (no network)"
