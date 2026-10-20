@@ -1,0 +1,18 @@
+make[1]: Entering directory '/workspace/jwst-lrd-topology/tests/topology'
+nice -n 19 make -C ../../fortran/topology
+make[2]: Entering directory '/workspace/jwst-lrd-topology/fortran/topology'
+mkdir -p build
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_sha256.f90 -o build/topo_sha256.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_field.f90 -o build/topo_field.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_complex.f90 -o build/topo_complex.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_homology.f90 -o build/topo_homology.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_record.f90 -o build/topo_record.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_commit.f90 -o build/topo_commit.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_incremental.f90 -o build/topo_incremental.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_fixtures.f90 -o build/topo_fixtures.o
+/usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -Jbuild -c src/topo_export.f90 -o build/topo_export.o
+ar rcs build/libtopology.a build/topo_sha256.o build/topo_field.o build/topo_complex.o build/topo_homology.o build/topo_record.o build/topo_commit.o build/topo_incremental.o build/topo_fixtures.o build/topo_export.o
+make[2]: Leaving directory '/workspace/jwst-lrd-topology/fortran/topology'
+mkdir -p build
+nice -n 19 /usr/bin/gfortran -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -I../../fortran/topology/build -Jbuild test_topology.f90 ../../fortran/topology/build/libtopology.a -o build/test_topology
+make[1]: Leaving directory '/workspace/jwst-lrd-topology/tests/topology'

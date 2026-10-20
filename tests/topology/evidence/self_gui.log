@@ -1,0 +1,4 @@
+GUI_DEMO_READY
+GUI added morph for SELF SYNTHETIC_rp2_6v field=GF(2) counts=(6,15,10) betti=(1,1,1) chi=1 altsum=1 incidence_ok=true header_ok=true root=7028a3669a449aca908a1ddcae9f78861dc5c95804d1b736cf8c11323d18c4ba
+GUI added morph for SELF SYNTHETIC_filled_triangle field=GF(2) counts=(3,3,1) betti=(1,0,0) chi=1 altsum=1 incidence_ok=true header_ok=true root=0551d2bd0e274b56b0b7133ac2168ee8f6f45f7e59c1b4b8c41ed22390ed378e
+GUI_DEMO_DONE
