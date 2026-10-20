@@ -2,6 +2,8 @@
 fixtures/** -text
 self/topology/geometry/** -text
 self/**/*.self text eol=lf
+self/experiment/transport/*.sh text eol=lf
+self/experiment/transport/*.c text eol=lf
 agda/**/*.agda text eol=lf
 tests/morphic/** text eol=lf
 tests/morphic/evidence/*.png -text

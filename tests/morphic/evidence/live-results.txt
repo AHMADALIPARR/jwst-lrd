@@ -1,0 +1,8 @@
+PASS live_native_renderer_fresh
+PASS live_rejects_invalid_session_token
+PASS live_rejects_arbitrary_action
+PASS live_action_reaches_self_fifo
+PASS live_stream_has_distinct_native_frames
+PASS live_pause_stops_morphic_animation
+PASS live_control_changes_paused_native_frame
+PASS live_resume_restarts_morphic_animation

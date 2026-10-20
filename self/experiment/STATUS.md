@@ -1,6 +1,15 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
 # Execution status
 
+Live-route update: native Self now renders an animated helix, red-dot state
+and derived phase wave beside the archived QSO1 spectrum. The C transport
+binds only 127.0.0.1:8765 and forwards nine predefined experiment messages.
+Eight executed live tests verify fresh frames, invalid-token/action rejection,
+FIFO delivery, changing MJPEG frames, pause, changes while paused and resume.
+An isolated Edge test profile verified the live process inside the deployed
+Pages iframe after granting its this-device browser permission. It is not a
+publicly hosted Self VM: the NUC must be running the local companion.
+
 Executed on the Windows NUC in Ubuntu 22.04 WSL2, x86-64, 2026-10-20.
 The existing Self source distribution was built with X11, GCC 11.4,
 32-bit multilib and ncurses/X11 libraries. Runtime source revision:

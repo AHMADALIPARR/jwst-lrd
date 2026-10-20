@@ -1,6 +1,31 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
 # Little Red Dots experiment workspace
 
+## Live browser route
+
+`/jwst-lrd/live/` embeds a running Self/Morphic process on the NUC through
+`http://127.0.0.1:8765/live/`. Browser controls send allowlisted messages to
+that process; native Self draws the archived spectrum, animated phase wave,
+double helix and red-dot state. The helix and nucleus are illustrative model
+geometry, not a resolved observation or inferred JWST time signal.
+
+The browser may ask to connect to this device. Allow that permission on the
+NUC. The route is local-only: other visitors need their own running renderer.
+No public tunnel or administrative endpoint is enabled.
+
+```sh
+SELF_BIN=/path/to/Self SELF_OBJECTS=/path/to/self/objects \
+  sh self/experiment/transport/start.sh
+sh tests/morphic/live.sh
+```
+
+The transport uses the existing C and shell stack plus FFmpeg/Xvfb tools.
+It streams native frames at eight frames per second, with no JavaScript
+renderer or rewritten model. It accepts nine constant experiment commands;
+it exposes no arbitrary Self evaluation, shell, file upload or desktop input.
+The companion process must remain running. The session directory and PIDs
+are recorded under `build/out/live/` for operator inspection.
+
 A native Self/Morphic workspace for Abell 2744-QSO1. It uses the existing
 Self VM, ui2 controls, solver records and topology exports. No web framework,
 new language or background service is added.
