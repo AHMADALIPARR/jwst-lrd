@@ -5,6 +5,7 @@
 #   make toolchain  detect (and with LRD_INSTALL=1 install) tools, write build/TOOLCHAIN.lock
 #   make build      build C ingestion tools and the Fortran kernel into build/out/
 #   make test       run every tests/*/run.sh via tests/run_all.sh
+#   make fixtures   re-fetch (if missing) and verify sha256 of every raw FITS fixture
 #   make clean      remove build/out (never touches fixtures/ or build/tools)
 #   make rebuild    clean + build
 CC      ?= gcc
@@ -16,7 +17,7 @@ BIN     := $(OUT)/bin
 
 INGEST_BINS := $(BIN)/lrd_fetch $(BIN)/lrd_sha256 $(BIN)/lrd_rec $(BIN)/lrd_fitsx
 
-.PHONY: all toolchain build ingest fortran test clean rebuild
+.PHONY: all toolchain build ingest fortran fixtures test clean rebuild
 all: build
 
 toolchain:
@@ -43,6 +44,9 @@ $(BIN)/lrd_rec: ingest/src/lrd_rec.c | $(BIN)
 
 $(BIN)/lrd_fitsx: ingest/src/lrd_fitsx.c | $(BIN)
 	$(CC) $(CFLAGS) -std=c11 -o $@ $< -lcfitsio -lm
+
+fixtures: ingest
+	sh ingest/fetch_fixtures.sh
 
 fortran:
 	@if [ -f fortran/Makefile ]; then $(MAKE) -C fortran FC="$(FC)" CC="$(CC)"; fi

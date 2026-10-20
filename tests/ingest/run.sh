@@ -126,4 +126,32 @@ else
   if LRD_OFFLINE=1 sh ingest/lrd_ingest.sh >"$T/replay.out" 2>"$T/replay.err"; then pass offline_replay
   else fail offline_replay "$(tail -1 "$T/replay.err")"; fi
 fi
+
+# 11. Pointing check: for every stored product, read RA/DEC from the x1d EXTRACT1D (SCI)
+# header via CFITSIO (SRCRA/SRCDEC, else RA_TARG/DEC_TARG), compute the great-circle
+# separation (haversine) from the cited target position in ingest/target.conf and FAIL if it
+# exceeds the discovery cone radius. Measured separations go to build/out/ingest/separations.txt.
+. ingest/target.conf
+sex2deg() { echo "$1" | awk -F: -v k="$2" '{s=1; a=$1; if (substr(a,1,1)=="-") {s=-1; a=substr(a,2)}
+  printf "%.10f\n", s*k*(a + $2/60 + $3/3600)}'; }
+TRA=$(sex2deg "$TARGET_RA_SEX" 15); TDEC=$(sex2deg "$TARGET_DEC_SEX" 1)
+mkdir -p build/out/ingest; : > build/out/ingest/separations.txt
+for d in fixtures/ingest/*/; do
+  [ -f "$d/source.kv" ] || continue
+  s=$(basename "$d"); mkdir -p "$T/sep/$s"
+  if ! "$BIN/lrd_fitsx" "fixtures/raw/$s.fits" "$T/sep/$s" "$s" 2>/dev/null; then
+    fail "pointing_within_cone_$s" "lrd_fitsx failed"; continue; fi
+  kv="$T/sep/$s/header.kv"
+  ra=$(sed -n 's/^hdr.SRCRA=//p' "$kv"); de=$(sed -n 's/^hdr.SRCDEC=//p' "$kv"); src="SRCRA/SRCDEC"
+  if [ "$ra" = ABSENT ] || [ -z "$ra" ]; then
+    ra=$(sed -n 's/^hdr.RA_TARG=//p' "$kv"); de=$(sed -n 's/^hdr.DEC_TARG=//p' "$kv"); src="RA_TARG/DEC_TARG"; fi
+  if [ "$ra" = ABSENT ] || [ -z "$ra" ]; then fail "pointing_within_cone_$s" "no RA/DEC keywords"; continue; fi
+  line=$(awk -v r1="$TRA" -v d1="$TDEC" -v r2="$ra" -v d2="$de" -v rad="$CONE_RADIUS_DEG" 'BEGIN{
+    p=atan2(0,-1)/180; a=sin((d2-d1)*p/2)^2 + cos(d1*p)*cos(d2*p)*sin((r2-r1)*p/2)^2
+    sep=2*atan2(sqrt(a),sqrt(1-a))/p; printf "%.6f %s", sep*3600, (sep<=rad?"OK":"OUT") }')
+  sep=${line% *}; verdict=${line#* }
+  fn=$(sed -n 's/^mast.product_filename=//p' "$d/source.kv")
+  echo "$s $fn $src ra=$ra dec=$de sep_arcsec=$sep cone_arcsec=$(awk -v r="$CONE_RADIUS_DEG" 'BEGIN{printf "%.3f", r*3600}')" >> build/out/ingest/separations.txt
+  [ "$verdict" = OK ] && pass "pointing_within_cone_$s" || fail "pointing_within_cone_$s" "separation ${sep}\" > cone"
+done
 [ "$FAILS" -eq 0 ]
