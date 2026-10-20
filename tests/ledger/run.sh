@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-# Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
-# SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 #
 # Ledger track tests (TASK 004 Goedel ledger, TASK 010 capability addressing).
 # TASK 005 (RSA accumulator) lives in ledger/rsaacc/ on branch t005-rsaacc and is NOT run here.

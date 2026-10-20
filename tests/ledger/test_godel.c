@@ -1,6 +1,6 @@
 /* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
- * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
- * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+ * Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+ * SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
  *
  * TASK 004 tests: LRD-REC-v1 canonical records and the Goedel prime ledger.
  * Prints one line per test: "PASS <name>" or "FAIL <name> <why>". Exit 1 iff any FAIL.

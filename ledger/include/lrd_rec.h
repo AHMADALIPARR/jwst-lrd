@@ -1,6 +1,6 @@
 /* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
- * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
- * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+ * Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+ * SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
  *
  * LRD-REC-v1 canonical records (research/CONTRACTS.md): builder, strict parser, commitment.
  * Records are kept sorted bytewise by key at insertion time, so serialization is canonical.
