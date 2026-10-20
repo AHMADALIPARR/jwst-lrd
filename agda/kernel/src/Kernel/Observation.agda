@@ -28,6 +28,7 @@ open import Data.Nat.Base as ℕ using (ℕ; zero; suc; _<_; _≤_; s≤s; z≤n
 open import Data.Nat.Properties as ℕP using (_<?_; <-irrefl; <-asym)
 open import Data.Nat.Coprimality using (Coprime; coprime?)
 open import Data.Integer.Base as ℤ using (ℤ; +_; ∣_∣)
+import Data.Integer.Properties as ℤP
 open import Data.Rational.Base using (ℚ; mkℚ; _≃_; *≡*)
 open import Data.Rational.Properties using (≃⇒≡)
 open import Data.List.Base using (List; []; _∷_)
@@ -35,6 +36,7 @@ open import Data.List.Relation.Unary.All as All using (All; []; _∷_; all?)
 open import Data.List.Relation.Unary.Any using (here; there)
 open import Data.List.Membership.Propositional using (_∈_)
 open import Data.Maybe.Base using (Maybe; just; nothing)
+open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
 open import Data.Product.Base using (Σ; _×_; _,_; proj₁; proj₂; ∃)
 open import Relation.Nullary using (Dec; yes; no; ¬_)
 open import Relation.Nullary.Decidable using (True; toWitness; fromWitness; _×-dec_)
@@ -48,6 +50,13 @@ open import Relation.Binary.PropositionalEquality
 data UnitTag : Set where
   microjansky micron angstrom second kelvin erg-s-cm2 dimensionless : UnitTag
 
+-- Field role (CONTRACTS v1.2: kernels reject non-positive sigma rather
+-- than masking it silently; non-finite values are not representable as
+-- rationals, so the ingest track must reject NaN/Inf before a RawObs
+-- exists -- obligation IngestFaithful).
+data Role : Set where
+  value sigma : Role
+
 record RawField : Set where
   constructor field′
   field
@@ -55,6 +64,7 @@ record RawField : Set where
     num  : ℤ
     den  : ℕ
     unit : Maybe UnitTag  -- nothing = undeclared unit
+    role : Role           -- measured value or its 1-sigma uncertainty
 open RawField public
 
 record RawObs : Set where
@@ -75,12 +85,20 @@ unitDeclared? : (u : Maybe UnitTag) → Dec (UnitDeclared u)
 unitDeclared? nothing  = no λ ()
 unitDeclared? (just _) = yes tt
 
+SigmaPositive : Role → ℤ → Set
+SigmaPositive value _ = ⊤
+SigmaPositive sigma n = ℤ.+ 0 ℤ.< n
+
+sigmaPositive? : (r : Role) (n : ℤ) → Dec (SigmaPositive r n)
+sigmaPositive? value _ = yes tt
+sigmaPositive? sigma n = ℤ.+ 0 ℤP.<? n
+
 -- (W) + (U)
 FieldOK : RawField → Set
-FieldOK f = (0 < key f) × (0 < den f) × Coprime ∣ num f ∣ (den f) × UnitDeclared (unit f)
+FieldOK f = (0 < key f) × (0 < den f) × Coprime ∣ num f ∣ (den f) × UnitDeclared (unit f) × SigmaPositive (role f) (num f)
 
 fieldOK? : (f : RawField) → Dec (FieldOK f)
-fieldOK? f = (0 <? key f) ×-dec ((0 <? den f) ×-dec (coprime? ∣ num f ∣ (den f) ×-dec unitDeclared? (unit f)))
+fieldOK? f = (0 <? key f) ×-dec ((0 <? den f) ×-dec (coprime? ∣ num f ∣ (den f) ×-dec (unitDeclared? (unit f) ×-dec sigmaPositive? (role f) (num f))))
 
 -- (C) strictly ascending keys
 _≺_ : RawField → RawField → Set
@@ -146,12 +164,12 @@ rational-unique n₁ n₂ d₁ d₂ c₁ c₂ h =
   eq = ≃⇒≡ (*≡* h)
 
 field-unique : ∀ f g → FieldOK f → FieldOK g →
-  key f ≡ key g → unit f ≡ unit g →
+  key f ≡ key g → unit f ≡ unit g → role f ≡ role g →
   num f ℤ.* + den g ≡ num g ℤ.* + den f → f ≡ g
-field-unique (field′ k n₁ zero u) _ (_ , () , _) _ _ _ _
-field-unique _ (field′ k n₂ zero u) _ (_ , () , _) _ _ _
-field-unique (field′ k n₁ (suc d₁) u) (field′ .k n₂ (suc d₂) .u)
-             (_ , _ , c₁ , _) (_ , _ , c₂ , _) refl refl h
+field-unique (field′ k n₁ zero u ro) _ (_ , () , _) _ _ _ _ _
+field-unique _ (field′ k n₂ zero u ro) _ (_ , () , _) _ _ _ _
+field-unique (field′ k n₁ (suc d₁) u ro) (field′ .k n₂ (suc d₂) .u .ro)
+             (_ , _ , c₁ , _) (_ , _ , c₂ , _) refl refl refl h
   with rational-unique n₁ n₂ d₁ d₂ c₁ c₂ h
 ... | refl , refl = refl
 
@@ -207,3 +225,45 @@ isValidᵇ : RawObs → Bool
 isValidᵇ r with validate r
 ... | just _  = true
 ... | nothing = false
+
+------------------------------------------------------------------------
+-- Charter rule 1 ("preserve observations exactly"): validation never
+-- edits its input.  A certificate's raw observation IS the input.
+validate-preserves-exactly : ∀ {r v} → validate r ≡ just v → rawOf v ≡ r
+validate-preserves-exactly = validate-sound
+
+-- Explicit, logged masking (CONTRACTS v1.2).  The kernel itself never
+-- masks.  If a caller masks, it must use `maskFields`, which returns
+-- the kept fields together with a log of every removed field, and the
+-- partition is proved lossless: each input field is either kept or
+-- logged as removed.
+record MaskResult : Set where
+  constructor maskResult
+  field
+    kept    : List RawField
+    removed : List RawField     -- the mask log
+open MaskResult public
+
+maskFields : (RawField → Bool) → List RawField → MaskResult
+maskFields drop? []       = maskResult [] []
+maskFields drop? (x ∷ xs) with drop? x
+... | true  = maskResult (kept (maskFields drop? xs)) (x ∷ removed (maskFields drop? xs))
+... | false = maskResult (x ∷ kept (maskFields drop? xs)) (removed (maskFields drop? xs))
+
+mask-lossless : ∀ drop? xs {z} → z ∈ xs → z ∈ kept (maskFields drop? xs) ⊎ z ∈ removed (maskFields drop? xs)
+mask-lossless drop? (x ∷ xs) m with drop? x
+mask-lossless drop? (x ∷ xs) (here refl) | true  = inj₂ (here refl)
+mask-lossless drop? (x ∷ xs) (there m)   | true  with mask-lossless drop? xs m
+... | inj₁ k = inj₁ k
+... | inj₂ r = inj₂ (there r)
+mask-lossless drop? (x ∷ xs) (here refl) | false = inj₁ (here refl)
+mask-lossless drop? (x ∷ xs) (there m)   | false with mask-lossless drop? xs m
+... | inj₁ k = inj₁ (there k)
+... | inj₂ r = inj₂ r
+
+-- Nothing is removed unless the predicate asked for it.
+mask-removed-flagged : ∀ drop? xs {z} → z ∈ removed (maskFields drop? xs) → drop? z ≡ true
+mask-removed-flagged drop? (x ∷ xs) m with drop? x in eq
+mask-removed-flagged drop? (x ∷ xs) (here refl) | true = eq
+mask-removed-flagged drop? (x ∷ xs) (there m)   | true = mask-removed-flagged drop? xs m
+mask-removed-flagged drop? (x ∷ xs) m           | false = mask-removed-flagged drop? xs m

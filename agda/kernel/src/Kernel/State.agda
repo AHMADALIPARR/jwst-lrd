@@ -90,8 +90,10 @@ data DecisionRec : Set where
 
 module Transition (hash : LrdState → Digest) where
 
+  -- CONTRACTS v1.1: new state record = {commit=<prev_commit>, kind, payload_sha256, seq};
+  -- new_commit = hash of that record.  Kind-specific fields are not part of it.
   successor : LrdState → Proposal → LrdState
-  successor s p = lrdState (pSeq p) (hash s) (pKind p) (pPayloadSha256 p)
+  successor _ p = lrdState (pSeq p) (prevCommit p) (pKind p) (pPayloadSha256 p)
 
   -- Envelope check: seq first (stale_seq), then prev_commit (bad_prev).
   decide : LrdState → Proposal → Outcome LrdState

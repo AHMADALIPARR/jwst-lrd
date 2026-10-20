@@ -62,3 +62,13 @@ TransitionRefinement {S} {P} step tr = ∀ t → Σ P λ p → tr (suc t) ≡ st
 IngestFaithful : {Raw Product : Set} → (Faithful : Raw → Product → Set) →
                  (decodeIngest : Product → Raw) → Set
 IngestFaithful {Raw} {Product} Faithful decodeIngest = ∀ (p : Product) → Faithful (decodeIngest p) p
+
+-- PayloadHashRawBytes (CONTRACTS v1.2): the payload_sha256 the runtime
+-- puts in a proposal is SHA-256 of the raw LRD-ARR-v1 `.f64` bytes only
+-- (the `.hdr` sidecar excluded).  The kernel treats digests abstractly
+-- and cannot check this; it is an obligation of ingest/ and ledger/.
+PayloadHashRawBytes : {Payload Bytes Digest : Set} →
+  (rawF64Bytes : Payload → Bytes) → (sha256 : Bytes → Digest) →
+  (payloadDigest : Payload → Digest) → Set
+PayloadHashRawBytes {Payload} rawF64Bytes sha256 payloadDigest =
+  ∀ (p : Payload) → payloadDigest p ≡ sha256 (rawF64Bytes p)

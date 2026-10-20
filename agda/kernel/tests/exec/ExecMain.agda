@@ -56,9 +56,12 @@ showInterval C.indeterminate = "indeterminate"
 ------------------------------------------------------------------------
 -- Observation
 f : ℕ → ℤ → ℕ → Maybe UnitTag → RawField
-f = field′
+f k n d u = field′ k n d u value
 
-obsValid obsUnsorted obsDen0 obsNotReduced obsNoUnit obsEmptyKey obsDupKey : RawObs
+obsValid obsUnsorted obsDen0 obsNotReduced obsNoUnit obsEmptyKey obsDupKey obsSigmaOk obsSigmaZero obsSigmaNeg : RawObs
+obsSigmaOk    = obs 8 (f 1 (+ 3) 2 (just microjansky) ∷ field′ 2 (+ 1) 10 (just microjansky) sigma ∷ [])
+obsSigmaZero  = obs 9 (f 1 (+ 3) 2 (just microjansky) ∷ field′ 2 (+ 0) 1 (just microjansky) sigma ∷ [])
+obsSigmaNeg   = obs 10 (f 1 (+ 3) 2 (just microjansky) ∷ field′ 2 -[1+ 0 ] 10 (just microjansky) sigma ∷ [])
 obsValid      = obs 1 (f 1 (+ 3) 2 (just microjansky) ∷ f 2 -[1+ 0 ] 1 (just micron) ∷ [])
 obsUnsorted   = obs 2 (f 2 (+ 3) 2 (just microjansky) ∷ f 1 (+ 1) 1 (just micron) ∷ [])
 obsDen0       = obs 3 (f 1 (+ 3) 0 (just microjansky) ∷ [])
@@ -250,6 +253,9 @@ allLines =
   ∷ ("obs.no-unit " ++ showB (isValidᵇ obsNoUnit))
   ∷ ("obs.empty-key " ++ showB (isValidᵇ obsEmptyKey))
   ∷ ("obs.dup-key " ++ showB (isValidᵇ obsDupKey))
+  ∷ ("obs.sigma-positive " ++ showB (isValidᵇ obsSigmaOk))
+  ∷ ("obs.sigma-zero " ++ showB (isValidᵇ obsSigmaZero))
+  ∷ ("obs.sigma-negative " ++ showB (isValidᵇ obsSigmaNeg))
   ∷ seqRun (3 ∷ 5 ∷ 4 ∷ 5 ∷ 9 ∷ []) Seq.empty
   List.++ basisLines List.++ rsaLines List.++ causalLines List.++ simplicialLines
   List.++ hamLines List.++ capLines List.++ kernelLines
