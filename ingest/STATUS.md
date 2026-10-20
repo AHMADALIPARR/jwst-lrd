@@ -10,23 +10,24 @@ public products.
   Furtak, L. J., Zitrin, A., Plat, A., et al. 2023, ApJ 952, 142,
   "JWST UNCOVER: Extremely Red and Compact Object at z_phot ≃ 7.6 Triply Imaged by A2744",
   doi:10.3847/1538-4357/acdc9d, arXiv:2212.10531 (v4):
-  
+  `Image A (8296)  R.A. 00:14:19.161  Dec. -30:24:05.664`
   → converted by awk to RA 3.5798375°, Dec −30.4015733°.
 - The spectrum paper, Furtak, L. J., Labbé, I., Zitrin, A., et al. 2024, Nature 628, 57–61,
   doi:10.1038/s41586-024-07184-8, arXiv:2308.05735, uses the UNCOVER (GO-2561) NIRSpec prism
   data and points to the 2023 paper for the image positions.
 
 ## Pipeline (sh + curl + jq for discovery JSON; C + libcurl for download; C + CFITSIO for parsing)
-1.  at the cited position, r = 0.0006° (2.16″) → 1367 rows, 126 NIRSPEC/MSA obs_ids.
-2.  on those obs_ids + JWST, NIRSPEC/MSA, proposal 2561, calib_level 3,
-   PUBLIC, spectrum → keep source-level () observations whose footprint box contains
-   the target:  and .
-3.  → the public  product.
-4.  via  (libcurl, streaming,
+1. `Mast.Caom.Cone` at the cited position, r = 0.0006° (2.16″) → 1367 rows, 126 NIRSPEC/MSA obs_ids.
+2. `Mast.Caom.Filtered` on those obs_ids + JWST, NIRSPEC/MSA, proposal 2561, calib_level 3,
+   PUBLIC, spectrum → keep source-level (`_s<id>_`) observations whose footprint box contains
+   the target: `jw02561-o002_s000013123` and `jw02561-o006_s000024175`.
+3. `Mast.Caom.Products` → the public `X1D` product.
+4. `https://mast.stsci.edu/api/v0.1/Download/file?uri=...` via `lrd_fetch` (libcurl, streaming,
    6 retries, HTTP Range resume, rejects servers that ignore Range), SHA-256 (OpenSSL EVP).
-5. Raw ID = sha256; stored at , mode 0444.
-6.  (CFITSIO): keywords and WAVELENGTH/FLUX/FLUX_ERROR with TUNITn →
-   LRD-ARR-v1 arrays;  writes the LRD-REC-v1 manifest + LRD-COMMIT-v1 commitment.
+5. Raw ID = sha256; stored at `fixtures/raw/<sha>.fits`, mode 0444.
+6. `lrd_fitsx` (CFITSIO): keywords and WAVELENGTH/FLUX/FLUX_ERROR with TUNITn →
+   LRD-ARR-v1 arrays; `lrd_rec` writes the LRD-REC-v1 manifest + LRD-COMMIT-v1 commitment.
+   `SEL_OBS_ID` in `ingest/target.conf` selects the primary; it must be among the discovered candidates.
 
 ## Products (both committed to git)
 | role | obsid | file | sha256 | bytes | DATE-OBS | rows |
@@ -38,7 +39,7 @@ MAST URIs: `mast:JWST/product/<file>`. Both are NIRSPEC, EXP_TYPE NRS_MSASPEC, G
 CAL_VER 3.0.0, CRDS_CTX jwst_1584.pmap, TUNIT: WAVELENGTH um, FLUX Jy, FLUX_ERROR Jy.
 BUNIT is absent from both the primary and EXTRACT1D headers (written as `ABSENT`, not invented).
 TARGNAME is present but empty (`''`) in o006; o002 has `uncover_nircam`. RA_TARG/DEC_TARG are absent;
-JWST uses TARG_RA/TARG_DEC (the MSA pointing target), also recorded.
+JWST uses TARG_RA/TARG_DEC (the MSA pointing target), which are also recorded.
 
 **Why o006 is primary:** the o002 x1d we retrieved has a globally negative FLUX column
 (continuum and the Hβ/Hα features are all negative, e.g. −1.37e−06 Jy at 5.279 µm), i.e. an
