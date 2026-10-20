@@ -116,7 +116,7 @@ diffcase() {
   if [ -z "$why" ]; then pass "$name"; else fail "$name" "atol=$atol rtol=$rtol$why"; DIFF_OK=0; fi
 }
 
-run_diffs() { # TAG LAM_A LAM_UM FLUX SIGMA  (all LRD-ARR-v1 prefixes in $W)
+run_diffs() { # TAG LAM_A LAM_UM FLUX SIGMA  (all LRD-ARR-v1 prefixes in $W); z grid = $ZG
   t=$1; la=$2; lu=$3; fl=$4; sg=$5
   diffcase "fortran-ref-diff-$t-um2a" 0 1e-15 "um2a $lu F_${t}_um2a" "um2a $lu R_${t}_um2a" "${t}_um2a"
   diffcase "fortran-ref-diff-$t-a2um" 0 1e-15 "a2um $la F_${t}_a2um" "a2um $la R_${t}_a2um" "${t}_a2um"
@@ -135,11 +135,11 @@ run_diffs() { # TAG LAM_A LAM_UM FLUX SIGMA  (all LRD-ARR-v1 prefixes in $W)
   diffcase "fortran-ref-diff-$t-resid" 0 1e-15 "resid $fl F_${t}_g F_${t}_res" "resid $fl R_${t}_g R_${t}_res" "${t}_res"
   diffcase "fortran-ref-diff-$t-chi2" 0 1e-12 "chi2 $fl F_${t}_g $sg F_${t}_chi2" "chi2 $fl R_${t}_g $sg R_${t}_chi2" "${t}_chi2"
   diffcase "fortran-ref-diff-$t-zgrid" 1e-12 1e-9 \
-    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 1 SYNTHETIC_zg F_${t}_z" \
-    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 1 SYNTHETIC_zg R_${t}_z" "${t}_z_chi2" "${t}_z_params"
+    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 1 $ZG F_${t}_z" \
+    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 1 $ZG R_${t}_z" "${t}_z_chi2" "${t}_z_params"
   diffcase "fortran-ref-diff-$t-zgrid-best" 0 0 \
-    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 0 SYNTHETIC_zg F_${t}_y" \
-    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 0 SYNTHETIC_zg R_${t}_y" "${t}_y_best"
+    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 0 $ZG F_${t}_y" \
+    "zgrid $la $fl $sg SYNTHETIC_lc SYNTHETIC_lw 0 $ZG R_${t}_y" "${t}_y_best"
 }
 
 if [ -n "$REF" ]; then
@@ -154,7 +154,7 @@ if [ -n "$REF" ]; then
   "$FUT" gauss 0 0 1 1.5 SYNTHETIC_spec_lam syn_siglam_tmp >> gen.log 2>&1 &&
   sed 's/^unit=.*/unit=Angstrom/' syn_siglam_tmp.hdr > syn_siglam.hdr && cp syn_siglam_tmp.f64 syn_siglam.f64
   if [ $? -eq 0 ]; then
-    run_diffs syn SYNTHETIC_spec_lam SYNTHETIC_spec_um SYNTHETIC_spec_flux SYNTHETIC_spec_sigma
+    ZG=SYNTHETIC_zg run_diffs syn SYNTHETIC_spec_lam SYNTHETIC_spec_um SYNTHETIC_spec_flux SYNTHETIC_spec_sigma
     # masked variant: NaN flux (pixels 10, 500), NaN wavelength (700), sigma 0 (20)
     for q in lam flux sigma; do cp SYNTHETIC_spec_$q.f64 SYNTHETIC_mask_$q.f64
       sed "s/^name=.*/name=SYNTHETIC_mask_$q/" SYNTHETIC_spec_$q.hdr > SYNTHETIC_mask_$q.hdr; done
@@ -198,8 +198,10 @@ else
   "$FUT" um2a x1d_um x1d_A > x1d.log 2>&1
   "$FUT" gauss 0 0 1 0 x1d_A x1d_siglam_tmp >> x1d.log 2>&1
   sed 's/^unit=.*/unit=Angstrom/' x1d_siglam_tmp.hdr > x1d_siglam.hdr; cp x1d_siglam_tmp.f64 x1d_siglam.f64
+  # z grid 4.000..9.000 step 0.002 for the real spectrum (differential only)
+  "$FUT" mk zgrid_x1d 1 $(i=0; while [ $i -le 2500 ]; do printf '%s ' "$(echo "4 + $i * 0.002" | bc -l)"; i=$((i + 1)); done) >> x1d.log 2>&1
   DIFF_OK=1
-  run_diffs x1d x1d_A x1d_um x1d_flux x1d_err
+  ZG=zgrid_x1d run_diffs x1d x1d_A x1d_um x1d_flux x1d_err
   if [ $DIFF_OK = 1 ]; then pass fortran-ref-diff-x1d; else fail fortran-ref-diff-x1d "see fortran-ref-diff-x1d-* lines (inputs: $XW $XF $XE)"; fi
 fi
 
