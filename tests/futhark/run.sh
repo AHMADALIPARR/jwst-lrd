@@ -93,6 +93,60 @@ else
   REF=
 fi
 
+# ------------------------- vacuum/air vs published Morton (2000) pairs
+# Oracle: tests/futhark/refdata/morton2000_table2_p406.txt, verbatim rows of
+# Morton 2000, ApJS 130, 403, Table 2 (journal p. 406, Ge I multiplets 1-2):
+# column 1 = air (A), column 2 = vacuum (A), both rounded to 1e-4 A.
+# Declared tolerance 1e-4 A absolute (two half-unit roundings).
+PUB=$ROOT/tests/futhark/refdata/morton2000_table2_p406.txt
+PUB_TOL=1e-4
+if [ -f "$PUB" ]; then
+  sed -n '/^BEGIN VERBATIM morton2000 p406/,/^END VERBATIM/p' "$PUB" \
+    | grep -E '^ +[0-9]+\.[0-9]{4} +[0-9]+\.[0-9]{4} ' | awk '{print $1, $2}' > pub_pairs.txt
+fi
+NPUB=$(wc -l < pub_pairs.txt 2>/dev/null | tr -d ' ')
+if [ ! -f "$PUB" ]; then
+  unav vac_air_published_pairs "reference excerpt $PUB missing"
+elif [ "${NPUB:-0}" -lt 3 ]; then
+  unav vac_air_published_pairs "fewer than 3 pairs parsed from $PUB"
+else
+  "$FUT" mk PUB_air Angstrom $(awk '{print $1}' pub_pairs.txt) > pub.log 2>&1
+  "$FUT" mk PUB_vac Angstrom $(awk '{print $2}' pub_pairs.txt) >> pub.log 2>&1
+  pub_gate() { # NAME CLI
+    if "$2" vac2air PUB_vac "${1}_v2a" >> pub.log 2>&1 && "$2" air2vac PUB_air "${1}_a2v" >> pub.log 2>&1 \
+       && r1=$("$FUT" cmp $PUB_TOL 0 "${1}_v2a" PUB_air) && r2=$("$FUT" cmp $PUB_TOL 0 "${1}_a2v" PUB_vac); then
+      pass "$1"
+    else
+      fail "$1" "n=$NPUB tol=${PUB_TOL}A vac2air:[${r1:-}] air2vac:[${r2:-}] $(oneline pub.log)"
+    fi
+  }
+  pub_gate vac_air_published_pairs "$FUT"
+  if [ -n "$REF" ]; then pub_gate fortran-ref-vac_air_published_pairs "$REF"
+  else fail fortran-ref-vac_air_published_pairs "fortran reference not built"; fi
+fi
+# Re-verify the excerpt against the publisher PDF when a cached copy exists.
+MPDF=${LRD_MORTON_PDF:-$HOME/.cache/jwst-lrd/morton2000_ApJS130_403.pdf}
+MSHA=d0695ab273886ccda7b8e5c8191458303bcb620c9dd9211f44ae29dabf2b7211
+if [ ! -f "$PUB" ]; then
+  unav vac_air_published_source_verified "reference excerpt missing"
+elif [ ! -f "$MPDF" ]; then
+  unav vac_air_published_source_verified "no cached publisher PDF at $MPDF (excerpt not re-verified this run)"
+elif ! command -v pdftotext > /dev/null 2>&1; then
+  unav vac_air_published_source_verified "pdftotext not installed"
+elif [ "$(sha256sum "$MPDF" | cut -d' ' -f1)" != "$MSHA" ]; then
+  fail vac_air_published_source_verified "cached PDF sha256 mismatch"
+else
+  pdftotext -layout -f 4 -l 4 "$MPDF" - | sed -n 1,21p > pub_p406.txt
+  pdftotext -layout -f 3 -l 3 "$MPDF" - | sed -n 70,85p > pub_p405.txt
+  sed -n '/^BEGIN VERBATIM morton2000 p406/,/^END VERBATIM/p' "$PUB" | sed '1d;$d' > ex_p406.txt
+  sed -n '/^BEGIN VERBATIM morton2000 p405/,/^END VERBATIM/p' "$PUB" | sed '1d;$d' > ex_p405.txt
+  if cmp -s pub_p406.txt ex_p406.txt && cmp -s pub_p405.txt ex_p405.txt; then
+    pass vac_air_published_source_verified
+  else
+    fail vac_air_published_source_verified "excerpt differs from pdftotext of the publisher PDF"
+  fi
+fi
+
 # diffcase NAME ATOL RTOL "fut-args" "ref-args" OUTSUFFIX...
 #   runs the same kernel through lrd-fut (prefix F_) and lrdref (prefix R_)
 DIFF_OK=1
@@ -130,6 +184,14 @@ run_diffs() { # TAG LAM_A LAM_UM FLUX SIGMA  (all LRD-ARR-v1 prefixes in $W); z 
     "flam2fnu $la - $fl $sg R_${t}_fnu0" "${t}_fnu0" "${t}_fnu0_sigma"
   diffcase "fortran-ref-diff-$t-fnu2flam" 0 1e-14 "fnu2flam $la ${t}_siglam $fl $sg F_${t}_flam" \
     "fnu2flam $la ${t}_siglam $fl $sg R_${t}_flam" "${t}_flam" "${t}_flam_sigma"
+  for q in "$fl:${t}_fjy" "$sg:${t}_sjy"; do
+    cp "${q%%:*}.f64" "${q#*:}.f64"
+    sed "s/^unit=.*/unit=Jy/; s/^name=.*/name=${q#*:}/" "${q%%:*}.hdr" > "${q#*:}.hdr"
+  done
+  diffcase "fortran-ref-diff-$t-jy2flam" 0 1e-14 "jy2flam $la ${t}_siglam ${t}_fjy ${t}_sjy F_${t}_jfl" \
+    "jy2flam $la ${t}_siglam ${t}_fjy ${t}_sjy R_${t}_jfl" "${t}_jfl" "${t}_jfl_sigma"
+  diffcase "fortran-ref-diff-$t-jy2flam-nolamerr" 0 1e-14 "jy2flam $la - ${t}_fjy ${t}_sjy F_${t}_jfl0" \
+    "jy2flam $la - ${t}_fjy ${t}_sjy R_${t}_jfl0" "${t}_jfl0" "${t}_jfl0_sigma"
   diffcase "fortran-ref-diff-$t-gauss" 0 1e-14 "gauss 2.5 46777.4 21.3 1.0 $la F_${t}_g" \
     "gauss 2.5 46777.4 21.3 1.0 $la R_${t}_g" "${t}_g"
   diffcase "fortran-ref-diff-$t-resid" 0 1e-15 "resid $fl F_${t}_g F_${t}_res" "resid $fl R_${t}_g R_${t}_res" "${t}_res"
@@ -174,6 +236,16 @@ if [ -n "$REF" ]; then
 else
   fail fortran-ref-diff "fortran reference not built"
 fi
+
+# zgrid outputs must carry the limitation statement (header + stderr).
+CAV="no LSF, fixed line widths, test kernel, not a redshift measurement"
+why=
+for p in F_syn_z_chi2 F_syn_z_best F_syn_z_params R_syn_z_chi2 R_syn_z_best R_syn_z_params; do
+  grep -qxF "caveat=$CAV" "$p.hdr" 2>/dev/null || why="$why $p.hdr"
+done
+grep -qF "$CAV" "$W/fortran-ref-diff-syn-zgrid.fut.log" 2>/dev/null || why="$why lrd-fut-stderr"
+grep -qF "$CAV" "$W/fortran-ref-diff-syn-zgrid.ref.log" 2>/dev/null || why="$why lrdref-stderr"
+if [ -z "$why" ]; then pass zgrid-caveat; else fail zgrid-caveat "missing caveat in:$why"; fi
 
 # Real JWST x1d fixture (shared checkout, read-only): needs LRD-ARR-v1
 # wavelength (unit um), flux and flux-error arrays exported by ingest.

@@ -20,6 +20,7 @@ run() { # run ENTRY  (stdin = Futhark input stream) -> $TMP/out
   "$BIN" -b -e "$1" > "$TMP/out"
 }
 
+ZGRID_CAVEAT="no LSF, fixed line widths, test kernel, not a redshift measurement"
 usage() { sed -n 's/^#U //p' "$0" >&2; exit 2; }
 #U lrd-fut vac2air IN OUT            (IN unit Angstrom)
 #U lrd-fut air2vac IN OUT            (IN unit Angstrom)
@@ -28,11 +29,14 @@ usage() { sed -n 's/^#U //p' "$0" >&2; exit 2; }
 #U lrd-fut rest Z IN OUT | obs Z IN OUT
 #U lrd-fut flam2fnu LAM SIGLAM|- FLAM SIGFLAM OUT  -> OUT, OUT_sigma
 #U lrd-fut fnu2flam LAM SIGLAM|- FNU SIGFNU OUT    -> OUT, OUT_sigma
+#U lrd-fut jy2flam LAM SIGLAM|- FJY SIGJY OUT       (FJY, SIGJY unit Jy) -> OUT, OUT_sigma erg/s/cm2/A
 #U lrd-fut resid DATA MODEL OUT
 #U lrd-fut chi2 DATA MODEL SIGMA OUT  (OUT length 1)
 #U lrd-fut gauss AMP CENTER SIGMA CONT LAM OUT
 #U lrd-fut zgrid LAM FLUX SIGMA CENTERS WIDTHS FITCONT(0|1) ZGRID OUT
 #U         -> OUT_chi2, OUT_best=[z,index], OUT_params=[amps...,cont]
+#U         LIMITATION: no LSF, fixed line widths, test kernel, not a redshift measurement
+#U         (written as caveat= in every zgrid output header and printed on stderr)
 #U lrd-fut synth N L0 L1 Z CENTERS WIDTHS AMPS CONT NOISE SEED OUT
 #U         -> OUT_lam, OUT_flux, OUT_sigma (SYNTHETIC)
 #U lrd-fut mk OUT UNIT V1 [V2 ...]   (decimal text -> LRD-ARR-v1)
@@ -67,6 +71,14 @@ case "$K" in
       if [ "$2" = - ]; then lrd_zeros_fut "$n"; else lrd_require_unit "$2" Angstrom; lrd_to_fut "$2"; fi
       lrd_to_fut "$3"; lrd_to_fut "$4"; } | run $E
     lrd_from_fut "$TMP/out" "$5:$U" "$5_sigma:$U" ;;
+  jy2flam)
+    [ $# -eq 5 ] || usage
+    n=$(lrd_check "$1")
+    lrd_require_unit "$1" Angstrom; lrd_require_unit "$3" Jy; lrd_require_unit "$4" Jy
+    { lrd_to_fut "$1"
+      if [ "$2" = - ]; then lrd_zeros_fut "$n"; else lrd_require_unit "$2" Angstrom; lrd_to_fut "$2"; fi
+      lrd_to_fut "$3"; lrd_to_fut "$4"; } | run jy_to_flam
+    lrd_from_fut "$TMP/out" "$5:erg/s/cm2/A" "$5_sigma:erg/s/cm2/A" ;;
   resid)
     [ $# -eq 3 ] || usage
     { lrd_to_fut "$1"; lrd_to_fut "$2"; } | run residuals
@@ -84,7 +96,8 @@ case "$K" in
     case "$6" in 1) FC=true;; 0) FC=false;; *) lrd_die "FITCONT must be 0 or 1";; esac
     { lrd_to_fut "$1"; lrd_to_fut "$2"; lrd_to_fut "$3"; lrd_to_fut "$4"; lrd_to_fut "$5"
       printf '%s ' "$FC"; lrd_to_fut "$7"; } | run zgrid_search
-    lrd_from_fut "$TMP/out" "$8_chi2:1" "$8_best:1" "$8_params:$(u "$2")" ;;
+    echo "lrd-fut zgrid: $ZGRID_CAVEAT" >&2
+    LRD_EXTRA_HDR="caveat=$ZGRID_CAVEAT" lrd_from_fut "$TMP/out" "$8_chi2:1" "$8_best:1" "$8_params:$(u "$2")" ;;
   synth)
     [ $# -eq 11 ] || usage
     { printf '%s %s %s %s ' "$1" "$2" "$3" "$4"

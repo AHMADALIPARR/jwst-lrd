@@ -15,8 +15,9 @@ module lrd_kernels
   real(dp), parameter, public :: air_vac_min_A = 2000.0_dp
   real(dp), parameter, public :: c_A_per_s = 2.99792458e18_dp   ! c in Angstrom/s
   real(dp), parameter, public :: A_per_um = 1.0e4_dp
+  real(dp), parameter, public :: jy_cgs = 1.0e-23_dp           ! erg s^-1 cm^-2 Hz^-1 per Jy
   public :: vac2air, air2vac, um_to_angstrom, angstrom_to_um, rest_frame, &
-       obs_frame, flam_to_fnu, fnu_to_flam, residuals, chi2, gauss_model, &
+       obs_frame, flam_to_fnu, fnu_to_flam, jy_to_flam, residuals, chi2, gauss_model, &
        zgrid_search, solve_spd
 contains
   ! Morton (2000, ApJS 130, 403), IAU standard, as given in the VALD3 docs:
@@ -96,6 +97,14 @@ contains
     s = sqrt(t1 * t1 + t2 * t2)
   end subroutine fnu_to_flam
 
+  ! Jy -> f_lambda [erg s^-1 cm^-2 A^-1]; 1 Jy = 1e-23 erg s^-1 cm^-2 Hz^-1.
+  ! Same propagation as fnu_to_flam applied to 1e-23-scaled inputs.
+  elemental subroutine jy_to_flam(l, sl, f, sf, fl, s)
+    real(dp), intent(in) :: l, sl, f, sf
+    real(dp), intent(out) :: fl, s
+    call fnu_to_flam(l, sl, jy_cgs * f, jy_cgs * sf, fl, s)
+  end subroutine jy_to_flam
+
   pure function residuals(d, m) result(r)
     real(dp), intent(in) :: d(:), m(:)
     real(dp) :: r(size(d))
@@ -166,6 +175,7 @@ contains
   end function solve_spd
 
   ! Weighted linear LSQ of k line amplitudes + continuum at every z.
+  ! LIMITATION: no LSF, fixed line widths, test kernel, not a redshift measurement.
   ! params = [amp_1..amp_k, cont]; best = [z_best, index (0-based)].
   subroutine zgrid_search(lam, flux, sigma, centers, widths, fit_cont, zgrid, &
        chis, best, params)

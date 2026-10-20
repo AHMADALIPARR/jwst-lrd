@@ -92,6 +92,18 @@ entry fnu_to_flam [n] (lam_A: [n]f64) (sig_lam_A: [n]f64)
                       (fnu: [n]f64) (sig_fnu: [n]f64) : ([n]f64, [n]f64) =
   unzip (map4 fnu2flam1 lam_A sig_lam_A fnu sig_fnu)
 
+-- Jy -> f_lambda: 1 Jy = 1e-23 erg s^-1 cm^-2 Hz^-1 (exact by definition).
+-- f_lambda = 1e-23 f_Jy c / lambda^2  [erg s^-1 cm^-2 A^-1], lambda in A;
+-- sigma propagated exactly as fnu_to_flam (independent flux and
+-- wavelength errors; sigma_lam = 0 when unknown):
+--   sigma_flam^2 = (1e-23 c/lambda^2 sigma_Jy)^2 + (2e-23 f_Jy c/lambda^3 sigma_lam)^2
+def jy_cgs : f64 = 1.0e-23
+
+entry jy_to_flam [n] (lam_A: [n]f64) (sig_lam_A: [n]f64)
+                     (f_jy: [n]f64) (sig_jy: [n]f64) : ([n]f64, [n]f64) =
+  unzip (map4 (\l sl f sf -> fnu2flam1 l sl (jy_cgs * f) (jy_cgs * sf))
+              lam_A sig_lam_A f_jy sig_jy)
+
 -- ---------------------------------------------------------------------
 -- 4. Residuals and chi-square
 -- ---------------------------------------------------------------------
@@ -182,6 +194,9 @@ def fit_at_z [n][k] (lam: [n]f64) (flux: [n]f64) (sigma: [n]f64)
   in (c2, a)
 
 -- Batched grid search over z (map over the z grid).
+-- LIMITATION: no LSF, fixed line widths, test kernel, not a redshift
+-- measurement.  Line widths are fixed inputs (no instrumental line-spread
+-- function, no width fit); only linear amplitudes and continuum are fitted.
 -- Returns (chi2 per z, [best_z, best_index_as_f64], best params [k+1]).
 -- Ties are broken towards the lowest index; NaN chi2 never wins.
 entry zgrid_search [n][k][m] (lam: [n]f64) (flux: [n]f64) (sigma: [n]f64)

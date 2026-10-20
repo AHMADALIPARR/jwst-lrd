@@ -76,6 +76,16 @@ program test_lrd_kernels
   call flam_to_fnu([20000.0_dp], [2.0_dp], [4.0e-19_dp], [sf], o1, o2)
   call check('fnu_combined_error', relerr(o2(1), sqrt(2.0_dp) * sf * 20000.0_dp**2 / 2.99792458e18_dp), 1.0e-15_dp)
 
+  ! Jy -> f_lambda: 1 Jy at 1e4 A = 1e-23 * 2.99792458e18 / 1e8 erg/s/cm2/A
+  call jy_to_flam([1.0e4_dp], [0.0_dp], [1.0_dp], [0.2_dp], o1, o2)
+  call check('jy_known', max(relerr(o1(1), 2.99792458e-13_dp), relerr(o2(1), 0.2_dp * 2.99792458e-13_dp)), 1.0e-15_dp)
+  ! identity f_lambda = 1e-23 f_Jy c / lambda^2 (sigma_lam = 0) over 0.6-5.3 um
+  f = 3.0e-6_dp * (1.0_dp + 0.5_dp * cos(x / 2000.0_dp))
+  s = 0.1_dp * f
+  call jy_to_flam(x, zr, f, s, f2, s2)
+  call check('jy_identity', max(maxval(abs(f2 - 1.0e-23_dp * f * 2.99792458e18_dp / (x * x)) / f2), &
+       maxval(abs(s2 - 1.0e-23_dp * s * 2.99792458e18_dp / (x * x)) / s2)), 1.0e-15_dp)
+
   ! noiseless grid search, z on the grid (index 225 -> z = 6.25)
   cs = [6564.61_dp, 4862.68_dp, 5008.24_dp]; ws = 2.5_dp; am = [3.0_dp, 1.0_dp, 2.0_dp]
   zg = linspace(401, 4.0_dp, 8.0_dp)

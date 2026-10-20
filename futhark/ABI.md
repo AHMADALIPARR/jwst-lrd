@@ -5,7 +5,8 @@
 
 - `<p>.f64`: raw little-endian IEEE-754 binary64 values, no header.
 - `<p>.hdr`: lines `key=value`. Required: `format=LRD-ARR-v1`, `name`, `length`, `unit`.
-  Optional: `source_sha256`. This track also writes `note=SYNTHETIC` on every
+  Optional: `source_sha256`. zgrid outputs carry `caveat=no LSF, fixed line widths, test kernel, not a redshift measurement`.
+  This track also writes `note=SYNTHETIC` on every
   synthetic array it generates, and the Fortran ref adds `producer=...`.
   Readers ignore keys they don't know.
 - Readers reject a file when `format` is wrong, `length` is not a decimal
@@ -51,6 +52,7 @@ entry rest_frame     [n] (z: f64) (lam_obs: [n]f64) : [n]f64
 entry obs_frame      [n] (z: f64) (lam_rest: [n]f64) : [n]f64
 entry flam_to_fnu    [n] (lam_A: [n]f64) (sig_lam_A: [n]f64) (flam: [n]f64) (sig_flam: [n]f64) : ([n]f64, [n]f64)
 entry fnu_to_flam    [n] (lam_A: [n]f64) (sig_lam_A: [n]f64) (fnu: [n]f64) (sig_fnu: [n]f64) : ([n]f64, [n]f64)
+entry jy_to_flam     [n] (lam_A: [n]f64) (sig_lam_A: [n]f64) (f_jy: [n]f64) (sig_jy: [n]f64) : ([n]f64, [n]f64)   -- erg/s/cm2/A
 entry residuals      [n] (data: [n]f64) (model: [n]f64) : [n]f64
 entry chi2           [n] (data: [n]f64) (model: [n]f64) (sigma: [n]f64) : f64
 entry gauss_model    [n] (amp: f64) (center: f64) (sigma: f64) (cont: f64) (lam: [n]f64) : [n]f64
@@ -77,11 +79,16 @@ a2um IN OUT                       IN unit Angstrom -> um
 rest Z IN OUT | obs Z IN OUT      keeps the IN unit
 flam2fnu LAM SIGLAM|- FLAM SIGFLAM OUT   -> OUT, OUT_sigma (erg/s/cm2/Hz); "-" = zero lambda error
 fnu2flam LAM SIGLAM|- FNU SIGFNU OUT     -> OUT, OUT_sigma (erg/s/cm2/A)
+jy2flam LAM SIGLAM|- FJY SIGJY OUT       -> OUT, OUT_sigma (erg/s/cm2/A); FJY, SIGJY must have unit=Jy
 resid DATA MODEL OUT
 chi2 DATA MODEL SIGMA OUT                -> OUT length 1, unit 1
 gauss AMP CENTER SIGMA CONT LAM OUT
 zgrid LAM FLUX SIGMA CENTERS WIDTHS FITCONT(0|1) ZGRID OUT
                                          -> OUT_chi2, OUT_best=[z,index], OUT_params=[amps...,cont]
+                                         LIMITATION: no LSF, fixed line widths, test kernel, not a redshift measurement.
+                                         Every zgrid output header carries
+                                         caveat=no LSF, fixed line widths, test kernel, not a redshift measurement
+                                         and both CLIs print the same statement on stderr.
 ```
 
 Front-end only (`lrd-fut`): `synth`, `mk OUT UNIT v1 v2 ...`, `cmp ATOL RTOL A B`, `dump A`.
@@ -100,3 +107,10 @@ Exit status: 0 on success, 2 on an ABI or usage error. `cmp` exits 1 when the ar
   fixed to 0. With `fit_cont = false` the continuum is 0.
 - The best z is the one with the lowest chi2, ties going to the lowest index.
   NaN chi2 values never win.
+- `jy_to_flam`: 1 Jy = 1e-23 erg s⁻¹ cm⁻² Hz⁻¹, and f_λ = 1e-23 f_Jy c/λ² (λ in Å, c = 2.99792458e18 Å/s).
+  The σ propagation is the same as `fnu_to_flam`'s, applied to the 1e-23-scaled flux and σ,
+  including the wavelength error term.
+- **zgrid_search limitation:** no LSF, fixed line widths, test kernel, not a redshift measurement.
+  The widths are fixed inputs: there is no instrumental line-spread function and no width
+  fit. Only the linear amplitudes and the continuum are fitted. The output is a
+  differential/regression test artifact, and its best z must not be quoted as a redshift.

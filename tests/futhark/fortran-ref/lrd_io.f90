@@ -80,8 +80,9 @@ contains
     end if
   end subroutine read_lrd
 
-  subroutine write_lrd(prefix, a, unit)
+  subroutine write_lrd(prefix, a, unit, caveat)
     character(*), intent(in) :: prefix, unit
+    character(*), intent(in), optional :: caveat
     real(dp), intent(in) :: a(:)
     integer :: u, i, slash
     call require_little_endian()
@@ -102,6 +103,7 @@ contains
     write (u, '(a,i0)') 'length=', size(a)
     write (u, '(a)') 'unit=' // unit
     write (u, '(a)') 'producer=tests/futhark/fortran-ref/lrdref'
+    if (present(caveat)) write (u, '(a)') 'caveat=' // caveat
     close (u)
   end subroutine write_lrd
 end module lrd_io

@@ -5,11 +5,12 @@
 ! lrdref: Fortran reference CLI with the same kernel names and argument
 ! order as futhark/lrd-fut (see futhark/ABI.md).
 program lrdref
-  use, intrinsic :: iso_fortran_env, only: real64
+  use, intrinsic :: iso_fortran_env, only: real64, error_unit
   use lrd_kernels
   use lrd_io
   implicit none
   integer, parameter :: dp = real64
+  character(*), parameter :: zgrid_caveat = 'no LSF, fixed line widths, test kernel, not a redshift measurement'
   character(:), allocatable :: k
   real(dp), allocatable :: a(:), b(:), c(:), d(:), e(:), o1(:), o2(:), zg(:), chis(:), params(:)
   character(:), allocatable :: ua, ub, uc, ud, ue, uz
@@ -57,6 +58,21 @@ program lrdref
       call fnu_to_flam(a, b, c, d, o1, o2)
       call write_lrd(arg(6), o1, 'erg/s/cm2/A'); call write_lrd(arg(6) // '_sigma', o2, 'erg/s/cm2/A')
     end if
+  case ('jy2flam')
+    call nargs(6)
+    call read_lrd(arg(2), a, ua); call need(ua, 'Angstrom')
+    n = size(a)
+    if (arg(3) == '-') then
+      allocate (b(n)); b = 0.0_dp
+    else
+      call read_lrd(arg(3), b, ub); call need(ub, 'Angstrom')
+    end if
+    call read_lrd(arg(4), c, uc); call need(uc, 'Jy')
+    call read_lrd(arg(5), d, ud); call need(ud, 'Jy')
+    if (size(b) /= n .or. size(c) /= n .or. size(d) /= n) call die('length mismatch')
+    allocate (o1(n), o2(n))
+    call jy_to_flam(a, b, c, d, o1, o2)
+    call write_lrd(arg(6), o1, 'erg/s/cm2/A'); call write_lrd(arg(6) // '_sigma', o2, 'erg/s/cm2/A')
   case ('resid')
     call nargs(4)
     call read_lrd(arg(2), a, ua); call read_lrd(arg(3), b, ub)
@@ -80,9 +96,10 @@ program lrdref
     if (arg(7) /= '0' .and. arg(7) /= '1') call die('FITCONT must be 0 or 1')
     allocate (chis(size(zg)), params(size(d) + 1))
     call zgrid_search(a, b, c, d, e, arg(7) == '1', zg, chis, best, params)
-    call write_lrd(arg(9) // '_chi2', chis, '1')
-    call write_lrd(arg(9) // '_best', best, '1')
-    call write_lrd(arg(9) // '_params', params, ub)
+    write (error_unit, '(a)') 'lrdref zgrid: ' // zgrid_caveat
+    call write_lrd(arg(9) // '_chi2', chis, '1', zgrid_caveat)
+    call write_lrd(arg(9) // '_best', best, '1', zgrid_caveat)
+    call write_lrd(arg(9) // '_params', params, ub, zgrid_caveat)
   case default
     call die('unknown kernel ' // k)
   end select

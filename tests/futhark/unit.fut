@@ -265,6 +265,50 @@ def d_zgrid_mask (_: i64) : (bool, f64, f64) =
   let e = f64.max (maxrel c1 c2) (maxrel p1 p2)
   in (b1[0] == b2[0] && b1[0] == 6.0 && e <= 1.0e-12, e, 1.0e-12)
 
+-- Jy -> f_lambda known value: lambda = 1e4 A, 1 Jy -> 1e-23 * 2.99792458e18 / 1e8
+-- = 2.99792458e-13 erg/s/cm2/A; sigma_lam = 0: sigma = 0.2 Jy * same factor.
+-- Tol 1e-15 rel.
+-- ==
+-- entry: t_jy_known
+-- input { 0i64 } output { true }
+def d_jy_known (_: i64) : (bool, f64, f64) =
+  let (fl, sl) = jy_to_flam [1.0e4] [0.0] [1.0] [0.2]
+  in res (f64.max (relerr fl[0] 2.99792458e-13) (relerr sl[0] (0.2 * 2.99792458e-13))) 1.0e-15
+
+-- Analytic identity f_lambda = f_nu c / lambda^2 with f_nu = 1e-23 f_Jy,
+-- written out independently of the kernel, over 0.6-5.3 um, and sigma
+-- (sigma_lam = 0) = 1e-23 sigma_Jy c / lambda^2.  Also equality with
+-- fnu_to_flam on 1e-23-scaled inputs including a lambda error.
+-- Tol 1e-15 rel (identity), 1e-15 rel (fnu_to_flam consistency).
+-- ==
+-- entry: t_jy_identity
+-- input { 0i64 } output { true }
+def d_jy_identity (_: i64) : (bool, f64, f64) =
+  let n = 3000
+  let l = linspace n 6000.0 53000.0
+  let fj = map (\x -> 3.0e-6 * (1.0 + 0.5 * f64.cos (x / 2000.0))) l
+  let sj = map (* 0.1) fj
+  let z = replicate n 0.0
+  let (fl, sl) = jy_to_flam l z fj sj
+  let fe = map2 (\x f -> 1.0e-23 * f * 2.99792458e18 / (x * x)) l fj
+  let se = map2 (\x s -> 1.0e-23 * s * 2.99792458e18 / (x * x)) l sj
+  let slam = map (\x -> 1.0e-4 * x) l
+  let (fl2, sl2) = jy_to_flam l slam fj sj
+  let (fl3, sl3) = fnu_to_flam l slam (map (* 1.0e-23) fj) (map (* 1.0e-23) sj)
+  in res (f64.maximum [maxrel fl fe, maxrel sl se, maxrel fl2 fl3, maxrel sl2 sl3]) 1.0e-15
+
+-- Lambda-only error for Jy -> f_lambda vs a central finite difference
+-- (h = 1e-3 A).  Tol 1e-8 rel.
+-- ==
+-- entry: t_jy_lambda_error
+-- input { 0i64 } output { true }
+def d_jy_lambda_error (_: i64) : (bool, f64, f64) =
+  let (l, f, sl, h) = (42000.0, 5.0e-6, 3.0, 1.0e-3)
+  let (_, s) = jy_to_flam [l] [sl] [f] [0.0]
+  let (fp, _) = jy_to_flam [l + h] [0.0] [f] [0.0]
+  let (fm, _) = jy_to_flam [l - h] [0.0] [f] [0.0]
+  in res (relerr s[0] (f64.abs ((fp[0] - fm[0]) / (2.0 * h)) * sl)) 1.0e-8
+
 -- Generated wrappers: t_<name> -> pass flag (for futhark test);
 -- m_<name> -> (metric, tolerance) (printed by run.sh).
 entry t_gauss_integral (x: i64) : bool = (d_gauss_integral x).0
@@ -305,3 +349,9 @@ entry t_zgrid_degenerate (x: i64) : bool = (d_zgrid_degenerate x).0
 entry m_zgrid_degenerate (x: i64) : (f64, f64) = let (_, m, t) = d_zgrid_degenerate x in (m, t)
 entry t_zgrid_mask (x: i64) : bool = (d_zgrid_mask x).0
 entry m_zgrid_mask (x: i64) : (f64, f64) = let (_, m, t) = d_zgrid_mask x in (m, t)
+entry t_jy_known (x: i64) : bool = (d_jy_known x).0
+entry m_jy_known (x: i64) : (f64, f64) = let (_, m, t) = d_jy_known x in (m, t)
+entry t_jy_identity (x: i64) : bool = (d_jy_identity x).0
+entry m_jy_identity (x: i64) : (f64, f64) = let (_, m, t) = d_jy_identity x in (m, t)
+entry t_jy_lambda_error (x: i64) : bool = (d_jy_lambda_error x).0
+entry m_jy_lambda_error (x: i64) : (f64, f64) = let (_, m, t) = d_jy_lambda_error x in (m, t)

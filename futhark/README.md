@@ -42,8 +42,18 @@ round trip is restricted to vacuum >= 2001 Å because vacuum 2000 Å maps to
 about 1999.35 Å in air, which falls in the pass-through region, so the trip is
 deliberately not invertible within about 0.65 Å of the 2000 Å boundary.
 
-No published reference wavelength pair is used as a gate. The formula check
-(`t_vac_air_formula`) re-evaluates the published expression by hand at 5000 Å.
+**Published-pair gate.** The `vac_air_published_pairs` gate uses Morton (2000)
+Table 2, journal p. 406 (Ge I multiplets 1–2). It checks 9 air/vacuum pairs
+between 2497 and 2755 Å, quoted verbatim in
+`tests/futhark/refdata/morton2000_table2_p406.txt` with the source URL and the
+PDF sha256. Morton computed the air column from the vacuum column with his
+eq. (8) (p. 405), and both columns are rounded to 1e-4 Å, so the declared
+tolerance is 1e-4 Å. The measured maximum deviation is 6.78e-5 Å for vacuum→air
+and also for the Piskunov air→vacuum inverse. Because the published values are
+rounded, this gate catches formula errors of about 1e-4 Å or more (dropping the
+38.9 term shifts results by 0.017 Å and is caught), but not tiny coefficient
+errors. Those are covered by `t_vac_air_formula`, which re-evaluates the
+published expression by hand at 5000 Å.
 
 **Units.** 1 µm = 1e4 Å exactly. The rest frame is `lambda_rest = lambda_obs / (1+z)`.
 
@@ -52,13 +62,18 @@ No published reference wavelength pair is used as a gate. The formula check
 and to first order, assuming independent errors (no covariance),
 σ_fν² = (λ²/c σ_fλ)² + (2 f_λ λ/c σ_λ)². The inverse is analogous. If no
 wavelength uncertainty is available, pass `-` (CLI) or zeros (entry point).
-JWST x1d FLUX is in Jy, and 1 Jy = 1e-23 erg s⁻¹ cm⁻² Hz⁻¹. The caller has to
-scale to cgs first, because these kernels do not convert Jy.
+JWST x1d FLUX is in Jy. `jy_to_flam` (CLI `jy2flam`) converts Jy straight to
+f_λ in erg s⁻¹ cm⁻² Å⁻¹, using 1 Jy = 1e-23 erg s⁻¹ cm⁻² Hz⁻¹ and f_λ = f_ν c/λ².
+It propagates σ the same way as above, including the λ error term. The other
+flux kernels expect cgs input.
 
 **χ².** χ² = Σ (d−m)²/σ² over the valid pixels, and residual = d − m.
 
 **Gaussian.** g(x) = cont + A exp(−½((x−μ)/σ)²). The line integral is A σ √(2π).
 
-**Redshift grid search.** For each z, this is a weighted linear least-squares
+**Redshift grid search: no LSF, fixed line widths, test kernel, not a redshift
+measurement.** For each z, this is a weighted linear least-squares
 fit of the line amplitudes plus the continuum (see ABI.md §5). The grid is
-batched with `map` over z.
+batched with `map` over z. Line widths are fixed inputs: there is no LSF and no
+width fit. Every zgrid output header carries a `caveat=` line saying exactly this,
+and the CLIs print it on stderr.
