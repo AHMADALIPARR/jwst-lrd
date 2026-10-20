@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# validation: residuals. $1 data, $2 model -> $3
+lrdir 1
+let d : arr<f64> = load($1, "arbitrary")
+let m : arr<f64> = load($2, "arbitrary")
+let r : arr<f64> = residuals(d, m)
+store r $3

@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Redshift. Hand values: 6/1-1 = 5 and 0.75/0.5-1 = 0.5 are exact in binary64.
+# $1 observed line wavelengths, $2 rest wavelengths (um); output $3.
+lrdir 1
+let z1 : f64 = redshift(6.0, 1.0)
+let z2 : f64 = redshift(0.75, 0.5)
+print z1
+print z2
+let obs : arr<f64> = load($1, "um")
+let rest : arr<f64> = load($2, "um")
+let zs : arr<f64> = redshift_arr(obs, rest)
+store zs $3

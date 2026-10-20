@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Complete analysis program for the REAL spectrum (inputs from branch t001-ingest-fortran).
+# $1 ingest wavelength (um)  $2 flam  $3 line model (both erg s-1 cm-2 Angstrom-1, Fortran outputs)
+# $4 verifier  $5 out observed wavelength (Angstrom)  $6 out rest-frame wavelength (Angstrom)
+# $7 out residuals  $8 out proposal record  $9 out state record
+# z = 7.0451 is Furtak et al. 2024 (Nature 628, 57), as cited in fortran/STATUS.md on t001-ingest-fortran.
+# chi2 is not run: flam_err is NaN on masked pixels and lrdc's chi2 rejects non-finite sigma.
+lrdir 1
+let wl : arr<f64> = load($1, "um")
+let z : f64 = 7.0451
+let rest : arr<f64> = restframe(wl, z)
+let wlA : arr<f64> = convert(wl, "um", "Angstrom")
+let restA : arr<f64> = convert(rest, "um", "Angstrom")
+let fin : bool = all_finite(wlA)
+let mono : bool = monotone_inc(wlA)
+let ok : bool = and(fin, mono)
+assert ok "wavelength grid finite and strictly increasing"
+let flam : arr<f64> = load($2, "erg s-1 cm-2 Angstrom-1")
+let model : arr<f64> = load($3, "erg s-1 cm-2 Angstrom-1")
+let r : arr<f64> = residuals(flam, model)
+let prop : rec = ledger_proposal("0000000000000000000000000000000000000000000000000000000000000000", 1, r)
+let st : rec = gate($4, prop)
+store wlA $5
+store restA $6
+store r $7
+emit prop $8
+emit st $9

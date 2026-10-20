@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# validation: rest-frame shift, z = 5.0 (test parameter). $1 in (um) -> $2
+lrdir 1
+let a : arr<f64> = load($1, "um")
+let z : f64 = 5.0
+let r : arr<f64> = restframe(a, z)
+store r $2

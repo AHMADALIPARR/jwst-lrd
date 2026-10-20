@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: runtime length mismatch (run with full and short arrays)
+lrdir 1
+let a : arr<f64> = load($1, "arbitrary")
+let b : arr<f64> = load($2, "arbitrary")
+let r : arr<f64> = residuals(a, b)

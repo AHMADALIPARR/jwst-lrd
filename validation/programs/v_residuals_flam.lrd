@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# validation: residuals on flux density. $1 flam, $2 model -> $3
+lrdir 1
+let d : arr<f64> = load($1, "erg s-1 cm-2 Angstrom-1")
+let m : arr<f64> = load($2, "erg s-1 cm-2 Angstrom-1")
+let r : arr<f64> = residuals(d, m)
+store r $3
