@@ -57,6 +57,11 @@ The NUC/WSL validation completed **27 checks**, including:
 
 [Proof results](proof-results.txt) · [Model results](model-results.txt)
 
+The live companion additionally passes eight transport checks: fresh native
+frames, invalid-token and arbitrary-action rejection, allowlisted Self message
+delivery, changing stream frames, pause, phase changes while paused, and resume.
+[Live transport results](https://github.com/AHMADALIPARR/jwst-lrd/blob/frontend/morphic-workspace/tests/morphic/evidence/live-results.txt)
+
 The mathematical growth certificate is a conservative sufficient bound:
 9,000 solar masses under its stated benchmark and continuous-growth bridge.
 It is not the numerical minimum or a measured seed mass. Cryptographic
@@ -80,7 +85,7 @@ sh tests/morphic/run.sh
 For an interactive session, follow the
 [workspace guide](https://github.com/AHMADALIPARR/jwst-lrd/blob/frontend/morphic-workspace/self/experiment/README.md).
 Validated implementation: commit
-[`21d0f22`](https://github.com/AHMADALIPARR/jwst-lrd/commit/21d0f22).
+[`78d967c`](https://github.com/AHMADALIPARR/jwst-lrd/commit/78d967c).
 
 ---
 
