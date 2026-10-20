@@ -1,0 +1,8 @@
+PASS mutation_no_bad_prev_check detected (3 failing tests: acceptance_corrupted_worker_memory_is_refused_by_independent_authority rollback_rejected state_file_tampered_externally_is_refused )
+PASS mutation_no_consumption detected (1 failing tests: consumed_capability_rejected_after_authority_restart )
+PASS mutation_mac_always_ok detected (1 failing tests: forged_mac_rejected )
+PASS mutation_no_witness_check detected (2 failing tests: bad_accumulator_witness_rejected consumed_capability_rejected_after_authority_restart )
+PASS mutation_no_stale_seq_check detected (1 failing tests: rollback_rejected )
+PASS mutation_no_scope_check detected (1 failing tests: historical_read_cannot_transition )
+PASS mutation_no_expiry_check detected (1 failing tests: expiry_and_revocation )
+PASS mutation_no_cap_binding detected (1 failing tests: capability_bound_to_exactly_one_slot )
