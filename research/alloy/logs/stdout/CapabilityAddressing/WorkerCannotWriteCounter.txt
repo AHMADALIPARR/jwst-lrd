@@ -1,0 +1,3 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/CapabilityAddressing/WorkerCannotWriteCounter -t text -c WorkerCannotWriteCounter CapabilityAddressing.als
+00. check WorkerCannotWriteCounter     0       UNSAT

@@ -1,0 +1,7 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/CapabilityAddressing/scenario_rollback_rejected -t text -c scenario_rollback_rejected CapabilityAddressing.als
+00. run   scenario_rollback_rejected     0    1/1     SAT
+c last restart ## conflicts  :  53 2458 
+c last restart ## conflicts  :  1 2337 
+c last restart ## conflicts  :  1 2316 
+c last restart ## conflicts  :  1 2296 

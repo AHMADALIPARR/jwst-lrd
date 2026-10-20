@@ -1,0 +1,9 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/CapabilityAddressing/vacuity_CapabilityAddressing -t text -c vacuity_CapabilityAddressing CapabilityAddressing.als
+00. run   vacuity_CapabilityAddressing     0    1/1     SAT
+c last restart ## conflicts  :  149 2982 
+c last restart ## conflicts  :  2 2899 
+c last restart ## conflicts  :  1 2970 
+c last restart ## conflicts  :  3 2995 
+c last restart ## conflicts  :  1 2960 
+c last restart ## conflicts  :  2 2954 

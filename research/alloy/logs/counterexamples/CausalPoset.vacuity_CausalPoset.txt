@@ -1,0 +1,32 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Verbatim copy of Alloy 6.2.0 solution file logs/solutions/CausalPoset/vacuity_CausalPoset-solution-0.txt (run 2, solver glucose).
+---Trace---
+------State 0 (loop)-------
+univ={Frame$0, Frame$1, Frame$2, Frame$3, Emission$0, Emission$1, ArchivePublication$0, GroundReceipt$0, Emission$2, Emission$3, Emission$4, Detection$0, Geo$0, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+Int={-16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+seq/Int={0, 1, 2, 3, 4, 5, 6, 7}
+String={}
+none={}
+this/Frame={Frame$0, Frame$1, Frame$2, Frame$3}
+this/Emission={Emission$0, Emission$1, Emission$2, Emission$3, Emission$4}
+this/Detection={Detection$0}
+this/GroundReceipt={GroundReceipt$0}
+this/ArchivePublication={ArchivePublication$0}
+this/Event={Emission$0, Emission$1, ArchivePublication$0, GroundReceipt$0, Emission$2, Emission$3, Emission$4, Detection$0}
+this/Event<:ts={Emission$0->-1, Emission$1->-1, ArchivePublication$0->15, GroundReceipt$0->14, Emission$2->8, Emission$3->15, Emission$4->4, Detection$0->12}
+this/Event<:frame={Emission$0->Frame$0, Emission$1->Frame$1, ArchivePublication$0->Frame$3, GroundReceipt$0->Frame$0, Emission$2->Frame$0, Emission$3->Frame$3, Emission$4->Frame$3, Detection$0->Frame$2}
+this/Geo={Geo$0}
+this/Geo<:tl={Geo$0->GroundReceipt$0->ArchivePublication$0, Geo$0->Emission$2->ArchivePublication$0, Geo$0->Emission$2->GroundReceipt$0, Geo$0->Detection$0->ArchivePublication$0, Geo$0->Detection$0->GroundReceipt$0}
+this/Geo<:ll={Geo$0->Emission$2->Detection$0}
+this/Geo<:sl={Geo$0->Emission$0->ArchivePublication$0, Geo$0->Emission$0->GroundReceipt$0, Geo$0->ArchivePublication$0->Emission$0, Geo$0->ArchivePublication$0->Emission$3, Geo$0->GroundReceipt$0->Emission$0, Geo$0->Emission$3->ArchivePublication$0}
+this/Geo<:amb={Geo$0->Emission$0->Emission$2, Geo$0->Emission$0->Emission$3, Geo$0->Emission$0->Emission$4, Geo$0->Emission$0->Detection$0, Geo$0->ArchivePublication$0->Emission$4, Geo$0->GroundReceipt$0->Emission$3, Geo$0->GroundReceipt$0->Emission$4, Geo$0->Emission$2->Emission$0, Geo$0->Emission$2->Emission$3, Geo$0->Emission$2->Emission$4, Geo$0->Emission$3->Emission$0, Geo$0->Emission$3->GroundReceipt$0, Geo$0->Emission$3->Emission$2, Geo$0->Emission$3->Emission$4, Geo$0->Emission$3->Detection$0, Geo$0->Emission$4->Emission$0, Geo$0->Emission$4->ArchivePublication$0, Geo$0->Emission$4->GroundReceipt$0, Geo$0->Emission$4->Emission$2, Geo$0->Emission$4->Emission$3, Geo$0->Emission$4->Detection$0, Geo$0->Detection$0->Emission$0, Geo$0->Detection$0->Emission$3, Geo$0->Detection$0->Emission$4}
+this/Geo<:inv={Geo$0->Emission$0->Emission$1, Geo$0->Emission$1->Emission$0, Geo$0->Emission$1->ArchivePublication$0, Geo$0->Emission$1->GroundReceipt$0, Geo$0->Emission$1->Emission$2, Geo$0->Emission$1->Emission$3, Geo$0->Emission$1->Emission$4, Geo$0->Emission$1->Detection$0, Geo$0->ArchivePublication$0->Emission$1, Geo$0->GroundReceipt$0->Emission$1, Geo$0->Emission$2->Emission$1, Geo$0->Emission$3->Emission$1, Geo$0->Emission$4->Emission$1, Geo$0->Detection$0->Emission$1}
+this/ValidFrame={Frame$0, Frame$2, Frame$3}
+skolem $vacuity_CausalPoset_a={Emission$0}
+skolem $vacuity_CausalPoset_b={ArchivePublication$0}
+skolem $vacuity_CausalPoset_a'={Emission$0}
+skolem $vacuity_CausalPoset_b'={Detection$0}
+skolem $vacuity_CausalPoset_a''={Emission$1}
+skolem $vacuity_CausalPoset_b''={ArchivePublication$0}
+
