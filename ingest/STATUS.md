@@ -100,8 +100,8 @@ exit=0
 - Retry/resume against a real interrupted HTTP transfer is not tested automatically; Range resume is
   tested over file://. The HTTP 200-on-Range fallback path is untested.
 - The cone uses the image-A position only; images B and C were not ingested.
-- License header: the user said AGPL-3.0-only; SNAPKITTY_OPAQUE_LICENSE.md mentions AGPL-3.0-or-later for
-  modified portions. Files carry `AGPL-3.0-only` + a pointer to the SnapKitty license; Hilbert should reconcile.
+- License: AGPL-3.0-only everywhere (decision 2026-10-19; SNAPKITTY_OPAQUE_LICENSE.md on main @ c1bc485 says
+  AGPL-3.0-only). Files carry `AGPL-3.0-only` + a pointer to the SnapKitty license.
 - CONTRACTS/brief mention docs/STATUS; there is no docs/ in the repo and I do not own it, so the
   "archive polling, not telemetry" statement is here at the top.
 
