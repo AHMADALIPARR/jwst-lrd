@@ -48,7 +48,11 @@ $N "$HERE/build/test_topology" "$EVD" "$FIXD" "$GEOD" > "$EVD/fortran_test.log" 
 FRC=$?
 grep -E '^(PASS|FAIL) ' "$EVD/fortran_test.log"
 NFAIL=$((NFAIL + $(grep -c '^FAIL ' "$EVD/fortran_test.log")))
-if [ $FRC -ne 0 ] && ! grep -q '^FAIL ' "$EVD/fortran_test.log"; then fail fortran_driver_exit "exit $FRC"; fi
+if [ $FRC -eq 0 ] && grep -q '^FORTRAN SUMMARY pass=[0-9]* fail=0$' "$EVD/fortran_test.log"; then
+  pass fortran_driver_exit_status_0
+else
+  fail fortran_driver_exit_status "exit $FRC (crash or failure), see evidence/fortran_test.log"
+fi
 
 # ---------------------------------------------------------------- independent hash cross-checks (coreutils)
 S="$EVD/torus_7v_gf2.lrdrec"
@@ -130,7 +134,9 @@ else
         esac
         GOT="$HERE/build/fx_got.out"
         $N "$HERE/build/topology_fx_$BK" -e "${ENTRY}_fx" < "$IN" > "$GOT" 2>>"$EVD/futhark_run_$BK.err"
-        if futhark datacmp "$EXP" "$GOT" > /dev/null 2>&1; then M=yes; OK=$((OK+1)); else M=NO; BAD=$((BAD+1)); fi
+        XRC=$?
+        [ $XRC -eq 0 ] || echo "$STEM $ENTRY exit status $XRC" >> "$EVD/futhark_run_$BK.err"
+        if [ $XRC -eq 0 ] && futhark datacmp "$EXP" "$GOT" > /dev/null 2>&1; then M=yes; OK=$((OK+1)); else M=NO; BAD=$((BAD+1)); fi
         if [ "$ENTRY" = boundary ]; then
           echo "$STEM boundary - | $(grep -o 'i32' "$EXP" | wc -l) entries, $(grep -o '\-1i32' "$EXP" | wc -l) of -1, $(grep -oE '(^|[^-0-9])1i32' "$EXP" | wc -l) of +1 | $(grep -o 'i32' "$GOT" | wc -l) entries, $(grep -o '\-1i32' "$GOT" | wc -l) of -1, $(grep -oE '(^|[^-0-9])1i32' "$GOT" | wc -l) of +1 | $M" >> "$T"
         else
@@ -158,6 +164,8 @@ else
   echo "self: $SELFBIN (objects $SELFOBJ); source commit $(git -C "$SELFOBJ/.." log -1 --format='%h %ad' --date=short 2>/dev/null)" >> "$EVD/versions.txt"
   ( cd "$SELFOBJ" && TOPO_SELF_DIR="$SELFD" TOPO_GEOM_DIR="$GEOD" timeout 300 $N "$SELFBIN" -f worldBuilder.self -b . -o none \
       -f2 "$HERE/self_headless.self" < /dev/null ) > "$EVD/self_headless_full.log" 2>&1
+  SRC=$?
+  if [ $SRC -eq 0 ]; then pass self_headless_exit_status_0; else fail self_headless_exit_status "exit $SRC (crash or timeout), see evidence/self_headless_full.log"; fi
   grep -E '^(PASS|FAIL|SELF) ' "$EVD/self_headless_full.log" > "$EVD/self_headless.log"
   grep -E '^(PASS|FAIL) ' "$EVD/self_headless.log"
   NFAIL=$((NFAIL + $(grep -c '^FAIL ' "$EVD/self_headless.log")))
@@ -196,12 +204,19 @@ else
     for _ in $(seq 1 40); do sleep 2; grep -q "GUI_DEMO_DONE" "$EVD/self_gui_full.log" && break; done
     sleep 8
     rm -f "$EVD/self_morphic_topology.png"
+    if kill -0 "$SPID" 2>/dev/null; then GUIALIVE=1; else GUIALIVE=0; wait "$SPID"; GUIRC=$?; fi
     DISPLAY="$DNUM" import -window root "$EVD/self_morphic_topology.png" > /dev/null 2>&1
+    IMRC=$?
     exec 7>&-
     kill "$SPID" > /dev/null 2>&1; wait "$SPID" 2>/dev/null
     kill $XPID > /dev/null 2>&1; rm -f "$FIFO"
     grep -E '^GUI' "$EVD/self_gui_full.log" > "$EVD/self_gui.log"
-    if grep -q GUI_DEMO_DONE "$EVD/self_gui_full.log" && [ -s "$EVD/self_morphic_topology.png" ]; then
+    if [ $GUIALIVE -ne 1 ]; then
+      fail self_gui_process_alive "Self GUI process exited early with status ${GUIRC:-?}, see evidence/self_gui_full.log"
+    else
+      pass self_gui_process_alive_until_screenshot
+    fi
+    if [ $IMRC -eq 0 ] && grep -q GUI_DEMO_DONE "$EVD/self_gui_full.log" && [ -s "$EVD/self_morphic_topology.png" ]; then
       pass self_gui_morphic_screenshot
     else
       fail self_gui_morphic_screenshot "see evidence/self_gui_full.log"
