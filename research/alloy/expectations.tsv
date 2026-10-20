@@ -1,0 +1,40 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# module<TAB>command<TAB>kind<TAB>expect   (0 = UNSAT/no counterexample or instance in scope, 1 = SAT)
+# Must match the `expect` annotations in <module>.als; check.sh enforces both.
+GodelLedger	EncodingInjective	check	0
+GodelLedger	EncodeFacInjective	check	0
+GodelLedger	AppendDeterministic	check	0
+GodelLedger	AppendExtendsCode	check	0
+GodelLedger	EncoderSound	check	0
+GodelLedger	PrefixVerifies	check	0
+GodelLedger	CodePrefixVerifies	check	0
+GodelLedger	MalformedRejected	check	0
+GodelLedger	VerifyCharacterisation	check	0
+GodelLedger	EncodingInjective_s6	check	0
+GodelLedger	MalformedRejected_s6	check	0
+GodelLedger	MalformedRejected_BROKEN	check	1
+GodelLedger	vacuity_GodelLedger	run	1
+CapabilityAddressing	NoForgedOrRolledBackAccepted	check	0
+CapabilityAddressing	ReplayedNonceRejected	check	0
+CapabilityAddressing	NoMessageAcceptedTwice	check	0
+CapabilityAddressing	RetiredCapabilityRejected	check	0
+CapabilityAddressing	CounterMonotonic	check	0
+CapabilityAddressing	CounterDominatesAccepted	check	0
+CapabilityAddressing	WorkerCannotWriteCounter	check	0
+CapabilityAddressing	NoForgedOrRolledBackAccepted_s5	check	0
+CapabilityAddressing	NoForgedOrRolledBackAccepted_BROKEN	check	1
+CapabilityAddressing	CounterMonotonic_BROKEN	check	1
+CapabilityAddressing	vacuity_CapabilityAddressing	run	1
+CapabilityAddressing	scenario_rollback_rejected	run	1
+CausalPoset	NoCausalityFromTimestampsAlone	check	0
+CausalPoset	PrecRequiresValidConeRelation	check	0
+CausalPoset	PrecIrreflexive	check	0
+CausalPoset	PrecTransitive	check	0
+CausalPoset	PrecAntisymmetric	check	0
+CausalPoset	PrecAcyclic	check	0
+CausalPoset	KindChainConsistent	check	0
+CausalPoset	ChainEventsInValidFrames	check	0
+CausalPoset	NoCausalityFromTimestampsAlone_s8	check	0
+CausalPoset	NoCausalityFromTimestampsAlone_BROKEN	check	1
+CausalPoset	vacuity_CausalPoset	run	1

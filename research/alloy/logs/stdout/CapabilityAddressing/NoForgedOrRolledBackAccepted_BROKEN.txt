@@ -1,0 +1,8 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/CapabilityAddressing/NoForgedOrRolledBackAccepted_BROKEN -t text -c NoForgedOrRolledBackAccepted_BROKEN CapabilityAddressing.als
+00. check NoForgedOrRolledBackAccepted_BROKEN     0    1/1     SAT
+c last restart ## conflicts  :  145 2273 
+c last restart ## conflicts  :  1 2302 
+c last restart ## conflicts  :  1 2304 
+c last restart ## conflicts  :  1 2250 
+c last restart ## conflicts  :  1 2249 

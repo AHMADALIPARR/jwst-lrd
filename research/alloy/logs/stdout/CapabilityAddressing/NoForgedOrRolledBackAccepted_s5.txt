@@ -1,0 +1,15 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/CapabilityAddressing/NoForgedOrRolledBackAccepted_s5 -t text -c NoForgedOrRolledBackAccepted_s5 CapabilityAddressing.als
+00. check NoForgedOrRolledBackAccepted_s5     0       UNSAT
+c
+c Try to adapt solver strategies
+c 
+c Adjusting solver for the SAT Race 2015 (alpha feature)
+c Nothing extreme in this problem, continue with glucose default strategies.
+c
+c
+c Try to adapt solver strategies
+c 
+c Adjusting solver for the SAT Race 2015 (alpha feature)
+c Nothing extreme in this problem, continue with glucose default strategies.
+c

@@ -1,0 +1,28 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Verbatim copy of Alloy 6.2.0 solution file logs/solutions/CausalPoset/NoCausalityFromTimestampsAlone_BROKEN-solution-0.txt (run 2, solver glucose).
+---Trace---
+------State 0 (loop)-------
+univ={Frame$0, Emission$0, Emission$1, Geo$0, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+Int={-16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+seq/Int={0, 1, 2, 3, 4, 5}
+String={}
+none={}
+this/Frame={Frame$0}
+this/Emission={Emission$0, Emission$1}
+this/Detection={}
+this/GroundReceipt={}
+this/ArchivePublication={}
+this/Event={Emission$0, Emission$1}
+this/Event<:ts={Emission$0->15, Emission$1->14}
+this/Event<:frame={Emission$0->Frame$0, Emission$1->Frame$0}
+this/Geo={Geo$0}
+this/Geo<:tl={}
+this/Geo<:ll={}
+this/Geo<:sl={Geo$0->Emission$0->Emission$1, Geo$0->Emission$1->Emission$0}
+this/Geo<:amb={}
+this/Geo<:inv={}
+this/ValidFrame={Frame$0}
+skolem $NoCausalityFromTimestampsAlone_BROKEN_a={Emission$1}
+skolem $NoCausalityFromTimestampsAlone_BROKEN_b={Emission$0}
+
