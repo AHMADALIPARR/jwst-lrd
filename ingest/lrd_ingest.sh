@@ -149,6 +149,8 @@ fi
 EXPECT_SIZE=$(sed -n 's/^raw.size=//p' "$D/source.kv")
 ACT_SIZE=$(wc -c < "$RAW" | tr -d ' ')
 [ "$ACT_SIZE" = "$EXPECT_SIZE" ] || die "size mismatch $ACT_SIZE != $EXPECT_SIZE"
+# git does not preserve mode 0444 on checkout; re-assert immutability before checking.
+chmod 0444 "$RAW"
 PERM=$(stat -c %a "$RAW")
 [ "$PERM" = "444" ] || die "raw fixture not read-only (mode $PERM)"
 
