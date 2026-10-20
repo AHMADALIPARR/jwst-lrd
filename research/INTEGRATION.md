@@ -69,7 +69,7 @@ Integration branch ec8ffb7 (t001+futhark+t008+t009+t010): 157 PASS / 2 FAIL / 3 
 
 Fixture finding: 09bcd907 (obsid 300843505) has all-negative FLUX and is provenance only. The primary is c0b87857 (obsid 230168921). The Fortran gives z = 7.04221 ± 0.00027 against a published 7.0451, a discrepancy that remains open.
 
-Missions: BLIND-PROTOCOL.md (four blind fitters) and MISSION-QSO1-DCBH-001.md (12 roles). The May 2026 and September 2026 papers are not yet retrieved.
+Missions: BLIND-PROTOCOL.md (four blind fitters) and MISSION-QSO1-DCBH-001.md (12 roles). The May 2026 dynamical-mass paper has been retrieved (see research/CITATIONS.md). September 2026 papers remain to be identified.
 
 ## Handoff at 2026-10-19 23:01 PT (Hilbert)
 - AIR/STARK passed HCALC Alloy's review (c9dba36, 8 minor). Its merge to main is held: its mirror header failed against the -only ledger header. Alapeno RTL is removing the mirror and including ledger/abi/lrd_state.h from main.
@@ -84,3 +84,17 @@ Updated status note
 - Fixtures for primary product c0b87857... present under fixtures/ingest/.
 - run_all.sh respects shebangs; previous sh-vs-bash FAIL notes may be resolved or need re-test.
 - Next for production: re-run Hilbert verification on repaired tracks, complete pending Alloy/Lean reviews, finish QSO1-DCBH-001 mission roles (Growth, DCBH, Adversary bots assigned), end-to-end on real fixture, resolve ledger record-size blocker, reconcile capability designs.
+
+## Production remaining-work checklist (2026-10-20)
+Priority order for reaching production quality on the integration branch:
+
+1. **Citation hygiene** — Done for the primary dynamical-mass paper. Add any further September 2026 papers once identified. All numerical claims in growth/DCBH tracks must cite a retrieved DOI/arXiv.
+2. **Ledger record-size blocker** — Only ≤2-byte records fit under the current bij256 / max_bits limit. Positional encoding repair required before large LRD-REC-v1 payloads can be appended.
+3. **Capability design reconciliation** — Rust TASK 010 (t010-capability) and the earlier C/Ed25519 design must be reconciled or one formally deprecated. Accumulator should move to the canonical ledger location once t005 is ready.
+4. **Pending reviews** — Hamiltonian, capability, Futhark, AIR, ledger, topology still need Alloy/Lean/Spec sign-off. Tracks are not done until review per CONTRACTS.md.
+5. **Real-fixture end-to-end** — Trace the primary product c0b87857… (obsid 230168921) through ingest → Fortran/Futhark numerics → ledger proposal → Hamiltonian decision → AIR proof. Resolve the open z = 7.04221 vs published 7.0451 discrepancy.
+6. **Test hygiene** — Re-run `tests/run_all.sh` on the current integration head and record the exact PASS/FAIL/UNAVAILABLE counts. Confirm shebang handling eliminates the earlier false FAILs.
+7. **License consistency** — A few Agda files still carry AGPL-3.0-or-later; project standard is AGPL-3.0-only + SnapKitty Opaque. Normalize on next Agda touch.
+8. **Mission tracks** — Growth (Fortran sweeps), DCBH scenarios, and adversarial harnesses remain to be completed against the retrieved dynamical-mass benchmark. No invented numbers.
+
+All verification claims require an independent Hilbert re-run. No force-push to main.
