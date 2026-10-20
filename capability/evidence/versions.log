@@ -1,0 +1,6 @@
+date: Mon Oct 19 22:39:49 PDT 2026
+cargo 1.85.1 (d73d2caf9 2024-12-31)
+rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)
+cc (Debian 14.2.0-19) 14.2.0
+OpenSSL 3.5.7 9 Jun 2026 (Library: OpenSSL 3.5.7 9 Jun 2026)
+Linux 6.12.94+ x86_64

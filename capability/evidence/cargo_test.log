@@ -1,0 +1,94 @@
+   Compiling lrd-capability v0.1.0 (/workspace/jwst-lrd-capability/capability)
+    Finished `release` profile [optimized] target(s) in 2.07s
+     Running unittests src/lib.rs (target/release/deps/lrd_capability-82a7f9c0ae2d0949)
+
+running 19 tests
+test abi::abi_conformance::constants_match_contract ... ok
+test abi::abi_conformance::layout_matches_c_header ... ok
+test abi::abi_conformance::reject_helper_clears_new_commit ... ok
+test accumulator::tests::rejects_small_modulus ... ok
+test bigint::tests::division_edge_cases ... ok
+test bigint::tests::division_identity_randomized ... ok
+test bigint::tests::hex_and_bytes_roundtrip ... ok
+test bigint::tests::small_known_values ... ok
+test cap::tests::mac_binds_every_field ... ok
+test hmac::tests::ct_eq_works ... ok
+test hmac::tests::rfc4231 ... ok
+test rec::tests::line_roundtrip_and_rejects ... ok
+test rec::tests::nat_canonical ... ok
+test rec::tests::serialization_is_sorted_and_length_prefixed ... ok
+test prime::tests::known_primes_and_composites ... ok
+test sha256::tests::streaming_equals_oneshot ... ok
+test sha256::tests::nist_vectors ... ok
+test prime::tests::hash_to_prime_deterministic_256bit ... ok
+test accumulator::tests::membership_roundtrip_and_tamper ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running unittests src/bin/lrd-authority.rs (target/release/deps/lrd_authority-360eaa9aa042a4c6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lrd-worker.rs (target/release/deps/lrd_worker-48dbaddfca85c327)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/adversarial.rs (target/release/deps/adversarial-db62b1eae91f6061)
+
+running 14 tests
+test capability_bound_to_exactly_one_slot ... ok
+test bad_accumulator_witness_rejected ... ok
+ACCEPTANCE worker stderr (attack run):
+[worker] pid=1426950 loaded state seq=1 head=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a
+[worker] ATTACK corrupt-memory: in-memory head_commit e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd
+[worker] ATTACK corrupt-memory: state file /tmp/lrdcap-accept-1426917/worker/worker.state rewritten with forged commit
+[worker] authority REJECTED: reason=bad_prev
+ACCEPTANCE authority log excerpt:
+[authority] ISSUE cap_id=ca8f3403dd1b2eb0802c63117889d406 scope=read cap_seq=0 expiry=1792474854
+[authority] ISSUE cap_id=ae2243308dd59dcdb0fdbb2103b85205 scope=transition cap_seq=1 expiry=1792474854
+[authority] SUBMIT seq=1 prev=d5157305d33a95fd01bd9179a4340c6bea31318412060c36a543e26e57493dbd -> ACCEPT reason=ok new_commit=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a counter=1
+[authority] ISSUE cap_id=72ddf3e5f04030d1ec24b131436e5c2e scope=transition cap_seq=2 expiry=1792474854
+[authority] SUBMIT seq=2 prev=d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd -> REJECT reason=bad_prev authority_head=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a
+[authority] ISSUE cap_id=fd002b1392040e3b321c015c3582f71e scope=read cap_seq=1 expiry=1792474854
+[authority] ISSUE cap_id=29519616ba958c11c1a3dcc42ad6bfed scope=transition cap_seq=2 expiry=1792474854
+[authority] SUBMIT seq=2 prev=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> REJECT reason=bad_commit claimed=372128d82f52e452fe3a003401ccebf85b92ca2f8581a8691ee8ae8bd2a3f4d3
+[authority] VERIFY -> REJECT reason=bad_witness element=d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd
+[authority] ISSUE cap_id=2636974d378b0aea568fe87eb3bfd499 scope=read cap_seq=1 expiry=1792474854
+[authority] ISSUE cap_id=157e66866cab9b3603b653f0600fc717 scope=transition cap_seq=2 expiry=1792474854
+[authority] SUBMIT seq=2 prev=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> ACCEPT reason=ok new_commit=29166b30402a11b6bb8214b16921881a525e409e77d21033504994dc596b86c4 counter=2
+test acceptance_corrupted_worker_memory_is_refused_by_independent_authority ... ok
+test forged_mac_rejected ... ok
+test consumed_capability_rejected_after_authority_restart ... ok
+test counter_monotonic_and_no_silent_reset ... ok
+OUT_OF_SCOPE demonstrated: attacker holding authority.key computes valid MACs
+test out_of_scope_key_read_allows_mac_forgery ... ok
+test historical_read_cannot_transition ... ok
+OUT_OF_SCOPE demonstrated: store rollback + replay accepted (decision=Some("ACCEPT"))
+test out_of_scope_store_write_allows_rollback_and_replay ... ok
+POSITIVE CONTROL authority log:
+[authority] ready
+[authority] ISSUE cap_id=a83d083693d6022bb81e716ebb4b25ce scope=read cap_seq=0 expiry=1792474855
+[authority] ISSUE cap_id=9938207dc456516a985dce45f8cda1b3 scope=transition cap_seq=1 expiry=1792474855
+[authority] SUBMIT seq=1 prev=f76454ce0c190b2037fd31b48510bd20e5a348aa8c1de6fc1e81ca2f6ac22185 -> ACCEPT reason=ok new_commit=b2afa84d1079a0182b72d21889c62fce2ce7212982d32f6d1508ef5edde70821 counter=1
+[authority] ISSUE cap_id=e314fc3b43846442a6441adaae3f9528 scope=transition cap_seq=2 expiry=1792474855
+[authority] SUBMIT seq=2 prev=b2afa84d1079a0182b72d21889c62fce2ce7212982d32f6d1508ef5edde70821 -> ACCEPT reason=ok new_commit=5a9ac6d6d7a5889ae982a08866f63cf974bc1fb80c4540c2c5c2e502385f8cfb counter=2
+[authority] ISSUE cap_id=a10bd62b4551536762e23253128a31c3 scope=transition cap_seq=3 expiry=1792474855
+[authority] SUBMIT seq=3 prev=5a9ac6d6d7a5889ae982a08866f63cf974bc1fb80c4540c2c5c2e502385f8cfb -> ACCEPT reason=ok new_commit=0e6a6679638edbee01a771cd8b6c21fcb60c0f844450ec6c36b1930d58e45594 counter=3
+test positive_control_honest_transitions_accepted ... ok
+test replay_of_consumed_capability_rejected ... ok
+test state_file_tampered_externally_is_refused ... ok
+test rollback_rejected ... ok
+test expiry_and_revocation ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s
+
+   Doc-tests lrd_capability
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
