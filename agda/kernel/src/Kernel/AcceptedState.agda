@@ -20,6 +20,7 @@
 --   runtime's consumed log is the model's retired set) the obligation
 --   CapabilityConsumedOnce holds; with the crypto assumption
 --   CollisionResistant, equal head commitments imply equal heads.
+{-# OPTIONS --safe --without-K #-}
 open import Relation.Binary.Definitions using (DecidableEquality)
 open import Data.Nat.Base using (ℕ)
 open import Data.Bool.Base using (Bool)
