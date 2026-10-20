@@ -1,0 +1,145 @@
+LRD-REC-v1
+19:a.centroid.Halpha.z14:7.04226243E+00
+23:a.centroid.Halpha.z_err14:2.71350905E-04
+18:a.centroid.Hbeta.z14:7.03846105E+00
+22:a.centroid.Hbeta.z_err14:2.20719560E-03
+21:a.lsf.Halpha.chi2_min14:9.57052810E+01
+17:a.lsf.Halpha.npix2:16
+26:a.lsf.Halpha.sigma_int_kms14:5.00000000E+02
+14:a.lsf.Halpha.z14:7.04053000E+00
+25:a.lsf.Halpha.z_hi_dchi2_114:7.04080000E+00
+25:a.lsf.Halpha.z_lo_dchi2_114:7.04026000E+00
+20:a.lsf.Hbeta.chi2_min14:1.77717283E+01
+16:a.lsf.Hbeta.npix2:25
+25:a.lsf.Hbeta.sigma_int_kms14:6.00000000E+02
+13:a.lsf.Hbeta.z14:7.03795000E+00
+24:a.lsf.Hbeta.z_hi_dchi2_114:7.04025000E+00
+24:a.lsf.Hbeta.z_lo_dchi2_114:7.03565000E+00
+20:a.lsf.joint.chi2_min14:1.14709875E+02
+13:a.lsf.joint.z14:7.04050000E+00
+24:a.lsf.joint.z_hi_dchi2_114:7.04077000E+00
+24:a.lsf.joint.z_lo_dchi2_114:7.04022000E+00
+23:a.point.Halpha.chi2_min14:9.57028380E+01
+19:a.point.Halpha.npix2:16
+28:a.point.Halpha.sigma_int_kms14:6.50000000E+02
+16:a.point.Halpha.z14:7.04053000E+00
+27:a.point.Halpha.z_hi_dchi2_114:7.04081000E+00
+27:a.point.Halpha.z_lo_dchi2_114:7.04026000E+00
+22:a.point.Hbeta.chi2_min14:1.77846708E+01
+18:a.point.Hbeta.npix2:25
+27:a.point.Hbeta.sigma_int_kms14:1.00000000E+03
+15:a.point.Hbeta.z14:7.03798000E+00
+26:a.point.Hbeta.z_hi_dchi2_114:7.04031000E+00
+26:a.point.Hbeta.z_lo_dchi2_114:7.03567000E+00
+22:a.point.joint.chi2_min14:1.14670230E+02
+15:a.point.joint.z14:7.04050000E+00
+26:a.point.joint.z_hi_dchi2_114:7.04077000E+00
+26:a.point.joint.z_lo_dchi2_114:7.04023000E+00
+28:b.Halpha.centroid_hw1.5.npix1:3
+25:b.Halpha.centroid_hw1.5.z14:7.04315727E+00
+28:b.Halpha.centroid_hw2.0.npix1:4
+25:b.Halpha.centroid_hw2.0.z14:7.04451981E+00
+28:b.Halpha.centroid_hw2.5.npix1:5
+25:b.Halpha.centroid_hw2.5.z14:7.04226243E+00
+28:b.Halpha.centroid_hw3.0.npix1:6
+25:b.Halpha.centroid_hw3.0.z14:7.02164510E+00
+28:b.Halpha.centroid_hw3.5.npix1:7
+25:b.Halpha.centroid_hw3.5.z14:7.03532521E+00
+28:b.Halpha.centroid_hw4.0.npix1:7
+25:b.Halpha.centroid_hw4.0.z14:7.03532521E+00
+27:b.Halpha.last_valid_obs_ang14:5.30382299E+04
+32:b.Halpha.lsf_red_trunc0.chi2_min14:1.92511664E+01
+28:b.Halpha.lsf_red_trunc0.npix2:13
+37:b.Halpha.lsf_red_trunc0.sigma_int_kms14:5.50000000E+02
+25:b.Halpha.lsf_red_trunc0.z14:7.04323000E+00
+36:b.Halpha.lsf_red_trunc0.z_hi_dchi2_114:7.04377000E+00
+36:b.Halpha.lsf_red_trunc0.z_lo_dchi2_114:7.04206000E+00
+32:b.Halpha.lsf_red_trunc1.chi2_min14:3.31437804E+01
+28:b.Halpha.lsf_red_trunc1.npix2:14
+37:b.Halpha.lsf_red_trunc1.sigma_int_kms14:4.00000000E+02
+25:b.Halpha.lsf_red_trunc1.z14:7.04007000E+00
+36:b.Halpha.lsf_red_trunc1.z_hi_dchi2_114:7.04037000E+00
+36:b.Halpha.lsf_red_trunc1.z_lo_dchi2_114:7.03978000E+00
+27:b.Halpha.lsf_win12.chi2_min14:9.57052810E+01
+23:b.Halpha.lsf_win12.npix2:16
+32:b.Halpha.lsf_win12.sigma_int_kms14:5.00000000E+02
+20:b.Halpha.lsf_win12.z14:7.04053000E+00
+31:b.Halpha.lsf_win12.z_hi_dchi2_114:7.04080000E+00
+31:b.Halpha.lsf_win12.z_lo_dchi2_114:7.04026000E+00
+26:b.Halpha.lsf_win6.chi2_min14:5.41371943E+01
+22:b.Halpha.lsf_win6.npix2:10
+31:b.Halpha.lsf_win6.sigma_int_kms14:5.50000000E+02
+19:b.Halpha.lsf_win6.z14:7.04189000E+00
+30:b.Halpha.lsf_win6.z_hi_dchi2_114:7.04221000E+00
+30:b.Halpha.lsf_win6.z_lo_dchi2_114:7.04157000E+00
+26:b.Halpha.lsf_win9.chi2_min14:8.35847193E+01
+22:b.Halpha.lsf_win9.npix2:13
+31:b.Halpha.lsf_win9.sigma_int_kms14:5.50000000E+02
+19:b.Halpha.lsf_win9.z14:7.04106000E+00
+30:b.Halpha.lsf_win9.z_hi_dchi2_114:7.04135000E+00
+30:b.Halpha.lsf_win9.z_lo_dchi2_114:7.04057000E+00
+21:b.Halpha.peak_obs_ang14:5.28161287E+04
+14:b.Halpha.pix-137:5.27418613E+04 ok=T sn=5.32539588E+01
+14:b.Halpha.pix-237:5.26674795E+04 ok=T sn=3.89367767E+01
+14:b.Halpha.pix-337:5.25929832E+04 ok=T sn=2.48593149E+01
+14:b.Halpha.pix-437:5.25183678E+04 ok=T sn=1.78001472E+01
+14:b.Halpha.pix-537:5.24436331E+04 ok=T sn=1.30932516E+01
+14:b.Halpha.pix-637:5.23687792E+04 ok=T sn=1.09892506E+01
+13:b.Halpha.pix037:5.28161287E+04 ok=T sn=5.50816885E+01
+13:b.Halpha.pix137:5.28902769E+04 ok=T sn=3.70503462E+01
+13:b.Halpha.pix237:5.29643106E+04 ok=T sn=2.55614791E+01
+13:b.Halpha.pix337:5.30382299E+04 ok=T sn=5.15915774E+00
+13:b.Halpha.pix437:5.31120348E+04 ok=F sn=0.00000000E+00
+13:b.Halpha.pix537:5.31857204E+04 ok=F sn=0.00000000E+00
+13:b.Halpha.pix637:5.32593012E+04 ok=F sn=0.00000000E+00
+13:b.Halpha.pix737:5.33327627E+04 ok=F sn=0.00000000E+00
+13:b.Halpha.pix837:5.34061146E+04 ok=F sn=0.00000000E+00
+34:b.Halpha.valid_pix_redward_of_peak1:3
+26:b.Hbeta.lsf_win12.chi2_min14:1.77717283E+01
+22:b.Hbeta.lsf_win12.npix2:25
+31:b.Hbeta.lsf_win12.sigma_int_kms14:6.00000000E+02
+19:b.Hbeta.lsf_win12.z14:7.03795000E+00
+30:b.Hbeta.lsf_win12.z_hi_dchi2_114:7.04025000E+00
+30:b.Hbeta.lsf_win12.z_lo_dchi2_114:7.03565000E+00
+25:b.Hbeta.lsf_win6.chi2_min14:5.01047668E+00
+21:b.Hbeta.lsf_win6.npix2:13
+30:b.Hbeta.lsf_win6.sigma_int_kms14:5.50000000E+02
+18:b.Hbeta.lsf_win6.z14:7.03911000E+00
+29:b.Hbeta.lsf_win6.z_hi_dchi2_114:7.04150000E+00
+29:b.Hbeta.lsf_win6.z_lo_dchi2_114:7.03672000E+00
+25:b.Hbeta.lsf_win9.chi2_min14:9.48049637E+00
+21:b.Hbeta.lsf_win9.npix2:19
+30:b.Hbeta.lsf_win9.sigma_int_kms14:5.50000000E+02
+18:b.Hbeta.lsf_win9.z14:7.03820000E+00
+29:b.Hbeta.lsf_win9.z_hi_dchi2_114:7.04055000E+00
+29:b.Hbeta.lsf_win9.z_lo_dchi2_114:7.03589000E+00
+38:inj.Halpha.centroid_hw1.5.z_minus_true15:-1.59537546E-04
+38:inj.Halpha.centroid_hw2.0.z_minus_true14:1.62140046E-03
+38:inj.Halpha.centroid_hw2.5.z_minus_true15:-5.42910462E-04
+38:inj.Halpha.centroid_hw3.0.z_minus_true15:-2.07336395E-03
+38:inj.Halpha.centroid_hw3.5.z_minus_true15:-4.32356960E-04
+38:inj.Halpha.centroid_hw4.0.z_minus_true15:-4.32356960E-04
+31:inj.Halpha.lsf_fit.z_minus_true14:0.00000000E+00
+16:inj.Halpha.model111:SYNTHETIC: fitted continuum + LSF(JDox)*Gaussian(sigma_int fitted), pixel-integrated, noise-free, z_true=7.0451
+33:inj.Halpha.point_fit.z_minus_true14:0.00000000E+00
+37:inj.Hbeta.centroid_hw1.5.z_minus_true15:-3.10149843E-03
+37:inj.Hbeta.centroid_hw2.0.z_minus_true14:2.03445288E-03
+37:inj.Hbeta.centroid_hw2.5.z_minus_true15:-1.11338679E-03
+37:inj.Hbeta.centroid_hw3.0.z_minus_true14:5.17131855E-04
+37:inj.Hbeta.centroid_hw3.5.z_minus_true15:-2.10230195E-04
+37:inj.Hbeta.centroid_hw4.0.z_minus_true14:6.92643101E-05
+30:inj.Hbeta.lsf_fit.z_minus_true14:0.00000000E+00
+15:inj.Hbeta.model111:SYNTHETIC: fitted continuum + LSF(JDox)*Gaussian(sigma_int fitted), pixel-integrated, noise-free, z_true=7.0451
+32:inj.Hbeta.point_fit.z_minus_true14:2.00000000E-05
+19:lsf.R_at_Halpha_obs14:3.20562743E+02
+18:lsf.R_at_Hbeta_obs14:1.71836622E+02
+15:lsf.file_sha25664:58f9330440c50af624313e70f3e5b9f58a6b22d06af094e0085ed66408d0d937
+22:lsf.fwhm_kms_at_Halpha14:9.35206803E+02
+21:lsf.fwhm_kms_at_Hbeta14:1.74463659E+03
+22:lsf.fwhm_pix_at_Halpha14:2.21927925E+00
+21:lsf.fwhm_pix_at_Hbeta14:2.22123394E+00
+10:lsf.source94:JDox jwst_nirspec_prism_disp.fits (TABLE: WAVELENGTH MICRONS, R), 2.2-pixel resolution element
+23:pix.width_ang_at_Halpha14:7.42077827E+01
+22:pix.width_ang_at_Hbeta14:1.02454424E+02
+13:source_sha25664:c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7
+11:z_published61:7.0451 (Furtak et al. 2024, Nature 628, 57, arXiv:2308.05735)
