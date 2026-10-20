@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Observation access. $1 = LRD-ARR-v1 prefix with unit um.
+lrdir 1
+let lam : arr<f64> = load($1, "um")
+let n : i64 = len(lam)
+let first : f64 = get(lam, 0)
+let last : f64 = get(lam, 63)
+print n
+print first
+print last

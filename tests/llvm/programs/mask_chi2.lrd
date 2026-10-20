@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Explicit, logged masking (CONTRACTS v1.2; research/BLIND-PROTOCOL.md) then chi2 on the masked arrays.
+# $1 unit of FLUX/ERR, $2 unit of OBS/MODEL/SIG, $3 FLUX, $4 FLUX_ERROR (mask rule inputs),
+# $5 OBS, $6 SIG, $7 MODEL (non-finite outside its fit window),
+# outputs: $8 protocol mask, $9 model-window mask, $10 combined mask, $11 chi2, $12 masked residuals.
+lrdir 1
+let flux : arr<f64> = load($3, $1)
+let ferr : arr<f64> = load($4, $1)
+let obs : arr<f64> = load($5, $2)
+let sig : arr<f64> = load($6, $2)
+let model : arr<f64> = load($7, $2)
+let m : arr<f64> = mask(flux, ferr, $8)
+let w : arr<f64> = mask_finite(model, $9)
+let mw : arr<f64> = mask_and(m, w, $10)
+let o2 : arr<f64> = apply_mask(obs, mw)
+let s2 : arr<f64> = apply_mask(sig, mw)
+let m2 : arr<f64> = apply_mask(model, mw)
+let n : i64 = len(o2)
+let ok : bool = all_finite(s2)
+assert ok "masked sigma must be finite"
+let r : arr<f64> = residuals(o2, m2)
+let c : f64 = chi2(o2, m2, s2)
+store c $11
+store r $12
+print n
+print c

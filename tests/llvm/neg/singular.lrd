@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: solve with a singular matrix
+lrdir 1
+let a : arr<f64> = load($1, "1")
+let b : arr<f64> = load($2, "1")
+let A : mat<f64> = mat(a, 2, 2)
+let x : arr<f64> = solve(A, b)
+print x

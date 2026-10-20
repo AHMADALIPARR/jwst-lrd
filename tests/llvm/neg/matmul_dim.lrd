@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: matmul inner dimension mismatch
+lrdir 1
+let a : arr<f64> = load($1, "1")
+let A : mat<f64> = mat(a, 3, 3)
+let B : mat<f64> = matmul(A, A)
+let C : mat<f64> = mat(a, 9, 1)
+let D : mat<f64> = matmul(C, A)

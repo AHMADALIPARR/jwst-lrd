@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# validation: um -> Angstrom. $1 in (um) -> $2
+lrdir 1
+let a : arr<f64> = load($1, "um")
+let r : arr<f64> = convert(a, "um", "Angstrom")
+store r $2

@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Spectral transforms. $1 = wavelength (um); outputs $2 rest (um), $3 rest (Angstrom),
+# $4 rest (nm), $5 obsframe(rest) (um), $6 Angstrom->um of $3.
+lrdir 1
+let lam : arr<f64> = load($1, "um")
+let z : f64 = 5.0
+let rest : arr<f64> = restframe(lam, z)
+let restA : arr<f64> = convert(rest, "um", "Angstrom")
+let restnm : arr<f64> = convert(rest, "um", "nm")
+let back : arr<f64> = obsframe(rest, z)
+let restum : arr<f64> = convert(restA, "Angstrom", "um")
+store rest $2
+store restA $3
+store restnm $4
+store back $5
+store restum $6
