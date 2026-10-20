@@ -5,6 +5,12 @@ title: Little Red Dots Experiment
 
 # Observations. Hypotheses. Invariants.
 
+## [Watch the crisp 2D demo →](demo/)
+
+Thirty seconds of Self-generated vector geometry with red-dot, helix and
+waveform close-ups. Plays directly in the browser without the VM, with a
+4K master and zoomable SVG detail exports.
+
 ## [Open the live Self / Morphic route →](live/)
 
 On the NUC, this route embeds the running native renderer: archived waveform,
@@ -85,7 +91,7 @@ sh tests/morphic/run.sh
 For an interactive session, follow the
 [workspace guide](https://github.com/AHMADALIPARR/jwst-lrd/blob/frontend/morphic-workspace/self/experiment/README.md).
 Validated implementation: commit
-[`78d967c`](https://github.com/AHMADALIPARR/jwst-lrd/commit/78d967c).
+[`fc90fee`](https://github.com/AHMADALIPARR/jwst-lrd/commit/fc90fee).
 
 ---
 
