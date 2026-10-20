@@ -7,7 +7,7 @@ module lrd_fits
   use, intrinsic :: iso_fortran_env, only: real64
   implicit none
   private
-  public :: fits_nrows, fits_read_dcol, fits_read_key
+  public :: fits_nrows, fits_read_dcol, fits_read_key, fits_nrows_ext, fits_read_dcol_ext
 
   interface
     function c_nrows(path, nrows) bind(C, name="lrd_fits_nrows") result(rc)
@@ -30,6 +30,21 @@ module lrd_fits
       character(kind=c_char), intent(in) :: path(*), key(*)
       character(kind=c_char), intent(out) :: out(*)
       integer(c_int), value :: outlen
+      integer(c_int) :: rc
+    end function
+    function c_nrows_ext(path, ext, nrows) bind(C, name="lrd_fits_nrows_ext") result(rc)
+      import :: c_char, c_long, c_int
+      character(kind=c_char), intent(in) :: path(*), ext(*)
+      integer(c_long), intent(out) :: nrows
+      integer(c_int) :: rc
+    end function
+    function c_read_dcol_ext(path, ext, col, n, out, unit, unitlen) bind(C, name="lrd_fits_read_dcol_ext") result(rc)
+      import :: c_char, c_long, c_int, c_double
+      character(kind=c_char), intent(in) :: path(*), ext(*), col(*)
+      integer(c_long), value :: n
+      real(c_double), intent(out) :: out(*)
+      character(kind=c_char), intent(out) :: unit(*)
+      integer(c_int), value :: unitlen
       integer(c_int) :: rc
     end function
   end interface
@@ -81,5 +96,21 @@ contains
     vbuf = c_null_char
     rc = int(c_read_key(cstr(path), cstr(key), vbuf, int(size(vbuf), c_int)))
     val = from_c(vbuf)
+  end function
+  integer function fits_nrows_ext(path, ext, n) result(rc)
+    character(len=*), intent(in) :: path, ext
+    integer, intent(out) :: n
+    integer(c_long) :: nl
+    rc = int(c_nrows_ext(cstr(path), cstr(ext), nl))
+    n = int(nl)
+  end function
+
+  integer function fits_read_dcol_ext(path, ext, col, v, unit) result(rc)
+    character(len=*), intent(in) :: path, ext, col
+    real(real64), intent(out) :: v(:)
+    character(len=:), allocatable, intent(out) :: unit
+    character(kind=c_char) :: ubuf(72)
+    rc = int(c_read_dcol_ext(cstr(path), cstr(ext), cstr(col), int(size(v), c_long), v, ubuf, int(size(ubuf), c_int)))
+    unit = from_c(ubuf)
   end function
 end module lrd_fits

@@ -11,7 +11,7 @@ MODS   := lrd_const lrd_units lrd_cosmo lrd_stats lrd_lines lrd_arr lrd_fits
 OBJS   := $(MODS:%=$(B)/%.o) $(B)/lrd_fits_shim.o
 
 .PHONY: all clean
-all: $(BIN)/lrd_reference $(BIN)/lrd_ftest
+all: $(BIN)/lrd_reference $(BIN)/lrd_ftest $(BIN)/lrd_zinvest
 
 $(B) $(BIN):
 	mkdir -p $@
@@ -38,8 +38,11 @@ $(B)/lrd_fits.o: src/lrd_fits.f90 | $(B)
 $(BIN)/lrd_reference: app/lrd_reference.f90 $(OBJS) | $(BIN)
 	$(FC) $(FFLAGS) -I$(B) -o $@ $< $(OBJS) -lcfitsio
 
+$(BIN)/lrd_zinvest: app/lrd_zinvest.f90 $(OBJS) | $(BIN)
+	$(FC) $(FFLAGS) -I$(B) -o $@ $< $(OBJS) -lcfitsio
+
 $(BIN)/lrd_ftest: ../tests/fortran/test_kernel.f90 $(OBJS) | $(BIN)
 	$(FC) $(FFLAGS) -I$(B) -o $@ $< $(OBJS) -lcfitsio
 
 clean:
-	rm -rf $(B) $(BIN)/lrd_reference $(BIN)/lrd_ftest
+	rm -rf $(B) $(BIN)/lrd_reference $(BIN)/lrd_ftest $(BIN)/lrd_zinvest
