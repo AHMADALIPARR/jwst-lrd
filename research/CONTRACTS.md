@@ -1,3 +1,12 @@
+# Charter (Ahmad, 2026-10-19)
+
+1. Preserve observations exactly.
+2. Verify computations independently.
+3. Keep competing explanations alive.
+4. Never confuse mathematical proof with empirical discovery.
+
+Every track and every review is held to these.
+
 # JWST-LRD shared contracts (v1)
 
 Licensed AGPL-3.0 plus the SnapKitty Opaque License. Written by the orchestrator (Hilbert). Change it only through Hilbert.
@@ -55,3 +64,13 @@ The decision is an LRD-REC-v1 record:
 Rejection never constructs a new state. The C header lives at `ledger/abi/lrd_state.h` and is owned by the ledger track. Other tracks include it and do not fork it.
 
 Agda mirrors this ABI in `agda/Core/State.agda`. The proof obligations for each kind are listed in `agda/OBLIGATIONS.md`, which the Agda track owns and other tracks contribute entries to through Hilbert.
+
+## Amendments (v1.1, Hilbert, 2026-10-19)
+- Empty LRD-REC-v1 keys are rejected.
+- Added decision reason tokens: `malformed`, `wrong_kind`, `bad_payload`, `bad_epoch`, `epoch_exhausted`.
+- Hamiltonian step check order is normative: `epoch_exhausted`, then `infeasible`, then the energy check.
+- License header text: `AGPL-3.0-only` plus the SnapKitty Opaque License (not -or-later).
+- `new_commit` is the LRD-REC-v1 commitment of the new state record `{commit=<prev_commit>, kind, payload_sha256, seq}`. Kind-specific fields are not part of the state record.
+- A subsystem may expose a wrapper with extra explicit arguments (for example `air_transition(public, inputs, proof)`). The wrapper must reduce to an `lrd_transition_fn` with the context bound.
+- The ledger header `ledger/abi/lrd_state.h` has been on main since 7c0c393 (627fda7). Merge main to pick it up.
+- A branch that Hilbert has re-tested but that has not yet been reviewed goes into the `integration` branch (worktree /workspace/jwst-lrd-integration). It reaches main only after review.
