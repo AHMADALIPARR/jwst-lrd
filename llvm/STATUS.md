@@ -43,7 +43,7 @@ without fast-math or contract flags. Everything else calls the C runtime.
 - chi2 does not mask pixels: non-finite or <= 0 sigma is a runtime error. Real-data chi2 is therefore not run,
   because flam_err is NaN on masked pixels.
 - solve flags a matrix as singular when a pivot is 0 or <= n*DBL_EPSILON*max|A_ij|.
-- Real-data inputs come only from COMMITTED objects on t001-ingest-fortran (`git show`, head 69ee34a at run time):
+- Real-data inputs come only from COMMITTED objects on t001-ingest-fortran (`git show`, head f6c4681 at run time):
   fixtures/ingest/CURRENT wavelength, and the Fortran reference outputs fixtures/reference/<sha>/
   {wavelength_ang, flam, model_Halpha, model_Hbeta, resid_Halpha, resid_Hbeta}. z = 7.0451 in
   tests/llvm/programs/real_full.lrd is Furtak et al. 2024 as cited in that branch's fortran/STATUS.md. It is only a
@@ -68,7 +68,7 @@ without fast-math or contract flags. Everything else calls the C runtime.
   Fortran reference outputs on t001-ingest-fortran, so the diff actually ran (see output).
 - tests/llvm/fixtures/*.ll golden files carry a 3-line license comment. The test compares everything after it.
 
-## Verbatim output of `bash tests/llvm/run.sh` (before commit)
+## Verbatim output of `bash tests/llvm/run.sh` (after commit)
 Exit code: 0. Counts: PASS 129, FAIL 0, UNAVAILABLE 0.
 ```
 PASS toolchain_clang
@@ -203,22 +203,9 @@ PASS real_jwst_diff
 ```
 
 ## Git state
-`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `db41431b8262a69bd791faef905c758a27879a86`. That is the branch base (main at db41431, see Deviations). Nothing of this track was committed yet, so `git status --short` lists all t014 files as untracked. The run is re-done after the commit, and this file is then updated in a second commit.
+`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `b328cfde7836e06d5434b5f049a67f381885f02c`. That is the first t014 commit, which holds all t014 sources. This STATUS file is committed afterwards in a second, STATUS-only commit, so the branch head is one commit later than the hash above. A commit cannot contain its own hash.
 
 `git -C /workspace/jwst-lrd-t014 status --short`:
 ```
-?? abi/
-?? llvm/.gitignore
-?? llvm/LRD-IR.md
-?? llvm/Makefile
-?? llvm/STATUS.md
-?? llvm/SUPPORT.md
-?? llvm/TOOLCHAIN.md
-?? llvm/check_toolchain.sh
-?? llvm/lrdc/
-?? llvm/runtime/
-?? llvm/toolchain.pin
-?? tests/llvm/
-?? tests/validation/
-?? validation/
+(clean: no output)
 ```

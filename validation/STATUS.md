@@ -19,7 +19,7 @@ GNU Octave is installed but is not MATLAB, and no matlab/ track outputs exist. I
 ## References and what was compared
 | reference | source (consumed read-only) | status |
 |---|---|---|
-| Fortran (acceptance) | committed `fixtures/reference/<CURRENT>/` on t001-ingest-fortran (head 69ee34a), written by fortran/app/lrd_reference.f90 | ran: lrdc convert um->Angstrom vs wavelength_ang, lrdc residuals vs resid_Halpha and resid_Hbeta (a manual lrdcmp run on the same files reported n=429, finite pairs 429 / 16 / 24, maxabs 0, i.e. bit-identical); synthetic cases UNAVAILABLE (the Fortran app has no input CLI) |
+| Fortran (acceptance) | committed `fixtures/reference/<CURRENT>/` on t001-ingest-fortran (head f6c4681), written by fortran/app/lrd_reference.f90 | ran: lrdc convert um->Angstrom vs wavelength_ang, lrdc residuals vs resid_Halpha and resid_Hbeta (a manual lrdcmp run on the same files reported n=429, finite pairs 429 / 16 / 24, maxabs 0, i.e. bit-identical); synthetic cases UNAVAILABLE (the Fortran app has no input CLI) |
 | Futhark | `futhark/` committed on agent2-futhark (head eeb1e78), exported with git archive and built with `futhark c --safe` in a temp dir | ran: restframe, convert, residuals, chi2 (SYNTHETIC) + restframe, convert (real wavelength) |
 | Fortran (Futhark track's reference) | `tests/futhark/fortran-ref` committed on agent2-futhark, built with gfortran in a temp dir | ran: same 6 cases |
 | MATLAB | - | UNAVAILABLE: not installed (licensed), no outputs |
@@ -37,7 +37,7 @@ output cannot pass.
 - t001 Fortran publishes only fixed real-product outputs, so restframe and chi2 have no t001 Fortran reference.
 - References track moving branches. The heads used are printed above and in the futhark/fortran_fut build test names.
 
-## Verbatim output of `bash tests/validation/run.sh` (before commit)
+## Verbatim output of `bash tests/validation/run.sh` (after commit)
 Exit code: 0. Counts: PASS 31, FAIL 0, UNAVAILABLE 9.
 ```
 PASS toolchain_llvm_pinned
@@ -83,22 +83,9 @@ UNAVAILABLE sas_reference sas not installed (licensed software); no sas/ referen
 ```
 
 ## Git state
-`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `db41431b8262a69bd791faef905c758a27879a86`. That is the branch base (main at db41431, see Deviations). Nothing of this track was committed yet, so `git status --short` lists all t014 files as untracked. The run is re-done after the commit, and this file is then updated in a second commit.
+`git -C /workspace/jwst-lrd-t014 rev-parse HEAD` at the time of this run: `b328cfde7836e06d5434b5f049a67f381885f02c`. That is the first t014 commit, which holds all t014 sources. This STATUS file is committed afterwards in a second, STATUS-only commit, so the branch head is one commit later than the hash above. A commit cannot contain its own hash.
 
 `git -C /workspace/jwst-lrd-t014 status --short`:
 ```
-?? abi/
-?? llvm/.gitignore
-?? llvm/LRD-IR.md
-?? llvm/Makefile
-?? llvm/STATUS.md
-?? llvm/SUPPORT.md
-?? llvm/TOOLCHAIN.md
-?? llvm/check_toolchain.sh
-?? llvm/lrdc/
-?? llvm/runtime/
-?? llvm/toolchain.pin
-?? tests/llvm/
-?? tests/validation/
-?? validation/
+(clean: no output)
 ```
