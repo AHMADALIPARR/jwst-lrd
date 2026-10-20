@@ -41,10 +41,13 @@ CONSTRAINTS). Input: the Fortran solver's LRD-GROWTH-v1 record
   min seed 22,083,477 Msun under both models (lam < 1 makes them equal),
   matching an independent by-hand exponent computation (E = 0.8172,
   factor 2.2642, 5e7/2.2642 = 2.2083e7).
-- The full 1200-row test run (all 11 checks) had not completed a clean
-  pass at the time of writing: PAKCS needs ~2–4 minutes of uncontended
-  CPU for the full record parse, and this VM was replaced mid-run three
-  times on 2026-10-20, killing the evaluation each time. The full-run
-  result belongs in `tests/growth/evidence/curry_run.log` once
-  `tests/growth/run.sh` completes on a stable host; it is NOT claimed
-  here.
+- **Full 1200-row run COMPLETED 2026-10-20: all 11 checks PASS**
+  (row_count_1200, benchmark_tuple_found, benchmark_seed_near_497,
+  benchmark_heavy_seed_only, competing_hypotheses_alive,
+  nondet_matches_filter, weak_tuple_is_counterexample, pbh_range_alive,
+  light_seed_exists, every_feasible_has_hypothesis,
+  no_infeasible_has_hypothesis; log in
+  `tests/growth/evidence/curry_run.log`). Runtime was ~19 minutes of
+  PAKCS on this small VM — the classifier is correct but PAKCS's
+  throughput on a 522 KB record is what it is; earlier attempts were
+  killed by VM replacements and CPU contention, not by defects.

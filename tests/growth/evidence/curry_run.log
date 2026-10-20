@@ -1,0 +1,12 @@
+PASS curry.row_count_1200
+PASS curry.benchmark_tuple_found
+PASS curry.benchmark_seed_near_497
+PASS curry.benchmark_heavy_seed_only
+PASS curry.competing_hypotheses_alive
+PASS curry.nondet_matches_filter
+PASS curry.weak_tuple_is_counterexample
+PASS curry.pbh_range_alive
+PASS curry.light_seed_exists
+PASS curry.every_feasible_has_hypothesis
+PASS curry.no_infeasible_has_hypothesis
+CURRY_GROWTH_DONE
