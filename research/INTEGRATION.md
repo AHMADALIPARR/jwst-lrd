@@ -76,3 +76,11 @@ Missions: BLIND-PROTOCOL.md (four blind fitters) and MISSION-QSO1-DCBH-001.md (1
 - The -only lrd_state.h is on main at 38570a9, sha256 d5ff6110...ea33.
 - Topology t-topology 7f71e07 is pushed and reports 270 PASS. Hilbert's re-run was interrupted, so the count is unverified. Review owner: HCALC Spec.
 - Next: re-run each repaired branch, merge the ones that pass review, and trace the real QSO1 fixture c0b87857 end to end.
+Updated status note
+
+## Status update 2026-10-20 (Grok / Hilbert assistance)
+- Clean merge of origin/main into integration completed (commit e30265b). Pushed to origin/integration. PR #11 head updated; base is current main.
+- Key paper retrieved: Juodžbalis et al. 2026, Nature 653, 1017–1021, "A direct black-hole mass measurement in a little red dot at high redshift", doi:10.1038/s41586-026-10579-4. Dynamical BH mass ~5×10^7 M_⊙ (Keplerian point-mass fit, log(M_BH/M_⊙)=6.75±0.15 lower limit), M_BH/M_* >2, z=7.04, near-pristine environment. PDF available; full text extraction pending for formal citation in mission tracks.
+- Fixtures for primary product c0b87857... present under fixtures/ingest/.
+- run_all.sh respects shebangs; previous sh-vs-bash FAIL notes may be resolved or need re-test.
+- Next for production: re-run Hilbert verification on repaired tracks, complete pending Alloy/Lean reviews, finish QSO1-DCBH-001 mission roles (Growth, DCBH, Adversary bots assigned), end-to-end on real fixture, resolve ledger record-size blocker, reconcile capability designs.
