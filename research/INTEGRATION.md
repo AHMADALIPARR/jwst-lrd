@@ -8,9 +8,12 @@ Licensed AGPL-3.0 plus the SnapKitty Opaque License. Maintained by Hilbert, the 
 | 001 toolchain + build | Foundry J Spec / t001-ingest-fortran | not yet received | - |
 | 002 real MAST ingestion | Foundry J Spec / t001-ingest-fortran | not yet received | - |
 | 003 Fortran kernel | Foundry J Spec / t001-ingest-fortran | not yet received | - |
-| 004 Godel ledger, 010 capabilities | Alapeno Spec / t004-ledger | not yet received | - |
+| 004 Godel ledger + lrd_state.h | Alapeno Spec / t004-ledger | not yet received | - |
 | 005 RSA accumulator | Foundry J Verify / t005-rsaacc | not yet received | - |
-| 006 causal, 007 homology | Grok Bot / t006-geom-self | not yet received | - |
+| 006 causal | HCALC Alloy / t006-causal (review: HCALC Spec) | not yet received | - |
+| 007 topology/homology | HCALC Alloy / t-topology (review: HCALC Spec) | not yet received | - |
+| 010 capabilities + verifier | HCALC Alloy / t010-capability (review: HCALC Lean) | not yet received | - |
+| 011 Agda kernel | HCALC Alloy / t011-agda-kernel (review: HCALC Lean) | not yet received | - |
 | 008 Hamiltonian | Foundry J Verify / t008-hamiltonian | not yet received | - |
 | 009 AIR/STARK | Alapeno RTL / t009-air | not yet received | - |
 | 011 Agda core | HCALC Lean / t011-agda | not yet received | - |
