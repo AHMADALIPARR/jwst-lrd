@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: AGPL-3.0-only; also subject to SNAPKITTY_OPAQUE_LICENSE.md (applies to these annotations only).
+# The quoted excerpt is (C) 2000 The American Astronomical Society. It is quoted verbatim, for citation, as a test oracle.
+#
+# Source: Morton, D. C. 2000, ApJS, 130, 403-436, "Atomic Data for Resonance Absorption Lines. II.
+#         Wavelengths Longward of the Lyman Limit for Heavy Elements", doi:10.1086/317349
+# Copy:   publisher PDF https://iopscience.iop.org/article/10.1086/317349/pdf
+#         retrieved 2026-10-19 22:40 PDT, 253340 bytes,
+#         sha256 d0695ab273886ccda7b8e5c8191458303bcb620c9dd9211f44ae29dabf2b7211
+# Extraction: `pdftotext -layout -f 4 -l 4` (poppler-utils). PDF page 4 = journal page 406, Table 2
+#         ("RESONANCE LINES BY ELEMENT : Ge (Z = 32)", Ge I multiplets 1 and 2).
+#         PDF page 3 = journal page 405, which carries eq. (8).
+# Glyph mapping in this PDF's text layer: "\" is "=", "]" is "+" or "x", "[" is "-" in the numeric
+#         columns, "~" is superscript minus, "j" is lambda, and the unit Angstrom shows as "A".
+# Table 2 column notes, quoted from the IOP HTML full text
+#         (https://iopscience.iop.org/article/10.1086/317349/fulltext/50045.text.html, retrieved
+#         2026-10-19 22:40 PDT, sha256 93db83fd37f328ffaf8c13c95b915d91f57e1921f76a206a9710a053cc33b11c;
+#         lambda is an inline image with ALT="&lambda;"):
+#         "Air: For λ > 2000 Å calculated by equation (8)."   "Vacuum: Calculated by equation (3)."
+# Eq. (8), p. 405 (verbatim text-layer excerpt below):
+#         lambda_vac/lambda_air = n = 1 + 8.34254e-5 + 2.406147e-2/(130 - s^2) + 1.5998e-4/(38.9 - s^2),
+#         s = 1e4/lambda_vac, lambda in Angstrom.
+# So Morton's air column is eq. (8) applied to the vacuum column. Both are rounded to 1e-4 A, so the
+#         declared gate tolerance is 1e-4 A, the sum of the two half-unit roundings.
+# tests/futhark/run.sh parses the data rows of the p406 block (column 1 = air A, column 2 = vacuum A).
+BEGIN VERBATIM morton2000 p406 (pdftotext -layout -f 4 -l 4, lines 1-21)
+                                                                   TABLE 2
+                                                 RESONANCE LINES BY ELEMENT : Ge (Z \ 32)
+
+              Air
+ Mult      Wavelength     Vacuum         E           E                          A        Gamma                           log jf    Error
+                                          low         up
+Number        (A )         (A )      (cm~1)      (cm~1)      g     g        (s~1)       (s~1)         f       log gf     (A )   (dex)
+                                                                      l       u
+GERMANIUM \ Ge Z \ 32 A \ 70 : 20.5, 72 : 27.4, 73 : 7.8, 74 : 36.5, 76 : 7.8%
+Ge I   4s24p2 3P J \ 0                       IP \ 63713.24][0.01 cm-1 Ref SM93
+  1    4s24p5s 3P¡                         All Ref BLLSGD99b, (LCGJ78, APS75, TKG90)
+        2754.5877      2755.4020 1409.960        37702.3054          5       3   7.92E]07 2.14E]08   5.41E[02   [0.568    2.173    0.029
+        2709.6237      2710.4270   557.134       37451.6893          3       1   2.08E]08 2.08E]08   7.64E[02   [0.640    2.316    0.013
+        2691.3410      2692.1400   557.134       37702.3054          3       3   4.73E]07 2.14E]08   5.14E[02   [0.812    2.141    0.029
+        2651.5683      2652.3577      0.         37702.3054          1       3   6.94E]07 2.14E]08   2.20E[01   [0.658    2.765    0.029
+        2651.1719      2651.9612 1409.960        39117.9021          5       5   1.60E]08 2.22E]08   1.69E[01   [0.074    2.651    0.019
+        2592.5340      2593.3093   557.134       39117.9021          3       5   6.04E]07 2.22E]08   1.01E[01   [0.516    2.420    0.028
+  2    4s24p5s 1P¡                         All Ref BLLSGD99b, (LCGJ78, APS75, TKG90)
+        2589.1877      2589.9623 1409.960        40020.5604          5         3 3.97E]06 2.36E]08   2.40E[03   [1.922    0.793    0.05
+        2533.2304      2533.9918   557.134       40020.5604          3       3   8.56E]06 2.36E]08   8.24E[03   [1.607    1.320    0.05
+        2497.9625      2498.7156      0.         40020.5604          1       3   1.10E]07 2.36E]08   3.09E[02   [1.510    1.888    0.04
+END VERBATIM
+BEGIN VERBATIM morton2000 p405 eq8 (pdftotext -layout -f 3 -l 3, lines 70-85)
+lists
+                          H     reduce the detectabilityf of a
+                                                                                       vac
+individual lines. Many e†ects                                                         (1994)
+line, including distribution of an element over more than
+                                                                                           j   /j \ n \ 1 ] 8.34254 ] 10~5
+one ion stage, the population of excited levels, condensation                               vac air
+onto grains, and lower N . However, abundance anomalies                                                2.406147 ] 10~2 1.5998 ] 10~4
+                            H
+in stellar spectra can strengthen  the lines of many of the                                         ]                  ]             ,             (8)
+                                                                                                           130 [ s2        38.9 [ s2
+heavier elements.
+   The last column of Table 1 gives condensation tem-                                 where s \ 104/j , with j in A . This formula applies to dry
+                                                                                                      vac
+peratures T from Wasson (1985). At this temperature half                              air at 1 atm pressure   and 15¡C with 0.045% CO by
+             C                                                                                                                               2
+END VERBATIM
