@@ -60,3 +60,19 @@ How this front end binds to the existing stack in this repo:
 
 Nothing in the existing runtimes changes: this is a front-end and
 integration specification over them.
+
+## Implementation (merged with the Self front end)
+
+- `self/growth/blochSphere.self` — the state model: integer-only
+  quantized state (thetaSteps 0..128, phaseSteps 0..255 — the
+  crystallized phase), derived unit vector and probabilities, the
+  bounded two-chart stereographic atlas, and fixed-point (milli-unit)
+  projected vectors for rasterization.
+- `self/growth/blochMorph.self` — the Self Bloch sphere morph: the
+  growthMorph layout idiom (460x520) drawing the unit disk, the
+  projected state point and phase arm, the rim phase tick, and the
+  fixed-point vectors as text.
+- `tests/growth/self_headless_bloch.self` — headless checks (poles,
+  equator, phase wrap, atlas boundedness sweep), PASS/FAIL +
+  SELF_BLOCH_DONE, run on the owner's host like the rest of the Self
+  track (the 32-bit Self VM cannot execute on the agent VM).
