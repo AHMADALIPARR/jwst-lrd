@@ -246,7 +246,7 @@ static void arr_sha256(rt_arr *a, char hex[65]) {
   unsigned char d[32];
   int64_t i;
   lrd_sha256_init(&c);
-  for (i = 0; i < a->n; i++) {   /* the LRD-ARR-v1 .f64 bytes: little-endian binary64 */
+  for (i = 0; i < a->n; i++) {   /* payload_sha256 (CONTRACTS v1.2): SHA-256 of the raw .f64 bytes only, little-endian binary64, no .hdr */
     unsigned char b[8];
     uint64_t u;
     int k;
@@ -390,4 +390,71 @@ void lrd_print_rec(const char *name, void *p) {
   lrd_rec_commit(r, hex);
   printf("%s : rec commit=%s\n", name, hex);
   for (i = 0; i < r->n; i++) printf("%s.%s = %s\n", name, r->f[i].key, r->f[i].value);
+}
+
+/* ------------------------------------------------------------------ masking (CONTRACTS v1.2, BLIND-PROTOCOL)
+ * A mask is an arr<f64> of unit "1" holding exactly 1.0 (kept) or 0.0 (excluded).
+ * Every mask op writes its LRD-ARR-v1 mask array and logs kept/excluded counts on
+ * stdout; masking is never implicit. chi2 itself still rejects bad sigma. */
+static void mask_store(const char *op, rt_arr *m, const char *path, const char *rule, int64_t kept, const char *why) {
+  char extra[1024], err[1024];
+  const char *base = strrchr(path, '/');
+  base = base ? base + 1 : path;
+  snprintf(extra, sizeof extra, "note=mask written by lrdc op %s; 1=kept 0=excluded\nmask_rule=%s\nmask_kept=%lld\nmask_excluded=%lld\n%s",
+           op, rule, (long long)kept, (long long)(m->n - kept), why);
+  if (lrd_arr_write(path, base, "1", m->d, m->n, extra, err, sizeof err)) die(LRD_EXIT_RUNTIME, op, "%s", err);
+}
+void *lrd_mask(void *pf, void *ps, const char *path) {
+  rt_arr *f = pf, *s = ps, *m;
+  int64_t i, kept = 0, nff = 0, nfs = 0, nle = 0;
+  char why[256];
+  lrd_check_len(f, s, "mask");
+  lrd_check_unit(s, f->unit, "mask");
+  m = lrd_arr_new(f->n, "1", f, s);
+  for (i = 0; i < f->n; i++) {
+    int bf = !isfinite(f->d[i]), bs = !isfinite(s->d[i]), bl = isfinite(s->d[i]) && !(s->d[i] > 0.0);
+    nff += bf; nfs += bs; nle += bl;
+    m->d[i] = (bf || bs || bl) ? 0.0 : 1.0;
+    kept += !(bf || bs || bl);
+  }
+  snprintf(why, sizeof why, "mask_nonfinite_flux=%lld\nmask_nonfinite_sigma=%lld\nmask_sigma_le_0=%lld\n", (long long)nff, (long long)nfs, (long long)nle);
+  printf("mask: %s n=%lld kept=%lld excluded=%lld (nonfinite_flux=%lld nonfinite_sigma=%lld sigma_le_0=%lld; reasons may overlap)\n",
+         path, (long long)f->n, (long long)kept, (long long)(f->n - kept), (long long)nff, (long long)nfs, (long long)nle);
+  mask_store("mask", m, path, "exclude non-finite flux, non-finite sigma, or sigma <= 0 (research/BLIND-PROTOCOL.md)", kept, why);
+  return m;
+}
+void *lrd_mask_finite(void *px, const char *path) {
+  rt_arr *x = px, *m = lrd_arr_new(x->n, "1", x, NULL);
+  int64_t i, kept = 0;
+  for (i = 0; i < x->n; i++) { m->d[i] = isfinite(x->d[i]) ? 1.0 : 0.0; kept += isfinite(x->d[i]) != 0; }
+  printf("mask_finite: %s n=%lld kept=%lld excluded=%lld (non-finite values)\n", path, (long long)x->n, (long long)kept, (long long)(x->n - kept));
+  mask_store("mask_finite", m, path, "exclude non-finite values of the input array", kept, "");
+  return m;
+}
+static void check_mask(rt_arr *m, const char *op) {
+  int64_t i;
+  if (strcmp(m->unit, "1")) die(LRD_EXIT_RUNTIME, op, "mask unit must be '1' (got '%s')", m->unit);
+  for (i = 0; i < m->n; i++)
+    if (!(m->d[i] == 0.0 || m->d[i] == 1.0)) die(LRD_EXIT_RUNTIME, op, "mask[%lld] = %.17g is not 0 or 1", (long long)i, m->d[i]);
+}
+void *lrd_mask_and(void *pa, void *pb, const char *path) {
+  rt_arr *a = pa, *b = pb, *m;
+  int64_t i, kept = 0;
+  lrd_check_len(a, b, "mask_and");
+  check_mask(a, "mask_and"); check_mask(b, "mask_and");
+  m = lrd_arr_new(a->n, "1", a, b);
+  for (i = 0; i < a->n; i++) { m->d[i] = (a->d[i] == 1.0 && b->d[i] == 1.0) ? 1.0 : 0.0; kept += m->d[i] == 1.0; }
+  printf("mask_and: %s n=%lld kept=%lld excluded=%lld\n", path, (long long)a->n, (long long)kept, (long long)(a->n - kept));
+  mask_store("mask_and", m, path, "logical AND of two masks", kept, "");
+  return m;
+}
+void *lrd_apply_mask(void *px, void *pm) {
+  rt_arr *x = px, *m = pm, *r;
+  int64_t i, k = 0, kept = 0;
+  lrd_check_len(x, m, "apply_mask");
+  check_mask(m, "apply_mask");
+  for (i = 0; i < m->n; i++) kept += m->d[i] == 1.0;
+  r = lrd_arr_new(kept, x->unit, x, m);
+  for (i = 0; i < x->n; i++) if (m->d[i] == 1.0) r->d[k++] = x->d[i];
+  return r;
 }

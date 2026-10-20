@@ -64,12 +64,16 @@ compile-time error and lrdc exits 1 with no output file.
 | `and`, `or` | `(bool, bool) -> bool` | |
 | `not` | `(bool) -> bool` | |
 | `residuals` | `(arr obs, arr model) -> arr` | `obs[i] - model[i]`; equal lengths and units, else runtime error |
-| `chi2` | `(arr obs, arr model, arr sigma) -> f64` | `sum_i ((obs_i - model_i)/sigma_i)^2`, summed in order i = 0..n-1; equal lengths and units; every sigma finite and > 0 (no masking) |
+| `chi2` | `(arr obs, arr model, arr sigma) -> f64` | `sum_i ((obs_i - model_i)/sigma_i)^2`, summed in order i = 0..n-1; equal lengths and units; every sigma finite and > 0, else runtime error (no implicit masking, CONTRACTS v1.2) |
+| `mask` | `(arr flux, arr sigma, str path) -> arr` | research/BLIND-PROTOCOL.md rule: 0.0 where flux is non-finite, sigma is non-finite, or sigma <= 0; else 1.0. Equal lengths and units. Writes the mask as LRD-ARR-v1 (unit `1`) to `path` with `mask_rule`, `mask_kept`, `mask_excluded` and per-reason counts in the header, and logs `mask: <path> n=.. kept=.. excluded=..` on stdout |
+| `mask_finite` | `(arr x, str path) -> arr` | 1.0 where x is finite (e.g. a model defined only inside its fit window). Written and logged like `mask` |
+| `mask_and` | `(arr m1, arr m2, str path) -> arr` | elementwise AND of two masks. Written and logged |
+| `apply_mask` | `(arr x, arr mask) -> arr` | the elements of x where mask = 1, in order; keeps the unit of x. mask must have unit `1`, the same length, and only 0.0 or 1.0 values |
 | `mat` | `(arr, i64 rows, i64 cols) -> mat<f64>` | row-major reshape; length must equal rows*cols |
 | `matmul` | `(mat, mat) -> mat` | inner dimensions must agree; k-ascending sums, no FMA |
 | `solve` | `(mat A, arr b) -> arr` | solves A x = b by LU with partial pivoting. A must be square, finite, and the same order as b. Singular when a pivot is 0 or <= n*DBL_EPSILON*max abs(A_ij): explicit runtime error |
 | `flatten` | `(mat) -> arr` | row-major values, unit `1` |
-| `ledger_proposal` | `(str prev_commit, i64 seq, arr payload) -> rec` | LRD-STATE-v1 proposal `{kind=ledger_append, payload_sha256, prev_commit, seq}`. `payload_sha256` = SHA-256 of the payload's little-endian binary64 bytes (= `sha256sum` of its `.f64`). prev_commit must be 64 lowercase hex and seq >= 1 |
+| `ledger_proposal` | `(str prev_commit, i64 seq, arr payload) -> rec` | LRD-STATE-v1 proposal `{kind=ledger_append, payload_sha256, prev_commit, seq}`. `payload_sha256` = SHA-256 of the raw `.f64` bytes only (little-endian binary64; the `.hdr` is excluded), as defined in research/CONTRACTS.md v1.2 (= `sha256sum` of its `.f64`). prev_commit must be 64 lowercase hex and seq >= 1 |
 | `gate` | `(str verifier, rec proposal) -> rec` | runs the verifier binary with the canonical proposal serialization on stdin and parses stdout as a strict LRD-REC-v1 decision. Proceeds only on `decision=ACCEPT` with valid `reason` and 64-hex `new_commit`; returns the new state `{commit=new_commit, kind, payload_sha256, seq}`. On REJECT, malformed output, unknown fields, nonzero exit or exec failure: no state is constructed, and the program prints the reason and exits 4 |
 
 ### Unit conversions (exact, `convert`)

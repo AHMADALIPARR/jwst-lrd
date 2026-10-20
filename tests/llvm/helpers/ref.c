@@ -9,8 +9,10 @@
  *   ref restframe IN Z OUT | obsframe IN Z OUT
  *   ref um2A IN OUT | um2nm IN OUT | A2um IN OUT | nm2um IN OUT | nm2A IN OUT | A2nm IN OUT
  *   ref resid A B OUT | chi2 O M S OUT | redshift_arr OBS REST OUT
+ *   ref masked_chi2 FLUX FERR OBS MODEL SIG OUT | scalar DECIMAL OUT
  *   ref matmul A ar ac B br bc OUT | solve3 A b OUT (Cramer's rule)
  */
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,6 +111,26 @@ int main(int argc, char **argv) {
     if (n != n2 || n != n3) return 3;
     for (i = 0; i < n; i++) { double r = (a[i] - b[i]) / c[i]; s += r * r; }
     wr(argv[5], "1", &s, 1); return 0;
+  }
+  if (!strcmp(argv[1], "scalar") && argc == 4) {   /* decimal text (e.g. a Fortran reference.kv value) -> length-1 LRD-ARR-v1 */
+    char *e; double v = strtod(argv[2], &e);
+    if (*e || !isfinite(v)) return 3;
+    wr(argv[3], "1", &v, 1); return 0;
+  }
+  if (!strcmp(argv[1], "masked_chi2") && argc == 8) {
+    /* independent reference: rule of research/BLIND-PROTOCOL.md applied to FLUX/ERR (argv 2,3),
+     * restricted to finite model pixels, chi2 over OBS/MODEL/SIG (argv 4,5,6). Prints counts. */
+    double *fl, *fe, s = 0.0; long nn; long long kept = 0, base = 0; char uf[64], ue[64];
+    fl = rd(argv[2], &nn, uf); fe = rd(argv[3], &n, ue);
+    a = rd(argv[4], &n, u); b = rd(argv[5], &n2, u2); c = rd(argv[6], &n3, u3);
+    if (n != n2 || n != n3 || n != nn) return 3;
+    for (i = 0; i < n; i++) {
+      int ok = isfinite(fl[i]) && isfinite(fe[i]) && fe[i] > 0.0;
+      base += ok;
+      if (ok && isfinite(b[i])) { double r = (a[i] - b[i]) / c[i]; s += r * r; kept++; }
+    }
+    printf("ref masked_chi2: n=%lld base_kept=%lld kept=%lld chi2=%.17g\n", (long long)n, (long long)base, (long long)kept, s);
+    wr(argv[7], "1", &s, 1); return 0;
   }
   if (!strcmp(argv[1], "redshift_arr") && argc == 5) {
     a = rd(argv[2], &n, u); b = rd(argv[3], &n2, u2);

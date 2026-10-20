@@ -66,6 +66,21 @@ int main(int argc, char **argv) {
     wr("SYNTHETIC_h_model", "1", hm, 3, NULL, -1);
     wr("SYNTHETIC_h_sigma", "1", hs, 3, NULL, -1);
   }
+  {
+    /* masking fixture (CONTRACTS v1.2 / BLIND-PROTOCOL rule), hand-checked:
+     * i=1,4 non-finite flux; i=2 non-finite sigma; i=3 sigma=0; i=5 sigma<0; i=7 model NaN (window).
+     * base mask kept {0,6,7}; with model window kept {0,6}; chi2 = ((1-1.5)/0.5)^2 + ((7-5)/2)^2 = 2 exactly. */
+    double mf[8] = {1, NAN, 3, 4, INFINITY, 6, 7, 8}, ms[8] = {0.5, 0.5, NAN, 0, 0.5, -1, 2, 4};
+    double mm[8] = {1.5, 0, 0, 0, 0, 0, 5, NAN}, me[8] = {1, 0, 0, 0, 0, 0, 1, 1}, mw[8] = {1, 1, 1, 1, 1, 1, 1, 0};
+    double mc[8] = {1, 0, 0, 0, 0, 0, 1, 0}, bm[8] = {1, 0.5, 0, 1, 1, 1, 1, 1};
+    wr("SYNTHETIC_mflux", "arbitrary", mf, 8, NULL, -1);
+    wr("SYNTHETIC_msigma", "arbitrary", ms, 8, NULL, -1);
+    wr("SYNTHETIC_mmodel", "arbitrary", mm, 8, NULL, -1);
+    wr("SYNTHETIC_mask_expected", "1", me, 8, NULL, -1);
+    wr("SYNTHETIC_window_expected", "1", mw, 8, NULL, -1);
+    wr("SYNTHETIC_maskand_expected", "1", mc, 8, NULL, -1);
+    wr("SYNTHETIC_badmask", "1", bm, 8, NULL, -1);
+  }
   wr("SYNTHETIC_badfmt", "um", lam, N, "LRD-ARR-v0", -1);
   wr("SYNTHETIC_badlen", "um", lam, N, NULL, N + 1);
   nanarr[0] = 1.0; nanarr[1] = NAN; nanarr[2] = 2.0; nanarr[3] = 3.0;

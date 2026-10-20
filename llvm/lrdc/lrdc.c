@@ -189,7 +189,8 @@ static int reserved(const char *n) {
 /* ------------------------------------------------------------------ operations */
 enum { OP_LOAD, OP_LEN, OP_GET, OP_RESTFRAME, OP_OBSFRAME, OP_REDSHIFT, OP_REDSHIFT_ARR, OP_CONVERT,
        OP_ALL_FINITE, OP_MONOTONE_INC, OP_IN_RANGE, OP_IN_RANGE_S, OP_AND, OP_OR, OP_NOT,
-       OP_RESIDUALS, OP_CHI2, OP_MAT, OP_MATMUL, OP_SOLVE, OP_FLATTEN, OP_LEDGER_PROPOSAL, OP_GATE };
+       OP_RESIDUALS, OP_CHI2, OP_MAT, OP_MATMUL, OP_SOLVE, OP_FLATTEN, OP_LEDGER_PROPOSAL, OP_GATE,
+       OP_MASK, OP_MASK_FINITE, OP_MASK_AND, OP_APPLY_MASK };
 typedef struct { const char *name; int id; int nargs; Ty a[4]; Ty ret; } OpSig;
 static const OpSig OPS[] = {
   {"load", OP_LOAD, 2, {T_STR, T_STR}, T_ARR},
@@ -215,6 +216,10 @@ static const OpSig OPS[] = {
   {"flatten", OP_FLATTEN, 1, {T_MAT}, T_ARR},
   {"ledger_proposal", OP_LEDGER_PROPOSAL, 3, {T_STR, T_I64, T_ARR}, T_REC},
   {"gate", OP_GATE, 2, {T_STR, T_REC}, T_REC},
+  {"mask", OP_MASK, 3, {T_ARR, T_ARR, T_STR}, T_ARR},
+  {"mask_finite", OP_MASK_FINITE, 2, {T_ARR, T_STR}, T_ARR},
+  {"mask_and", OP_MASK_AND, 3, {T_ARR, T_ARR, T_STR}, T_ARR},
+  {"apply_mask", OP_APPLY_MASK, 2, {T_ARR, T_ARR}, T_ARR},
 };
 #define NOPS ((int)(sizeof OPS / sizeof OPS[0]))
 
@@ -447,6 +452,20 @@ static void lower_op(const OpSig *op, Arg *a, char *res) {
       t = tmp(); bprintf(&B, "  %s = call ptr @lrd_gate(ptr %s, ptr %s)\n", t, p, val(&a[1]));
       strcpy(res, t); free(t); return;
     }
+    case OP_MASK: case OP_MASK_AND: {
+      char p[160];
+      snprintf(p, sizeof p, "%s", str_arg(&a[2]));
+      t = tmp(); bprintf(&B, "  %s = call ptr @lrd_%s(ptr %s, ptr %s, ptr %s)\n", t, op->id == OP_MASK ? "mask" : "mask_and", val(&a[0]), val(&a[1]), p);
+      strcpy(res, t); free(t); return;
+    }
+    case OP_MASK_FINITE: {
+      char p[160];
+      snprintf(p, sizeof p, "%s", str_arg(&a[1]));
+      t = tmp(); bprintf(&B, "  %s = call ptr @lrd_mask_finite(ptr %s, ptr %s)\n", t, val(&a[0]), p);
+      strcpy(res, t); free(t); return;
+    }
+    case OP_APPLY_MASK:
+      t = tmp(); bprintf(&B, "  %s = call ptr @lrd_apply_mask(ptr %s, ptr %s)\n", t, val(&a[0]), val(&a[1])); strcpy(res, t); free(t); return;
   }
   die("internal error: operation '%s' has no lowering", op->name);
 }
@@ -703,6 +722,10 @@ static const char *RT_DECLS =
   "declare void @lrd_check_pos(double, ptr)\n"
   "declare void @lrd_check_all_pos(ptr, ptr)\n"
   "declare void @lrd_check_sigma(ptr, ptr)\n"
+  "declare ptr @lrd_mask(ptr, ptr, ptr)\n"
+  "declare ptr @lrd_mask_finite(ptr, ptr)\n"
+  "declare ptr @lrd_mask_and(ptr, ptr, ptr)\n"
+  "declare ptr @lrd_apply_mask(ptr, ptr)\n"
   "declare i32 @lrd_all_finite(ptr)\n"
   "declare i32 @lrd_monotone_inc(ptr)\n"
   "declare i32 @lrd_in_range(ptr, double, double)\n"

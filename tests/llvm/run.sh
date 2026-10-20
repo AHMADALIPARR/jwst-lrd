@@ -155,6 +155,24 @@ if build_prog chi2_hand "$TL/programs/chi2_hand.lrd"; then
   expect_out run_chi2_residuals_hand "$O/h.exp" "$O/h.out"
 fi
 
+# ------------------------------------------------------------------ explicit masking (CONTRACTS v1.2, BLIND-PROTOCOL)
+if build_prog mask_chi2 "$TL/programs/mask_chi2.lrd"; then
+  if "$O/mask_chi2" arbitrary arbitrary "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_msigma" "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_msigma" \
+       "$D/SYNTHETIC_mmodel" "$O/mk_m" "$O/mk_w" "$O/mk_mw" "$O/mk_c" "$O/mk_r" > "$O/mk.out" 2>&1; then
+    printf '%s
+' "mask: $O/mk_m n=8 kept=3 excluded=5 (nonfinite_flux=2 nonfinite_sigma=1 sigma_le_0=2; reasons may overlap)" \
+      "mask_finite: $O/mk_w n=8 kept=7 excluded=1 (non-finite values)" "mask_and: $O/mk_mw n=8 kept=2 excluded=6" "n = 2" "c = 2" > "$O/mk.exp"
+    expect_out run_mask_logged_counts_hand "$O/mk.exp" "$O/mk.out"
+    for p in "mk_m:mask" "mk_w:window" "mk_mw:maskand"; do
+      if cmp -s "$O/${p%%:*}.f64" "$D/SYNTHETIC_${p#*:}_expected.f64"; then pass "run_mask_array_${p#*:}_hand"; else fail "run_mask_array_${p#*:}_hand" "mask array differs from hand values"; fi
+    done
+    if grep -q '^unit=1$' "$O/mk_m.hdr" && grep -q '^mask_kept=3$' "$O/mk_m.hdr" && grep -q '^mask_excluded=5$' "$O/mk_m.hdr"; then pass run_mask_hdr_lrd_arr_v1
+    else fail run_mask_hdr_lrd_arr_v1 "mask header lacks unit/kept/excluded"; fi
+    "$B/ref" masked_chi2 "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_msigma" "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_mmodel" "$D/SYNTHETIC_msigma" "$O/mk_rc" > /dev/null
+    cmp_arr run_masked_chi2_vs_cref chi2 "$O/mk_c" "$O/mk_rc"
+  else fail run_mask_chi2 "$(oneline < "$O/mk.out")"; fi
+fi
+
 # ------------------------------------------------------------------ matrix ops
 if build_prog matrix "$TL/programs/matrix.lrd"; then
   if "$O/matrix" "$D/SYNTHETIC_mat3" "$D/SYNTHETIC_rhs3" "$D/SYNTHETIC_mat3x2" "$O/m_ab" "$O/m_x" > "$O/m.out" 2>&1; then
@@ -258,6 +276,16 @@ for p in assert_fail chi2_bad_sigma; do
 done
 neg_run neg_assert_false 3 "lrd runtime error: assert: constraint failed: spectrum must be finite" "$O/n_assert_fail" "$D/SYNTHETIC_nan_um"
 neg_run neg_chi2_zero_sigma 3 "lrd runtime error: chi2: sigma[0] = 0 must be finite and > 0" "$O/n_chi2_bad_sigma" "$D/SYNTHETIC_h_obs" "$D/SYNTHETIC_h_model"
+neg_compile neg_mask_path_type "$N/mask_type.lrd" "type mismatch: mask argument 3 expects str, got numeric literal"
+for p in chi2_nan_sigma apply_mask_bad mask_mismatch; do
+  "$LRDC" -o "$O/n_$p" "$N/$p.lrd" > "$O/n_$p.cerr" 2>&1 || fail "compile_neg_$p" "$(oneline < "$O/n_$p.cerr")"
+done
+neg_run neg_chi2_unmasked_nan_sigma 3 "lrd runtime error: chi2: sigma[2] = nan must be finite and > 0" "$O/n_chi2_nan_sigma" "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_msigma"
+neg_run neg_apply_mask_not_01 3 "lrd runtime error: apply_mask: mask[1] = 0.5 is not 0 or 1" "$O/n_apply_mask_bad" "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_badmask" 1
+neg_run neg_apply_mask_unit 3 "lrd runtime error: apply_mask: mask unit must be '1' (got 'arbitrary')" "$O/n_apply_mask_bad" "$D/SYNTHETIC_mflux" "$D/SYNTHETIC_msigma" arbitrary
+neg_run neg_mask_length_mismatch 3 "lrd runtime error: mask: length mismatch: 64 vs 63" "$O/n_mask_mismatch" "$D/SYNTHETIC_flux" "$D/SYNTHETIC_flux_short" arbitrary "$O/n_mask_x1"
+neg_run neg_mask_unit_mismatch 3 "lrd runtime error: mask: unit mismatch: array unit is 'um', operation expects 'arbitrary'" "$O/n_mask_mismatch" "$D/SYNTHETIC_flux" "$D/SYNTHETIC_lam_um" um "$O/n_mask_x2"
+if [ ! -e "$O/n_mask_x1.f64" ] && [ ! -e "$O/n_mask_x2.f64" ]; then pass neg_mask_no_output_on_error; else fail neg_mask_no_output_on_error "mask array written despite error"; fi
 
 # ------------------------------------------------------------------ complete observation-analysis program
 run_full() { # tag lam flux model sigma verifier outdir
@@ -291,11 +319,11 @@ if build_prog full "$TL/programs/full.lrd"; then
 fi
 
 # ------------------------------------------------------------------ determinism and golden fixtures
-for p in load spectral convert_nm redshift constraints kernels matrix ledger gate full; do
+for p in load spectral convert_nm redshift constraints kernels matrix ledger gate full mask_chi2; do
   "$LRDC" -S -o "$O/det1_$p.ll" "$TL/programs/$p.lrd" && "$LRDC" -S -o "$O/det2_$p.ll" "$TL/programs/$p.lrd"
   if cmp -s "$O/det1_$p.ll" "$O/det2_$p.ll"; then pass "deterministic_ll_$p"; else fail "deterministic_ll_$p" "two compilations differ"; fi
 done
-for g in spectral kernels matrix full; do
+for g in spectral kernels matrix full mask_chi2; do
   if [ ! -f "$TL/fixtures/$g.ll" ]; then fail "golden_ll_$g" "missing tests/llvm/fixtures/$g.ll"; continue; fi
   if tail -n +4 "$TL/fixtures/$g.ll" | cmp -s "$O/det1_$g.ll" -; then pass "golden_ll_$g"; else fail "golden_ll_$g" "emitted IR differs from tests/llvm/fixtures/$g.ll"; fi
 done
@@ -331,6 +359,39 @@ else
     cmp_arr real_jwst_restframe_lrdc_vs_cref restframe "$RD/sp_rest" "$RD/rf_rest"
     cmp_arr real_jwst_convert_lrdc_vs_cref convert "$RD/sp_restA" "$RD/rf_restA"
   else fail real_jwst_restframe_lrdc_vs_cref "$(oneline < "$RD/sp.out")"; fi
+  # (c) explicit mask + chi2 on the real spectrum (CONTRACTS v1.2). Mask inputs: ingest FLUX/FLUX_ERROR (Jy);
+  #     chi2 inputs: Fortran flam/flam_err/model_<line>. Fortran reference: reference.kv model.<line>.chi2_line/.n
+  NF1=$NFAIL
+  okc=1
+  for f in flux flux_error; do gshow "fixtures/ingest/$cur/$f.hdr" "$RD/$f.hdr" && gshow "fixtures/ingest/$cur/$f.f64" "$RD/$f.f64" || okc=0; done
+  for f in flam_err mask; do gshow "fixtures/reference/$cur/$f.hdr" "$RD/F_$f.hdr" && gshow "fixtures/reference/$cur/$f.f64" "$RD/F_$f.f64" || okc=0; done
+  gshow "fixtures/reference/$cur/reference.kv" "$RD/reference.kv" || okc=0
+  if [ $okc -eq 0 ]; then unav real_jwst_masked_chi2 "flux/flux_error/flam_err/mask/reference.kv not committed on $BR ${bh_:-?}"
+  elif [ -x "$O/mask_chi2" ]; then
+    n_rows=$(sed -n 's/^n_rows=//p' "$RD/reference.kv")
+    for L in Halpha Hbeta; do
+      F=$RD/mask_$L; mkdir -p "$F"
+      if "$O/mask_chi2" Jy "erg s-1 cm-2 Angstrom-1" "$RD/flux" "$RD/flux_error" "$RD/F_flam" "$RD/F_flam_err" "$RD/F_model_$L" \
+           "$F/mask" "$F/window" "$F/mw" "$F/chi2" "$F/resid" > "$F/out.txt" 2>&1; then
+        sed "s|$F/||" "$F/out.txt" | sed 's/^/  /'
+        kept=$(sed -n 's/^n = //p' "$F/out.txt"); fn=$(sed -n "s/^model\.$L\.n=//p" "$RD/reference.kv")
+        bk=$(sed -n 's/^mask_kept=//p' "$F/mask.hdr"); nv=$(sed -n 's/^n_valid=//p' "$RD/reference.kv")
+        len=$(sed -n 's/^length=//p' "$F/mask.hdr")
+        if [ "$len" = "$n_rows" ] && [ "$bk" = "$nv" ] && [ "$kept" = "$fn" ]; then pass "real_jwst_mask_counts_$L"
+        else fail "real_jwst_mask_counts_$L" "rows=$len/$n_rows base_kept=$bk/$nv kept=$kept/$fn"; fi
+        if cmp -s "$F/mask.f64" "$RD/F_mask.f64"; then pass "real_jwst_mask_vs_fortran_mask_$L"; else fail "real_jwst_mask_vs_fortran_mask_$L" "protocol mask differs from Fortran mask.f64"; fi
+        "$B/ref" masked_chi2 "$RD/flux" "$RD/flux_error" "$RD/F_flam" "$RD/F_model_$L" "$RD/F_flam_err" "$F/cref" > "$F/cref.txt"
+        sed 's/^/  /' "$F/cref.txt"
+        cmp_arr "real_jwst_masked_chi2_lrdc_vs_cref_$L" chi2 "$F/chi2" "$F/cref"
+        fc=$(sed -n "s/^model\.$L\.chi2_line=//p" "$RD/reference.kv")
+        if [ -n "$fc" ] && "$B/ref" scalar "$fc" "$F/fref"; then
+          echo "  fortran reference.kv model.$L.chi2_line=$fc model.$L.n=$fn"
+          cmp_arr "real_jwst_masked_chi2_lrdc_vs_fortran_$L" chi2 "$F/chi2" "$F/fref"
+        else unav "real_jwst_masked_chi2_lrdc_vs_fortran_$L" "no model.$L.chi2_line in reference.kv"; fi
+      else fail "real_jwst_masked_chi2_$L" "$(oneline < "$F/out.txt")"; fi
+    done
+    if [ $NFAIL -eq $NF1 ]; then pass real_jwst_masked_chi2; else fail real_jwst_masked_chi2 "$((NFAIL - NF1)) check(s) failed above"; fi
+  else fail real_jwst_masked_chi2 "mask_chi2 program not built"; fi
   # (b) complete program on the real spectrum, diffed against the Fortran reference outputs
   NF0=$NFAIL
   if build_prog real_full "$TL/programs/real_full.lrd"; then

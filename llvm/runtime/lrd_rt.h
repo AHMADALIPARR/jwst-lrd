@@ -32,6 +32,10 @@ void    lrd_check_z(double z, const char *op);
 void    lrd_check_pos(double x, const char *op);
 void    lrd_check_all_pos(void *a, const char *op);
 void    lrd_check_sigma(void *a, const char *op);
+void   *lrd_mask(void *flux, void *sigma, const char *path);
+void   *lrd_mask_finite(void *x, const char *path);
+void   *lrd_mask_and(void *a, void *b, const char *path);
+void   *lrd_apply_mask(void *x, void *mask);
 
 int32_t lrd_all_finite(void *a);
 int32_t lrd_monotone_inc(void *a);

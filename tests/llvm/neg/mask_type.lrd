@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST (compile time): mask path must be a string.
+lrdir 1
+let f : arr<f64> = load($1, "arbitrary")
+let m : arr<f64> = mask(f, f, 3)

@@ -30,7 +30,11 @@ passes in `tests/llvm/run.sh` or `tests/validation/run.sh`. Test names are the e
 | `in_range` (arr and f64 overloads) | runtime | `run_constraints_hand` |
 | `and`, `or`, `not` | inline IR (`and`/`or`/`xor i1`) | `run_constraints_hand` |
 | `residuals` | inline IR loop (`fsub`) | `run_residuals_vs_ref`, `run_chi2_residuals_hand`, `neg_length_mismatch_residuals`, `real_jwst_diff_resid_Halpha`, `real_jwst_diff_resid_Hbeta`, `fortran_t001_vs_lrdc_residuals_Halpha`, `fortran_t001_vs_lrdc_residuals_Hbeta`, `futhark_vs_lrdc_residuals_synth`, `fortran_fut_vs_lrdc_residuals_synth` |
-| `chi2` | inline IR loop (`fsub`,`fdiv`,`fmul`,`fadd`) | `run_chi2_vs_ref`, `run_chi2_residuals_hand`, `neg_length_mismatch_chi2`, `neg_chi2_zero_sigma`, `futhark_vs_lrdc_chi2_synth`, `fortran_fut_vs_lrdc_chi2_synth` |
+| `chi2` | inline IR loop (`fsub`,`fdiv`,`fmul`,`fadd`) | `run_chi2_vs_ref`, `run_chi2_residuals_hand`, `neg_length_mismatch_chi2`, `neg_chi2_zero_sigma`, `neg_chi2_unmasked_nan_sigma`, `run_masked_chi2_vs_cref`, `real_jwst_masked_chi2_lrdc_vs_cref_Halpha`, `real_jwst_masked_chi2_lrdc_vs_cref_Hbeta`, `real_jwst_masked_chi2_lrdc_vs_fortran_Halpha`, `real_jwst_masked_chi2_lrdc_vs_fortran_Hbeta`, `futhark_vs_lrdc_chi2_synth`, `fortran_fut_vs_lrdc_chi2_synth` |
+| `mask` (protocol rule; writes and logs mask) | runtime | `run_mask_logged_counts_hand`, `run_mask_array_mask_hand`, `run_mask_hdr_lrd_arr_v1`, `neg_mask_length_mismatch`, `neg_mask_unit_mismatch`, `neg_mask_no_output_on_error`, `neg_mask_path_type`, `real_jwst_mask_counts_Halpha`, `real_jwst_mask_counts_Hbeta`, `real_jwst_mask_vs_fortran_mask_Halpha`, `real_jwst_mask_vs_fortran_mask_Hbeta` |
+| `mask_finite` | runtime | `run_mask_logged_counts_hand`, `run_mask_array_window_hand`, `real_jwst_mask_counts_Halpha`, `real_jwst_mask_counts_Hbeta` |
+| `mask_and` | runtime | `run_mask_logged_counts_hand`, `run_mask_array_maskand_hand`, `real_jwst_mask_counts_Halpha`, `real_jwst_mask_counts_Hbeta` |
+| `apply_mask` | runtime | `run_mask_logged_counts_hand`, `run_masked_chi2_vs_cref`, `neg_apply_mask_not_01`, `neg_apply_mask_unit`, `real_jwst_masked_chi2_lrdc_vs_cref_Halpha`, `real_jwst_masked_chi2_lrdc_vs_cref_Hbeta` |
 | `mat` | runtime | `run_matmul_vs_ref`, `neg_mat_shape` |
 | `matmul` | runtime | `run_matmul_vs_ref`, `run_matmul_hand`, `neg_matmul_dimension` |
 | `solve` (LU, partial pivoting) | runtime | `run_solve_vs_cramer_ref`, `run_solve_vs_hand`, `neg_solve_singular` |
@@ -43,16 +47,16 @@ passes in `tests/llvm/run.sh` or `tests/validation/run.sh`. Test names are the e
 | `assert` | runtime | `neg_assert_false`, `full_restframe_angstrom_vs_ref` (assert passes in full.lrd) |
 | literals `let x : f64/i64/bool = ...` | constants in IR | `run_redshift_scalar_hand`, `run_constraints_hand` |
 | compile-time rejection: unknown op, type mismatch, wrong arity, undefined variable, declared-type mismatch, redefinition, unsupported type, unknown statement, missing `lrdir 1` | lrdc front end | `neg_unknown_op`, `neg_type_mismatch_chi2_bool`, `neg_wrong_arity`, `neg_undefined_variable`, `neg_declared_type_mismatch`, `neg_redefinition`, `neg_unsupported_type`, `neg_unknown_statement`, `neg_missing_version_line` |
-| deterministic `.ll` output | lrdc | `deterministic_ll_*`, `golden_ll_spectral`, `golden_ll_kernels`, `golden_ll_matrix`, `golden_ll_full` |
+| deterministic `.ll` output | lrdc | `deterministic_ll_*`, `golden_ll_spectral`, `golden_ll_kernels`, `golden_ll_matrix`, `golden_ll_full`, `golden_ll_mask_chi2` |
 
 ## Not supported (not implemented; rejected by lrdc as `unknown operation`/`unknown type`)
 - scalar arithmetic (`add`, `sub`, `mul`, `div`, `pow`, `exp`, `log`, `sqrt`), i64 arithmetic, comparisons
 - control flow, loops, user functions, variable copy/rebinding, string variables
-- arrays of element types other than f64 (`arr<i64>` etc.), slicing, concatenation, masking or NaN filtering
+- arrays of element types other than f64 (`arr<i64>` etc.), slicing, concatenation, implicit masking or NaN filtering (masking exists only as the explicit `mask`/`mask_finite`/`mask_and`/`apply_mask` ops)
 - vacuum<->air conversion, f_nu<->f_lambda (Jy -> erg s-1 cm-2 A-1) conversion, any unit pair not in LRD-IR.md
 - Gaussian line models, line fitting, redshift grid search, peak finding, cosmic time
 - matrix inverse, determinant, transpose, least squares, matrix-vector product
-- chi2 with masking (sigma <= 0 or non-finite input is a runtime error, not masked)
+- chi2 that masks internally: chi2 still rejects non-finite or non-positive sigma (CONTRACTS v1.2); mask first with `mask` + `apply_mask`
 - ledger kinds other than `ledger_append`. Proposals with kind-specific extra fields. Arbitrary `rec` construction
 - verifying `new_commit` against any rule (the gate checks only that it is 64 lowercase hex)
 
