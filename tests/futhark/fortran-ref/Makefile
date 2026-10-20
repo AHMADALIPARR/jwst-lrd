@@ -1,7 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Also subject to the SnapKitty Opaque License; see LICENSE and
 # SNAPKITTY_OPAQUE_LICENSE.md at the repository root.
-FC ?= gfortran
+# make predefines FC=f77; use gfortran unless FC is set explicitly
+ifeq ($(origin FC),default)
+FC = gfortran
+endif
 FFLAGS ?= -std=f2018 -O2 -Wall -Wextra -fimplicit-none -ffp-contract=off -Wno-compare-reals -ffpe-summary=none
 B ?= build
 
