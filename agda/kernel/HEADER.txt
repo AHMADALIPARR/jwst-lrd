@@ -1,0 +1,4 @@
+-- Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+-- JWST-LRD Sovereign Scientific Runtime -- formal verification kernel (Agda).
+-- Dual-licensed, intentionally: AGPL-3.0-only AND SnapKitty Opaque License.
+-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
