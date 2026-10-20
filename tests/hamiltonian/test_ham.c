@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  *
  * Test suite for the Frustration Hamiltonian Action-WORM engine (TASK 008).
  * Prints one line per test: "PASS <name>" | "FAIL <name> <why>" |
@@ -333,9 +334,10 @@ static int t_genesis_state_fields(void) {
     ham_epoch_cfg cfg = {4, 2};
     ham_state s; int a[2] = {0, 0};
     REQ(ham_state_genesis(&m, &cfg, a, &s, NULL, NULL) == HAM_OK);
-    lrd_state_v1 v; ham_state_view(&s, &v);
+    lrd_state_t v; ham_state_view(&s, &v);
     int ok = v.seq == 0 && strcmp(v.commit, LRD_GENESIS_COMMIT) == 0 &&
-             strcmp(v.kind, "hamiltonian_step") == 0 && strlen(v.payload_sha256) == 64 &&
+             v.kind == LRD_KIND_HAMILTONIAN_STEP && strcmp(lrd_kind_token(v.kind), HAM_KIND) == 0 &&
+             lrd_is_hex256(v.payload_sha256) && lrd_is_hex256(s.self_commit) && strlen(v.payload_sha256) == 64 &&
              strlen(s.self_commit) == 64 && strcmp(s.self_commit, LRD_GENESIS_COMMIT) != 0;
     char *e = ham_q_str(s.energy);
     ok = ok && strcmp(e, "5/2") == 0;
@@ -791,6 +793,96 @@ static int t_model_commit_binds(void) {
     return 1;
 }
 
+/* ---- ledger ABI adapter (ledger/abi/lrd_state.h) ---- */
+static int prop_from_bytes(const char *p, size_t pl, ham_rec *r, lrd_proposal_t *pr, lrd_field_t *ex, size_t *nex) {
+    if (ham_rec_parse(p, pl, r) != HAM_OK) return 0;
+    memset(pr, 0, sizeof *pr);
+    *nex = 0;
+    for (size_t i = 0; i < r->n; i++) {
+        const char *k = r->f[i].key, *v = r->f[i].val;
+        if (strcmp(k, "kind") == 0) pr->kind = lrd_kind_from_token(v, strlen(v));
+        else if (strcmp(k, "prev_commit") == 0) snprintf(pr->prev_commit, sizeof pr->prev_commit, "%s", v);
+        else if (strcmp(k, "payload_sha256") == 0) snprintf(pr->payload_sha256, sizeof pr->payload_sha256, "%s", v);
+        else if (strcmp(k, "seq") == 0) pr->seq = strtoull(v, NULL, 10);
+        else { ex[*nex].key = k; ex[*nex].key_len = strlen(k); ex[*nex].value = v; ex[*nex].value_len = strlen(v); (*nex)++; }
+    }
+    pr->extra = ex; pr->n_extra = *nex;
+    return 1;
+}
+
+static int t_abi_adapter(void) {
+    ham_model m; model_a(&m);
+    ham_epoch_cfg cfg = {4, 2};
+    ham_state s0, s1; int a[2] = {0, 0};
+    REQ(ham_state_genesis(&m, &cfg, a, &s0, NULL, NULL) == HAM_OK);
+    lrd_state_t view0; ham_state_view(&s0, &view0);
+    REQ(view0.kind == LRD_KIND_HAMILTONIAN_STEP && view0.seq == 0 && strcmp(view0.commit, LRD_GENESIS_COMMIT) == 0);
+    /* ACCEPT: descent 5/2 -> 1 */
+    int b[2] = {1, 0}; char *p; size_t pl;
+    REQ(ham_propose_step(&m, &s0, b, &p, &pl) == HAM_OK);
+    ham_rec r; lrd_proposal_t pr; lrd_field_t ex[8]; size_t nex;
+    REQ(prop_from_bytes(p, pl, &r, &pr, ex, &nex));
+    lrd_decision_t out; lrd_state_t nv; char *rec; size_t rl;
+    REQ(ham_decide_abi(&m, &cfg, &s0, &pr, &out, &s1, &nv, &rec, &rl) == HAM_OK);
+    /* the adapter must produce the same bytes as deciding the original record directly */
+    dec d = {0}; ham_state s1b;
+    REQ(decide_raw(&m, &cfg, &s0, p, pl, &d, &s1b));
+    int same = d.acc && d.n == rl && memcmp(d.b, rec, rl) == 0;
+    if (d.acc) ham_state_free(&s1b);
+    dec_free(&d); ham_rec_free(&r); free(p);
+    int ok = same && out.decision == LRD_DECISION_ACCEPT && strcmp(out.reason, "ok") == 0 &&
+             lrd_is_hex256(out.new_commit) && strcmp(out.new_commit, s1.self_commit) == 0 &&
+             nv.seq == 1 && strcmp(nv.commit, s0.self_commit) == 0 && nv.kind == LRD_KIND_HAMILTONIAN_STEP &&
+             strcmp(nv.payload_sha256, s1.payload_sha256) == 0;
+    free(rec);
+    if (!ok) { ham_state_free(&s0); ham_state_free(&s1); ham_model_free(&m); REQS(0, "accept path mismatch"); }
+    /* REJECT (energy increasing 1 -> 3): next/next_view untouched, new_commit "" */
+    int c[2] = {0, 1};
+    REQ(ham_propose_step(&m, &s1, c, &p, &pl) == HAM_OK);
+    REQ(prop_from_bytes(p, pl, &r, &pr, ex, &nex));
+    ham_state nx; memset(&nx, 0xA5, sizeof nx); lrd_state_t nvx; memset(&nvx, 0x5A, sizeof nvx);
+    unsigned char s1snap[sizeof nx], s2snap[sizeof nvx]; memcpy(s1snap, &nx, sizeof nx); memcpy(s2snap, &nvx, sizeof nvx);
+    uint64_t c0 = ham_states_constructed();
+    memset(&out, 0x77, sizeof out);
+    REQ(ham_decide_abi(&m, &cfg, &s1, &pr, &out, &nx, &nvx, NULL, NULL) == HAM_OK);
+    ok = out.decision == LRD_DECISION_REJECT && strcmp(out.reason, "energy_not_decreasing") == 0 &&
+         out.new_commit[0] == '\0' && memcmp(&nx, s1snap, sizeof nx) == 0 &&
+         memcmp(&nvx, s2snap, sizeof nvx) == 0 && ham_states_constructed() == c0;
+    /* wrong kind via enum */
+    pr.kind = LRD_KIND_LEDGER_APPEND;
+    REQ(ham_decide_abi(&m, &cfg, &s1, &pr, &out, &nx, &nvx, NULL, NULL) == HAM_OK);
+    ok = ok && out.decision == LRD_DECISION_REJECT && strcmp(out.reason, "wrong_kind") == 0;
+    /* extra field colliding with a common key -> unserializable -> malformed */
+    pr.kind = LRD_KIND_HAMILTONIAN_STEP;
+    lrd_field_t ex2[9]; memcpy(ex2, ex, nex * sizeof *ex);
+    ex2[nex].key = "seq"; ex2[nex].key_len = 3; ex2[nex].value = "2"; ex2[nex].value_len = 1;
+    pr.extra = ex2; pr.n_extra = nex + 1;
+    REQ(ham_decide_abi(&m, &cfg, &s1, &pr, &out, &nx, &nvx, NULL, NULL) == HAM_OK);
+    ok = ok && out.decision == LRD_DECISION_REJECT && strcmp(out.reason, "malformed") == 0 &&
+         memcmp(&nx, s1snap, sizeof nx) == 0 && ham_states_constructed() == c0;
+    ham_rec_free(&r); free(p);
+    ham_state_free(&s0); ham_state_free(&s1); ham_model_free(&m);
+    REQ(ok);
+    return 1;
+}
+
+static int t_reason_tokens_abi_conformant(void) {
+    /* every reason this engine can emit: lowercase [a-z0-9_]+, <= LRD_REASON_MAX */
+    const char *r[] = {"ok", "malformed", "wrong_kind", "stale_seq", "bad_prev", "bad_payload",
+                       "bad_epoch", "epoch_exhausted", "infeasible", "energy_not_decreasing"};
+    for (size_t i = 0; i < sizeof r / sizeof r[0]; i++) {
+        size_t n = strlen(r[i]);
+        REQS(n >= 1 && n <= LRD_REASON_MAX, "%s length", r[i]);
+        for (size_t k = 0; k < n; k++)
+            REQS((r[i][k] >= 'a' && r[i][k] <= 'z') || (r[i][k] >= '0' && r[i][k] <= '9') || r[i][k] == '_', "%s charset", r[i]);
+    }
+    REQ(strcmp(LRD_REASON_ENERGY_NOT_DECREASING, "energy_not_decreasing") == 0);
+    REQ(strcmp(LRD_REASON_INFEASIBLE, "infeasible") == 0);
+    REQ(strcmp(lrd_kind_token(LRD_KIND_HAMILTONIAN_STEP), HAM_KIND) == 0);
+    return 1;
+}
+
+
 int main(int argc, char **argv) {
     if (argc > 1) g_golden_commit = argv[1];
     run("sha256_fips_vectors", t_sha256_vectors);
@@ -822,6 +914,8 @@ int main(int argc, char **argv) {
     run("exact_tenths_double_would_accept", t_exact_tenths_double_would_accept);
     run("exact_huge_values", t_exact_huge_values);
     run("model_commit_binds", t_model_commit_binds);
+    run("abi_adapter_ledger_header", t_abi_adapter);
+    run("reason_tokens_abi_conformant", t_reason_tokens_abi_conformant);
     printf("# SUMMARY pass=%d fail=%d unavailable=%d\n", g_pass, g_fail, g_unav);
     return g_fail ? 1 : 0;
 }

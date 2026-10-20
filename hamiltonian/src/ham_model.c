@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  */
 /* Model, exact energy, hard-constraint feasibility, SAT, conflicts, reports. */
 #include "ham.h"
@@ -355,7 +356,7 @@ ham_status ham_sat_report(const ham_model *m, char **out, size_t *len) {
     char mc[65];
     ham_status cst = ham_model_commit(m, mc);
     if (cst != HAM_OK) return cst;
-    ham_status s2 = ham_rec_add(&rec, "kind", LRD_KIND_HAMILTONIAN_STEP);
+    ham_status s2 = ham_rec_add(&rec, "kind", HAM_KIND);
     if (s2 == HAM_OK) s2 = ham_rec_add(&rec, "model", mc);
     if (s2 == HAM_OK) s2 = ham_rec_addf(&rec, "hard_count", "%zu", m->nh);
     if (st == HAM_ERR_LIMIT) {
@@ -421,7 +422,7 @@ ham_status ham_infeasibility_report(const ham_model *m, const int *a, char **out
     ham_rec rec; ham_rec_init(&rec);
     char *as = ham_assign_str(m, a);
     if (st == HAM_OK && !as) st = HAM_ERR_NOMEM;
-    if (st == HAM_OK) st = ham_rec_add(&rec, "kind", LRD_KIND_HAMILTONIAN_STEP);
+    if (st == HAM_OK) st = ham_rec_add(&rec, "kind", HAM_KIND);
     if (st == HAM_OK) st = ham_rec_add(&rec, "model", mc);
     if (st == HAM_OK) st = ham_rec_add(&rec, "report", nv ? "infeasible" : "feasible");
     if (st == HAM_OK) st = ham_rec_add(&rec, "assign", as);

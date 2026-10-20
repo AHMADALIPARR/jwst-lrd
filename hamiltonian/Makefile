@@ -1,5 +1,6 @@
-# SPDX-License-Identifier: AGPL-3.0-only
-# Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+# Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+# Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+# SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
 #
 # Frustration Hamiltonian Action-WORM engine (TASK 008).
 #   make            -> build/std/libham.a + build/std/test_ham   (-Werror)
@@ -12,12 +13,11 @@ CSTD     = -std=c17
 WARN     = -Wall -Wextra -Werror -Wpedantic -Wshadow -Wstrict-prototypes -Wformat=2
 OPT      = -O2 -g
 
-# Real ledger ABI header if the ledger track has landed it, else PROVISIONAL copy.
-LEDGER_ABI := $(wildcard ../ledger/abi/lrd_state.h)
-ifneq ($(LEDGER_ABI),)
+# Shared LRD-STATE-v1 header owned by the ledger track (merged on main at 627fda7).
+# Included, never forked; the build fails loudly if it is missing.
 ABI_DIR := ../ledger/abi
-else
-ABI_DIR := abi
+ifeq ($(wildcard $(ABI_DIR)/lrd_state.h),)
+$(error ledger/abi/lrd_state.h not found: rebase on main >= 627fda7)
 endif
 
 CPPFLAGS = -Iinclude -I$(ABI_DIR)
@@ -28,14 +28,11 @@ HDRS     = include/ham.h $(ABI_DIR)/lrd_state.h
 
 SAN      = -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
 
-.PHONY: all std asan clang test abi-dir clean
+.PHONY: all std asan clang test clean
 all: std
 std:   build/std/test_ham
 asan:  build/asan/test_ham
 clang: build/clang/test_ham
-
-abi-dir:
-	@echo $(ABI_DIR)
 
 build/std/libham.a: $(SRCS) $(HDRS)
 	@mkdir -p build/std/obj

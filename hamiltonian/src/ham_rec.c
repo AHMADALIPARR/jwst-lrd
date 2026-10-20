@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  */
 /* LRD-REC-v1 canonical records and LRD-COMMIT-v1 commitments. */
 #include "ham.h"
@@ -144,4 +145,9 @@ ham_status ham_commit_bytes(const char *bytes, size_t len, char hex[65]) {
     ham_hex(d, 32, hex);
     free(buf);
     return HAM_OK;
+}
+
+ham_status ham_rec_addn(ham_rec *r, const char *key, size_t klen, const char *val, size_t vlen) {
+    if ((!key && klen) || (!val && vlen)) return HAM_ERR_ARG;
+    return add_n(r, key ? key : "", klen, val ? val : "", vlen);
 }

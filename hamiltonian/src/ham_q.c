@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  */
 /* Exact rational text forms (LRD-REC-v1: "p/q", q>0, gcd(p,q)=1). */
 #include "ham.h"

@@ -1,5 +1,6 @@
-<!-- SPDX-License-Identifier: AGPL-3.0-only
-     Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root). -->
+<!-- Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+     Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+     SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque -->
 # hamiltonian/OBLIGATIONS.md — proof obligations for `kind=hamiltonian_step`
 
 Contributed by the hamiltonian track (TASK 008) for the Agda track to mirror in
@@ -106,6 +107,14 @@ model = σ.model, assign = a, energy = H_M a`, and
 `(epoch, used) = (σ.epoch, σ.used+1)` for `step`, `(σ.epoch+1, 0)` for `epoch_advance`;
 `σ'.self` = commitment of its LRD-STATE-v1 record, emitted as `new_commit`.
 
+### 1.7 Ledger ABI mapping (`ledger/abi/lrd_state.h`, main 627fda7)
+- `ham_state_view : EState → lrd_state_t` gives `seq, commit = σ.prev, kind = LRD_KIND_HAMILTONIAN_STEP, payload_sha256`.
+- `ham_decide_abi` serializes an `lrd_proposal_t` (common fields + `extra`) to LRD-REC-v1 and returns
+  exactly `decide` on those bytes (bytes that cannot be serialized — duplicate keys, NUL/newline — are
+  decided as the empty input, i.e. `reject malformed`). It satisfies the `lrd_transition_fn` contract
+  (ACCEPT writes `*next` and `new_commit`; REJECT writes neither and leaves `new_commit = ""`) with the
+  engine context passed explicitly, because `lrd_transition_fn` has no context parameter.
+
 ## 2. Obligations
 
 **H-1 (rejection never constructs a state).**
@@ -171,6 +180,11 @@ and irreducible: `∀ c ∈ C. C ∖ {c}` is satisfiable.
 exactly `Viol_M s` (names, ascending index), `violated_count = |Viol_M s|`, and for
 each violated `k`, `witness.<name_k>` gives the values of `s` on `scope_k`.
 
+**H-12 (ABI adapter faithfulness).** For every `lrd_proposal_t` `π` that serializes to bytes `p`,
+`ham_decide_abi M Cfg σ π` yields the same decision record bytes as `decide M Cfg σ p`, and
+`out.decision`/`out.reason`/`out.new_commit` are projections of that record; H-1 holds for both `next`
+and `next_view`.
+
 ## 3. Why descent is bounded per epoch (and not assumed to terminate on its own)
 
 `(ℚ, <)` restricted to a set with a lower bound is **not** well-founded:
@@ -200,7 +214,7 @@ record EState : Set     -- §1.4
 data Reason : Set       -- §1.6
 data Decision : Set     -- §1.6 (reject carries no EState)
 decide : Model → Cfg → EState → Bytes → Decision
--- H-1 … H-11 as above; H-7 by induction on the run with measure (E − epoch , B − used)
+-- H-1 … H-12 as above; H-7 by induction on the run with measure (E − epoch , B − used)
 ```
 The lexicographic measure `(E − σ.epoch, B − σ.used)` strictly decreases on every
 accepted transition (`step`: second component; `epoch_advance`: first component),

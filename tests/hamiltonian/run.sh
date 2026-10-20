@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-only
-# Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+# Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+# Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+# SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
 #
 # CONTRACTS.md test runner for the hamiltonian module (TASK 008).
 # Prints "PASS <name>" | "FAIL <name> <why>" | "UNAVAILABLE <name> <reason>";
@@ -29,13 +30,11 @@ echo "# clang: $(clang --version 2>/dev/null | head -1)"
 echo "# make: $(make --version 2>/dev/null | head -1)"
 echo "# valgrind: $(valgrind --version 2>/dev/null || echo none)"
 echo "# gmp: $(dpkg-query -W -f='${Package} ${Version}' libgmp-dev 2>/dev/null || echo unknown)"
-ABI_DIR="$(make -s -C "$HAM" abi-dir)"
-echo "# abi header: hamiltonian/$ABI_DIR/lrd_state.h"
-
 if [ -f "$ROOT/ledger/abi/lrd_state.h" ]; then
-  pass ledger_abi_header
+  echo "# abi header: ledger/abi/lrd_state.h sha256=$(sha256sum "$ROOT/ledger/abi/lrd_state.h" | cut -d" " -f1) last-commit=$(git -C "$ROOT" log -1 --format=%h -- ledger/abi/lrd_state.h)"
+  if [ -e "$HAM/abi/lrd_state.h" ]; then fail ledger_abi_header "a forked copy exists under hamiltonian/abi"; else pass ledger_abi_header; fi
 else
-  unav ledger_abi_header "ledger/abi/lrd_state.h not landed; built against PROVISIONAL hamiltonian/abi/lrd_state.h"
+  fail ledger_abi_header "ledger/abi/lrd_state.h missing (rebase on main >= 627fda7)"
 fi
 
 # independent cross-check value for the LRD-COMMIT-v1 implementation

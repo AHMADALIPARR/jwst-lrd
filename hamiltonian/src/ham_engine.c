@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  */
 /* Action-WORM engine: LRD-STATE-v1 hamiltonian_step decisions.
  *
@@ -31,11 +32,11 @@ uint64_t ham_states_constructed(void) { return g_constructed; }
 
 void ham_state_free(ham_state *st) { mpq_clear(st->energy); memset(st, 0, sizeof *st); }
 
-void ham_state_view(const ham_state *st, lrd_state_v1 *out) {
+void ham_state_view(const ham_state *st, lrd_state_t *out) {
     memset(out, 0, sizeof *out);
     out->seq = st->seq;
     memcpy(out->commit, st->prev_commit, 65);
-    snprintf(out->kind, sizeof out->kind, "%s", LRD_KIND_HAMILTONIAN_STEP);
+    out->kind = LRD_KIND_HAMILTONIAN_STEP;
     memcpy(out->payload_sha256, st->payload_sha256, 65);
 }
 
@@ -66,7 +67,7 @@ ham_status ham_payload_sha256(const ham_model *m, const char *op, const char *as
 static ham_status state_commit(uint64_t seq, const char *prev, const char *payload, char hex[65]) {
     ham_rec r; ham_rec_init(&r);
     ham_status st = ham_rec_add(&r, LRD_F_COMMIT, prev);
-    if (st == HAM_OK) st = ham_rec_add(&r, LRD_F_KIND, LRD_KIND_HAMILTONIAN_STEP);
+    if (st == HAM_OK) st = ham_rec_add(&r, LRD_F_KIND, HAM_KIND);
     if (st == HAM_OK) st = ham_rec_add(&r, LRD_F_PAYLOAD_SHA256, payload);
     if (st == HAM_OK) st = ham_rec_addf(&r, LRD_F_SEQ, "%llu", (unsigned long long)seq);
     char *b = NULL; size_t n = 0;
@@ -125,7 +126,7 @@ ham_status ham_state_genesis(const ham_model *m, const ham_epoch_cfg *cfg, const
 static ham_status build_proposal(const char *op, uint64_t seq, const char *prev, const char *ph,
                                  const char *assign, uint32_t epoch, char **out, size_t *len) {
     ham_rec r; ham_rec_init(&r);
-    ham_status st = ham_rec_add(&r, "kind", LRD_KIND_HAMILTONIAN_STEP);
+    ham_status st = ham_rec_add(&r, "kind", HAM_KIND);
     if (st == HAM_OK) st = ham_rec_add(&r, "op", op);
     if (st == HAM_OK) st = ham_rec_addf(&r, "seq", "%llu", (unsigned long long)seq);
     if (st == HAM_OK) st = ham_rec_add(&r, "prev_commit", prev);
@@ -212,7 +213,7 @@ ham_status ham_decide(const ham_model *m, const ham_epoch_cfg *cfg, const ham_st
 #define TRY(x) do { st = (x); if (st != HAM_OK) goto out; } while (0)
 
     TRY(ham_commit_bytes(proposal ? proposal : "", plen, pc));
-    TRY(ham_rec_add(&d, "kind", LRD_KIND_HAMILTONIAN_STEP));
+    TRY(ham_rec_add(&d, "kind", HAM_KIND));
     TRY(ham_rec_add(&d, "proposal_commit", pc));
     TRY(ham_rec_add(&d, "state_commit", cur->self_commit));
     TRY(ham_rec_addf(&d, "state_seq", "%llu", (unsigned long long)cur->seq));
@@ -231,7 +232,7 @@ ham_status ham_decide(const ham_model *m, const ham_epoch_cfg *cfg, const ham_st
     /* 2 */
     {
         const char *k = ham_rec_get(&p, "kind");
-        if (!k || strcmp(k, LRD_KIND_HAMILTONIAN_STEP) != 0) { reason = "wrong_kind"; goto decide; }
+        if (!k || strcmp(k, HAM_KIND) != 0) { reason = "wrong_kind"; goto decide; }
     }
     /* 3: exact field set (parsed records are sorted, so compare in order) */
     if (p.n != NPF) { reason = "malformed"; goto decide; }
@@ -317,7 +318,7 @@ decide:
             TRY(ham_rec_addf(&d, "epoch_steps_after", "%u", (unsigned)nsteps));
             TRY(ham_rec_add(&d, "payload_sha256", ph));
         }
-        TRY(ham_rec_add(&d, LRD_F_DECISION, acc ? LRD_DECISION_ACCEPT : LRD_DECISION_REJECT));
+        TRY(ham_rec_add(&d, LRD_F_DECISION, acc ? LRD_DECISION_TOKEN_ACCEPT : LRD_DECISION_TOKEN_REJECT));
         TRY(ham_rec_add(&d, LRD_F_REASON, reason));
         TRY(ham_rec_serialize(&d, decision, dlen));
         if (acc) {
@@ -334,4 +335,50 @@ out:
     mpq_clear(ecand); mpq_clear(delta);
     ham_rec_free(&p); ham_rec_free(&d);
     return st;
+}
+
+ham_status ham_decide_abi(const ham_model *m, const ham_epoch_cfg *cfg, const ham_state *cur,
+                          const lrd_proposal_t *prop, lrd_decision_t *out,
+                          ham_state *next, lrd_state_t *next_view,
+                          char **record, size_t *rlen) {
+    if (!m || !cfg || !cur || !prop || !out || !next || !next_view || (!record) != (!rlen) ||
+        (prop->n_extra && !prop->extra))
+        return HAM_ERR_ARG;
+    if (record) { *record = NULL; *rlen = 0; }
+    ham_rec r; ham_rec_init(&r);
+    const char *kt = lrd_kind_token(prop->kind);
+    ham_status st = ham_rec_add(&r, LRD_F_KIND, kt ? kt : "");
+    if (st == HAM_OK) st = ham_rec_add(&r, LRD_F_PREV_COMMIT, prop->prev_commit);
+    if (st == HAM_OK) st = ham_rec_addf(&r, LRD_F_SEQ, "%llu", (unsigned long long)prop->seq);
+    if (st == HAM_OK) st = ham_rec_add(&r, LRD_F_PAYLOAD_SHA256, prop->payload_sha256);
+    for (size_t i = 0; st == HAM_OK && i < prop->n_extra; i++)
+        st = ham_rec_addn(&r, prop->extra[i].key, prop->extra[i].key_len,
+                          prop->extra[i].value, prop->extra[i].value_len);
+    char *bytes = NULL; size_t blen = 0;
+    if (st == HAM_OK) st = ham_rec_serialize(&r, &bytes, &blen);
+    ham_rec_free(&r);
+    if (st == HAM_ERR_NOMEM) return st;
+    if (st != HAM_OK) { free(bytes); bytes = NULL; blen = 0; }   /* unserializable -> malformed */
+
+    char *d = NULL; size_t dl = 0; int acc = 0;
+    ham_state tmp;                    /* written by ham_decide only on ACCEPT */
+    st = ham_decide(m, cfg, cur, bytes ? bytes : "", blen, &d, &dl, &acc, &tmp);
+    free(bytes);
+    if (st != HAM_OK) return st;
+    ham_rec dr;
+    st = ham_rec_parse(d, dl, &dr);
+    if (st != HAM_OK) { free(d); if (acc) ham_state_free(&tmp); return st == HAM_ERR_NOMEM ? st : HAM_ERR_ARG; }
+    const char *reason = ham_rec_get(&dr, LRD_F_REASON);
+    if (acc) {
+        out->decision = LRD_DECISION_ACCEPT;
+        snprintf(out->reason, sizeof out->reason, "%s", reason);
+        memcpy(out->new_commit, tmp.self_commit, LRD_HEX256_BUF);
+        *next = tmp;                  /* ownership of tmp.energy moves to *next */
+        ham_state_view(next, next_view);
+    } else {
+        lrd_decision_reject(out, reason);
+    }
+    ham_rec_free(&dr);
+    if (record) { *record = d; *rlen = dl; } else free(d);
+    return HAM_OK;
 }

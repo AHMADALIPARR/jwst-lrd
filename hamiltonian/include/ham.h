@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-only
- * Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+/* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
+ * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
  *
  * ham.h -- Frustration Hamiltonian Action-WORM engine (JWST-LRD TASK 008).
  *
@@ -20,6 +21,9 @@
 #include <stdint.h>
 #include <gmp.h>
 #include "lrd_state.h"
+
+/* kind token for this subsystem (lrd_kind_token(LRD_KIND_HAMILTONIAN_STEP)) */
+#define HAM_KIND       "hamiltonian_step"
 
 #define HAM_MAX_VARS   64
 #define HAM_MAX_DOM    64
@@ -59,6 +63,7 @@ typedef struct {
 void       ham_rec_init(ham_rec *r);
 void       ham_rec_free(ham_rec *r);
 ham_status ham_rec_add(ham_rec *r, const char *key, const char *val);
+ham_status ham_rec_addn(ham_rec *r, const char *key, size_t klen, const char *val, size_t vlen);
 ham_status ham_rec_addf(ham_rec *r, const char *key, const char *fmt, ...)
     __attribute__((format(printf, 3, 4)));
 ham_status ham_rec_add_q(ham_rec *r, const char *key, const mpq_t q);
@@ -148,8 +153,8 @@ typedef struct ham_state {
 /* number of ham_state objects ever constructed (genesis or ACCEPT) */
 uint64_t ham_states_constructed(void);
 void     ham_state_free(ham_state *st);
-/* fills an lrd_state_v1 view of st */
-void     ham_state_view(const ham_state *st, lrd_state_v1 *out);
+/* fills the ledger ABI (lrd_state_t) view of st */
+void     ham_state_view(const ham_state *st, lrd_state_t *out);
 
 /* Genesis: constructs *out only if a is in-domain and feasible. On
  * HAM_ERR_INFEASIBLE, *report (if non-NULL) gets an infeasibility record and
@@ -174,5 +179,18 @@ ham_status ham_propose_epoch_advance(const ham_model *m, const ham_state *cur,
 ham_status ham_decide(const ham_model *m, const ham_epoch_cfg *cfg, const ham_state *cur,
                       const char *proposal, size_t plen,
                       char **decision, size_t *dlen, int *accepted, ham_state *next);
+
+/* Ledger ABI adapter (ledger/abi/lrd_state.h). Same contract as lrd_transition_fn --
+ * on REJECT neither *next nor *next_view is written and out->new_commit is "" --
+ * but the engine context (model, epoch cfg, full engine state) is explicit, since
+ * lrd_transition_fn has no context parameter. prop is serialized to LRD-REC-v1
+ * (common fields + extra) and decided by ham_decide; a proposal that cannot be
+ * serialized (bad bytes in extra, duplicate keys) is decided as empty input,
+ * i.e. REJECT malformed. record/rlen (both NULL or both non-NULL) receive the full
+ * decision record. Non-HAM_OK return: no decision, nothing written to next*. */
+ham_status ham_decide_abi(const ham_model *m, const ham_epoch_cfg *cfg, const ham_state *cur,
+                          const lrd_proposal_t *prop, lrd_decision_t *out,
+                          ham_state *next, lrd_state_t *next_view,
+                          char **record, size_t *rlen);
 
 #endif /* HAM_H */
