@@ -5,6 +5,13 @@ title: Little Red Dots Experiment
 
 # Observations. Hypotheses. Invariants.
 
+## [Open the live Self / Morphic route →](live/)
+
+On the NUC, this route embeds the running native renderer: archived waveform,
+animated helix, phase wave and red-dot state. It connects only to localhost;
+allow this-device access if the browser asks. The controls operate the Self
+process, and no public remote-control tunnel is enabled.
+
 Explore the Abell 2744-QSO1 experiment through its native **Self / Morphic**
 workspace: archived JWST spectra, growth histories, topology and bounded
 state projection, with explicit provenance and proof boundaries.
@@ -17,9 +24,9 @@ state projection, with explicit provenance and proof boundaries.
 
 ![Actual native Self/Morphic workspace with archived QSO1 spectrum and invariant panels](workspace.png)
 
-This is an actual rendered Self/Morphic session. The interactive application
-runs in the native Self VM; this Pages site publishes its screenshots,
-verification records and instructions.
+This is an actual rendered Self/Morphic session. Use the [live route](live/)
+for the running animation on the NUC. The records below document the earlier
+growth/topology workspace and its verification.
 
 | View | What it shows |
 |---|---|
