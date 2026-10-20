@@ -1,0 +1,2 @@
+sha256sum of torus_7v_gf2.lrdrec: fb758f1e0e55580f73a2f50e7b76544edbe1907ba8ff3f8628672b0d23ca6161 ; Fortran sha256: fb758f1e0e55580f73a2f50e7b76544edbe1907ba8ff3f8628672b0d23ca6161
+root commitment = sha256('LRD-COMMIT-v1\0' || last record) via coreutils: 1ade24dfc483099f9e4cf1f9125b40320a35aa552b819ec3359e5f0b4e0655d3 ; Fortran: 1ade24dfc483099f9e4cf1f9125b40320a35aa552b819ec3359e5f0b4e0655d3
