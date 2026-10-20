@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Matrix ops. $1 3x3 A, $2 rhs b, $3 3x2 B; outputs $4 = A*B (flattened), $5 = solve(A,b).
+lrdir 1
+let a : arr<f64> = load($1, "1")
+let b : arr<f64> = load($2, "1")
+let bb : arr<f64> = load($3, "1")
+let A : mat<f64> = mat(a, 3, 3)
+let B : mat<f64> = mat(bb, 3, 2)
+let AB : mat<f64> = matmul(A, B)
+let x : arr<f64> = solve(A, b)
+let ab : arr<f64> = flatten(AB)
+store ab $4
+store x $5
+print AB

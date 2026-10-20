@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Complete observation-analysis program.
+# $1 wavelength (um)  $2 flux  $3 model  $4 sigma  $5 verifier
+# $6 out rest-frame wavelength (Angstrom)  $7 out residuals  $8 out chi2
+# $9 out proposal record  $10 out new state record
+lrdir 1
+let lam : arr<f64> = load($1, "um")
+let flux : arr<f64> = load($2, "arbitrary")
+let model : arr<f64> = load($3, "arbitrary")
+let sigma : arr<f64> = load($4, "arbitrary")
+let z : f64 = 5.0
+let rest : arr<f64> = restframe(lam, z)
+let restA : arr<f64> = convert(rest, "um", "Angstrom")
+let fin : bool = all_finite(flux)
+let mono : bool = monotone_inc(restA)
+let inr : bool = in_range(restA, 1000.0, 10000.0)
+let ok1 : bool = and(fin, mono)
+let ok : bool = and(ok1, inr)
+assert ok "spectrum finite, monotone, rest frame within 1000-10000 Angstrom"
+let r : arr<f64> = residuals(flux, model)
+let c : f64 = chi2(flux, model, sigma)
+let prop : rec = ledger_proposal("0000000000000000000000000000000000000000000000000000000000000000", 1, r)
+let st : rec = gate($5, prop)
+store restA $6
+store r $7
+store c $8
+emit prop $9
+emit st $10
+print c
+print st

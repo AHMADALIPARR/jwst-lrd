@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Remaining unit conversions. $1 wavelength (um); outputs $2 nm, $3 nm->um, $4 nm->Angstrom, $5 Angstrom->nm.
+lrdir 1
+let lam : arr<f64> = load($1, "um")
+let nm : arr<f64> = convert(lam, "um", "nm")
+let um : arr<f64> = convert(nm, "nm", "um")
+let A : arr<f64> = convert(nm, "nm", "Angstrom")
+let nm2 : arr<f64> = convert(A, "Angstrom", "nm")
+store nm $2
+store um $3
+store A $4
+store nm2 $5

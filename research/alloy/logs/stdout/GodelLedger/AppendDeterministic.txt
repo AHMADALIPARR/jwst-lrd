@@ -1,0 +1,10 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -s glucose -o logs/solutions/GodelLedger/AppendDeterministic -t text -c AppendDeterministic GodelLedger.als
+00. check AppendDeterministic      0       UNSAT
+c
+c Try to adapt solver strategies
+c 
+c Adjusting solver for the SAT Race 2015 (alpha feature)
+c Adjusting for high successive conflicts.
+c
+c Activating Chanseok Strategy: moved 8011 clauses to the permanent set.

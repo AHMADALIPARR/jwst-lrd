@@ -1,0 +1,10 @@
+LRD-REC-v1
+4:kind11:observation
+19:obs_manifest_commit64:59abe914b5aa2cd8fd80e909b8c236a127c843d06c16ed5fc4aa3f157d56040f
+14:obs_mast_obsid9:300843505
+11:obs_product52:jw02561-o002_s000013123_nirspec_clear-prism_x1d.fits
+16:obs_quality_flag22:flux_globally_negative
+15:obs_science_use15:provenance_only
+14:payload_sha25664:09bcd9077647ebf4fdaa766807de832bf6a94b92e3ed73fdb8a3c0281ae50c31
+11:prev_commit64:0000000000000000000000000000000000000000000000000000000000000000
+3:seq1:1

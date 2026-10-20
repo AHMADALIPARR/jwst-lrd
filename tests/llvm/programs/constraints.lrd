@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Constraint evaluation. $1 good wavelengths, $2 array with a NaN, $3 non-monotone array.
+lrdir 1
+let lam : arr<f64> = load($1, "um")
+let bad : arr<f64> = load($2, "um")
+let flat : arr<f64> = load($3, "um")
+let c1 : bool = all_finite(lam)
+let c2 : bool = all_finite(bad)
+let c3 : bool = monotone_inc(lam)
+let c4 : bool = monotone_inc(flat)
+let c5 : bool = in_range(lam, 1.0, 5.0)
+let c6 : bool = in_range(lam, 1.5, 5.0)
+let x : f64 = 2.5
+let c7 : bool = in_range(x, 0.0, 3.0)
+let c8 : bool = and(c1, c3)
+let c9 : bool = or(c2, c4)
+let c10 : bool = not(c9)
+print c1
+print c2
+print c3
+print c4
+print c5
+print c6
+print c7
+print c8
+print c9
+print c10
+assert c8 "wavelengths finite and increasing"

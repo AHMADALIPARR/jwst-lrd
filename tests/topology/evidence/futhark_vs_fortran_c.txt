@@ -1,0 +1,78 @@
+# stem entry field | Fortran reference | Futhark (c executable) | futhark datacmp equal
+SYNTHETIC_edge_d1 boundary - | 2 entries, 1 of -1, 1 of +1 | 2 entries, 1 of -1, 1 of +1 | yes
+SYNTHETIC_edge_d1 rank_gfp gf2 | 1i64 | 1i64 | yes
+SYNTHETIC_edge_d1 rank_gfp gf3 | 1i64 | 1i64 | yes
+SYNTHETIC_hollow_triangle_d1 boundary - | 9 entries, 3 of -1, 3 of +1 | 9 entries, 3 of -1, 3 of +1 | yes
+SYNTHETIC_hollow_triangle_d1 rank_gfp gf2 | 2i64 | 2i64 | yes
+SYNTHETIC_hollow_triangle_d1 rank_gfp gf3 | 2i64 | 2i64 | yes
+SYNTHETIC_filled_triangle_d1 boundary - | 9 entries, 3 of -1, 3 of +1 | 9 entries, 3 of -1, 3 of +1 | yes
+SYNTHETIC_filled_triangle_d1 rank_gfp gf2 | 2i64 | 2i64 | yes
+SYNTHETIC_filled_triangle_d1 rank_gfp gf3 | 2i64 | 2i64 | yes
+SYNTHETIC_filled_triangle_d2 boundary - | 3 entries, 1 of -1, 2 of +1 | 3 entries, 1 of -1, 2 of +1 | yes
+SYNTHETIC_filled_triangle_d2 rank_gfp gf2 | 1i64 | 1i64 | yes
+SYNTHETIC_filled_triangle_d2 rank_gfp gf3 | 1i64 | 1i64 | yes
+SYNTHETIC_filled_triangle_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_tetra_boundary_d1 boundary - | 24 entries, 6 of -1, 6 of +1 | 24 entries, 6 of -1, 6 of +1 | yes
+SYNTHETIC_tetra_boundary_d1 rank_gfp gf2 | 3i64 | 3i64 | yes
+SYNTHETIC_tetra_boundary_d1 rank_gfp gf3 | 3i64 | 3i64 | yes
+SYNTHETIC_tetra_boundary_d2 boundary - | 24 entries, 4 of -1, 8 of +1 | 24 entries, 4 of -1, 8 of +1 | yes
+SYNTHETIC_tetra_boundary_d2 rank_gfp gf2 | 3i64 | 3i64 | yes
+SYNTHETIC_tetra_boundary_d2 rank_gfp gf3 | 3i64 | 3i64 | yes
+SYNTHETIC_tetra_boundary_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_solid_tetra_d1 boundary - | 24 entries, 6 of -1, 6 of +1 | 24 entries, 6 of -1, 6 of +1 | yes
+SYNTHETIC_solid_tetra_d1 rank_gfp gf2 | 3i64 | 3i64 | yes
+SYNTHETIC_solid_tetra_d1 rank_gfp gf3 | 3i64 | 3i64 | yes
+SYNTHETIC_solid_tetra_d2 boundary - | 24 entries, 4 of -1, 8 of +1 | 24 entries, 4 of -1, 8 of +1 | yes
+SYNTHETIC_solid_tetra_d2 rank_gfp gf2 | 3i64 | 3i64 | yes
+SYNTHETIC_solid_tetra_d2 rank_gfp gf3 | 3i64 | 3i64 | yes
+SYNTHETIC_solid_tetra_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_solid_tetra_d3 boundary - | 4 entries, 2 of -1, 2 of +1 | 4 entries, 2 of -1, 2 of +1 | yes
+SYNTHETIC_solid_tetra_d3 rank_gfp gf2 | 1i64 | 1i64 | yes
+SYNTHETIC_solid_tetra_d3 rank_gfp gf3 | 1i64 | 1i64 | yes
+SYNTHETIC_solid_tetra_d3 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_hollow_square_d1 boundary - | 16 entries, 4 of -1, 4 of +1 | 16 entries, 4 of -1, 4 of +1 | yes
+SYNTHETIC_hollow_square_d1 rank_gfp gf2 | 3i64 | 3i64 | yes
+SYNTHETIC_hollow_square_d1 rank_gfp gf3 | 3i64 | 3i64 | yes
+SYNTHETIC_hollow_triangle_relab_d1 boundary - | 9 entries, 3 of -1, 3 of +1 | 9 entries, 3 of -1, 3 of +1 | yes
+SYNTHETIC_hollow_triangle_relab_d1 rank_gfp gf2 | 2i64 | 2i64 | yes
+SYNTHETIC_hollow_triangle_relab_d1 rank_gfp gf3 | 2i64 | 2i64 | yes
+SYNTHETIC_rp2_6v_d1 boundary - | 90 entries, 15 of -1, 15 of +1 | 90 entries, 15 of -1, 15 of +1 | yes
+SYNTHETIC_rp2_6v_d1 rank_gfp gf2 | 5i64 | 5i64 | yes
+SYNTHETIC_rp2_6v_d1 rank_gfp gf3 | 5i64 | 5i64 | yes
+SYNTHETIC_rp2_6v_d2 boundary - | 150 entries, 10 of -1, 20 of +1 | 150 entries, 10 of -1, 20 of +1 | yes
+SYNTHETIC_rp2_6v_d2 rank_gfp gf2 | 9i64 | 9i64 | yes
+SYNTHETIC_rp2_6v_d2 rank_gfp gf3 | 10i64 | 10i64 | yes
+SYNTHETIC_rp2_6v_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_torus_7v_d1 boundary - | 147 entries, 21 of -1, 21 of +1 | 147 entries, 21 of -1, 21 of +1 | yes
+SYNTHETIC_torus_7v_d1 rank_gfp gf2 | 6i64 | 6i64 | yes
+SYNTHETIC_torus_7v_d1 rank_gfp gf3 | 6i64 | 6i64 | yes
+SYNTHETIC_torus_7v_d2 boundary - | 294 entries, 14 of -1, 28 of +1 | 294 entries, 14 of -1, 28 of +1 | yes
+SYNTHETIC_torus_7v_d2 rank_gfp gf2 | 13i64 | 13i64 | yes
+SYNTHETIC_torus_7v_d2 rank_gfp gf3 | 13i64 | 13i64 | yes
+SYNTHETIC_torus_7v_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_torus_grid3x3_d1 boundary - | 243 entries, 27 of -1, 27 of +1 | 243 entries, 27 of -1, 27 of +1 | yes
+SYNTHETIC_torus_grid3x3_d1 rank_gfp gf2 | 8i64 | 8i64 | yes
+SYNTHETIC_torus_grid3x3_d1 rank_gfp gf3 | 8i64 | 8i64 | yes
+SYNTHETIC_torus_grid3x3_d2 boundary - | 486 entries, 24 of -1, 30 of +1 | 486 entries, 24 of -1, 30 of +1 | yes
+SYNTHETIC_torus_grid3x3_d2 rank_gfp gf2 | 17i64 | 17i64 | yes
+SYNTHETIC_torus_grid3x3_d2 rank_gfp gf3 | 17i64 | 17i64 | yes
+SYNTHETIC_torus_grid3x3_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_klein_grid4x4_d1 boundary - | 768 entries, 48 of -1, 48 of +1 | 768 entries, 48 of -1, 48 of +1 | yes
+SYNTHETIC_klein_grid4x4_d1 rank_gfp gf2 | 15i64 | 15i64 | yes
+SYNTHETIC_klein_grid4x4_d1 rank_gfp gf3 | 15i64 | 15i64 | yes
+SYNTHETIC_klein_grid4x4_d2 boundary - | 1536 entries, 42 of -1, 54 of +1 | 1536 entries, 42 of -1, 54 of +1 | yes
+SYNTHETIC_klein_grid4x4_d2 rank_gfp gf2 | 31i64 | 31i64 | yes
+SYNTHETIC_klein_grid4x4_d2 rank_gfp gf3 | 32i64 | 32i64 | yes
+SYNTHETIC_klein_grid4x4_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_random_seed20261019_d1 boundary - | 4272 entries, 178 of -1, 178 of +1 | 4272 entries, 178 of -1, 178 of +1 | yes
+SYNTHETIC_random_seed20261019_d1 rank_gfp gf2 | 23i64 | 23i64 | yes
+SYNTHETIC_random_seed20261019_d1 rank_gfp gf3 | 23i64 | 23i64 | yes
+SYNTHETIC_random_seed20261019_d2 boundary - | 17978 entries, 101 of -1, 202 of +1 | 17978 entries, 101 of -1, 202 of +1 | yes
+SYNTHETIC_random_seed20261019_d2 rank_gfp gf2 | 97i64 | 97i64 | yes
+SYNTHETIC_random_seed20261019_d2 rank_gfp gf3 | 97i64 | 97i64 | yes
+SYNTHETIC_random_seed20261019_d2 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+SYNTHETIC_random_seed20261019_d3 boundary - | 404 entries, 8 of -1, 8 of +1 | 404 entries, 8 of -1, 8 of +1 | yes
+SYNTHETIC_random_seed20261019_d3 rank_gfp gf2 | 4i64 | 4i64 | yes
+SYNTHETIC_random_seed20261019_d3 rank_gfp gf3 | 4i64 | 4i64 | yes
+SYNTHETIC_random_seed20261019_d3 ddcheck - | 0i64 0i64 | 0i64 0i64 | yes
+# total equal=76 unequal=0

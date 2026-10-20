@@ -29,7 +29,7 @@ if sh fortran/run_reference.sh "$T/ref" >/dev/null 2>"$T/ref.err"; then
   pass reference_run_real_spectrum
   ok=1; why=""
   for f in "$REF"/*; do
-    b=$(basename "$f"); cmp -s "$f" "$T/ref/$b" || { ok=0; why="$why $b"; }
+    b=$(basename "$f"); case $b in zinvest.*) continue;; esac; cmp -s "$f" "$T/ref/$b" || { ok=0; why="$why $b"; }
   done
   [ $ok = 1 ] && pass reference_outputs_reproducible || fail reference_outputs_reproducible "differs:$why"
   # Redshift vs Furtak et al. 2024, Nature 628, 57 (arXiv:2308.05735): z_spec = 7.0451 +- 0.0005.
@@ -49,5 +49,22 @@ if sh fortran/run_reference.sh "$T/ref" >/dev/null 2>"$T/ref.err"; then
   pass reference_lrd_arr_v1_headers
 else
   fail reference_run_real_spectrum "$(tail -1 "$T/ref.err")"
+fi
+
+# Redshift-discrepancy investigation (OPEN item, fortran/STATUS.md). LSF: JDox jwst_nirspec_prism_disp.fits.
+LSF_SHA=58f9330440c50af624313e70f3e5b9f58a6b22d06af094e0085ed66408d0d937
+got=$(openssl dgst -sha256 -r fortran/data/jdox/jwst_nirspec_prism_disp.fits 2>/dev/null | cut -d' ' -f1)
+[ "$got" = "$LSF_SHA" ] && pass zinvest_lsf_file_sha256 || fail zinvest_lsf_file_sha256 "got $got"
+if sh fortran/run_zinvest.sh "$T/zi" >/dev/null 2>"$T/zi.err"; then
+  ok=1; for b in zinvest.kv zinvest.rec zinvest.commit; do cmp -s "$REF/$b" "$T/zi/$b" || ok=0; done
+  [ $ok = 1 ] && pass zinvest_reproducible || fail zinvest_reproducible "differs from $REF/zinvest.*"
+  # JDox states R assumes a 2.2-pixel resolution element; FWHM in x1d pixels must agree within 0.05 px.
+  v=$(awk -F= '/^lsf.fwhm_pix_at_H(alpha|beta)=/{d=$2-2.2; if(d<0)d=-d; if(d>0.05)bad=bad" "$1"="$2} END{print bad==""?"OK":bad}' "$T/zi/zinvest.kv")
+  [ "$v" = OK ] && pass zinvest_lsf_fwhm_2p2pix || fail zinvest_lsf_fwhm_2p2pix "$v"
+  # Noise-free SYNTHETIC injection: Gaussian fits must recover z_true within 3 grid steps (3e-5).
+  v=$(awk -F= '/^inj\..*\.(lsf|point)_fit\.z_minus_true=/{n++; d=$2; if(d<0)d=-d; if(d>3e-5)bad=bad" "$1"="$2} END{print (n==4&&bad=="")?"OK":"n="n bad}' "$T/zi/zinvest.kv")
+  [ "$v" = OK ] && pass zinvest_injection_fit_unbiased || fail zinvest_injection_fit_unbiased "$v"
+else
+  fail zinvest_run "$(tail -1 "$T/zi.err")"
 fi
 [ "$FAILS" -eq 0 ]

@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# validation: chi-square. $1 data, $2 model, $3 sigma -> $4 (length-1 array)
+lrdir 1
+let d : arr<f64> = load($1, "arbitrary")
+let m : arr<f64> = load($2, "arbitrary")
+let s : arr<f64> = load($3, "arbitrary")
+let c : f64 = chi2(d, m, s)
+store c $4

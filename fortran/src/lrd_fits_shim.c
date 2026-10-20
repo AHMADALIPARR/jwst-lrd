@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static int goto_extract1d(fitsfile *f, int *st) {
+static int goto_ext(fitsfile *f, const char *want, int *st) {
     int n = 0, t;
     char en[FLEN_VALUE];
     if (fits_get_num_hdus(f, &n, st)) return *st;
@@ -18,11 +18,12 @@ static int goto_extract1d(fitsfile *f, int *st) {
         if (fits_movabs_hdu(f, h, &t, st)) return *st;
         int s2 = 0;
         if (t == BINARY_TBL && fits_read_key(f, TSTRING, "EXTNAME", en, NULL, &s2) == 0 &&
-            strcmp(en, "EXTRACT1D") == 0)
+            strcmp(en, want) == 0)
             return 0;
     }
     return -1;
 }
+static int goto_extract1d(fitsfile *f, int *st) { return goto_ext(f, "EXTRACT1D", st); }
 
 /* Number of rows of the first EXTRACT1D table. */
 int lrd_fits_nrows(const char *path, long *nrows) {
@@ -73,4 +74,37 @@ int lrd_fits_read_key(const char *path, const char *key, char *out, int outlen) 
     int cs = 0;
     fits_close_file(f, &cs);
     return rc;
+}
+
+/* Same as lrd_fits_nrows / lrd_fits_read_dcol but for the first binary table named `ext`. */
+int lrd_fits_nrows_ext(const char *path, const char *ext, long *nrows) {
+    fitsfile *f;
+    int st = 0, rc;
+    if (fits_open_file(&f, path, READONLY, &st)) return st;
+    rc = goto_ext(f, ext, &st);
+    if (rc == 0) fits_get_num_rows(f, nrows, &st);
+    int cs = 0;
+    fits_close_file(f, &cs);
+    return rc ? rc : st;
+}
+
+int lrd_fits_read_dcol_ext(const char *path, const char *ext, const char *col, long n, double *out,
+                           char *unit, int unitlen) {
+    fitsfile *f;
+    int st = 0, rc, c = 0, anynul = 0;
+    double nul = 0.0 / 0.0;
+    if (fits_open_file(&f, path, READONLY, &st)) return st;
+    rc = goto_ext(f, ext, &st);
+    if (rc == 0 && fits_get_colnum(f, CASEINSEN, (char *)col, &c, &st) == 0) {
+        char key[16], u[FLEN_VALUE];
+        int s2 = 0;
+        snprintf(key, sizeof key, "TUNIT%d", c);
+        if (fits_read_key(f, TSTRING, key, u, NULL, &s2)) strcpy(u, "ABSENT");
+        strncpy(unit, u, (size_t)unitlen - 1);
+        unit[unitlen - 1] = 0;
+        fits_read_col(f, TDOUBLE, c, 1, 1, n, &nul, out, &anynul, &st);
+    }
+    int cs = 0;
+    fits_close_file(f, &cs);
+    return rc ? rc : st;
 }

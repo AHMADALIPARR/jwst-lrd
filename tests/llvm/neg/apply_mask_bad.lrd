@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: apply_mask with a mask that is not unit "1" / not exactly 0 or 1.
+lrdir 1
+let x : arr<f64> = load($1, "arbitrary")
+let k : arr<f64> = load($2, $3)
+let y : arr<f64> = apply_mask(x, k)

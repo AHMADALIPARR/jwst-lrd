@@ -115,4 +115,78 @@ PASS reference_lrd_arr_v1_headers
 - Peak finding uses S/N ≥ 5 against a local linear continuum (inner 3, outer 10 px). Identification tolerance is 1.5 px.
 - Pixel errors are treated as independent. The x1d gives no covariance.
 - The kernel analyses only the primary product. o002 is excluded because its FLUX is inverted (see ingest/STATUS.md).
-- No LRD-STATE-v1 transition is emitted yet. The ledger ABI header `ledger/abi/lrd_state.h` is not in the repo.
+- LRD-STATE-v1 observation transitions are emitted by the ingest track (see ingest/STATUS.md, fixtures/state/observation/). The kernel itself emits none.
+
+## OPEN: redshift discrepancy vs Furtak et al. 2024
+Status: **OPEN, cause not identified.** The kernel gives z = 7.04221 ± 0.00027 (inverse-variance mean of the
+Hβ and Hα centroids). Furtak et al. 2024 (Nature 628, 57) publish z = 7.0451 ± 0.0005. Every estimator below
+lands below the published value. Mechanisms (b) and (c) below do not explain the offset under the models tested.
+
+Tool: `fortran/app/lrd_zinvest.f90`, run with `fortran/run_zinvest.sh`. Output:
+`fixtures/reference/<sha>/zinvest.{kv,rec,commit}`. The commitment is in zinvest.commit.
+- Input: the primary x1d (sha256 c0b87857…, CAL_VER 3.0.0, image A only).
+- Fitting method: profile χ²(z) on a 1e-5 grid over z = 7.020–7.065, with σ_int profiled over 0–4000 km/s in
+  50 km/s steps. Each z gets a linear continuum plus line flux by weighted LSQ. Intervals are Δχ² = 1.
+- Default window: −12/+12 px around the line (fewer pixels where the mask cuts it).
+- Because of the grid, z values are quantised at 1e-5 and σ_int at 50 km/s.
+
+LSF source: JDox `jwst_nirspec_prism_disp.fits`, sha256 58f9330440c50af624313e70f3e5b9f58a6b22d06af094e0085ed66408d0d937.
+Its R(λ) is based on Jakobsen et al. 2022, A&A 661, A80, and assumes a 2.2-px resolution element. Provenance is in
+`fortran/data/jdox/SOURCE.md`. The LSF is a Gaussian with FWHM λ/R(λ), integrated over each pixel with erf.
+- Interpolated R: 171.84 at observed Hβ and 320.56 at observed Hα.
+- FWHM: 1744.6 km/s (Hβ) and 935.2 km/s (Hα).
+- From the x1d pixel widths (102.45 Å and 74.21 Å), FWHM = 2.221 px and 2.219 px. This matches the 2.2-px
+  element stated by JDox.
+
+(a) Per-line and joint fits, z with its Δχ²=1 interval:
+| estimator | Hβ alone | Hα alone | Hβ+Hα joint |
+|---|---|---|---|
+| LSF-binned Gaussian | 7.03795 [7.03565, 7.04025] | 7.04053 [7.04026, 7.04080] | 7.04050 [7.04022, 7.04077] |
+| point-sampled Gaussian (no LSF binning) | 7.03798 [7.03567, 7.04031] | 7.04053 [7.04026, 7.04081] | 7.04050 [7.04023, 7.04077] |
+| kernel centroid (±2.5 px) | 7.03846 ± 0.00221 | 7.04226 ± 0.00027 | 7.04221 ± 0.00027 (weighted mean) |
+
+Hα dominates. Against 7.0451:
+- The joint LSF fit gives Δz = −0.00460, which is −171 km/s, or −30.2 Å observed at Hα (−0.41 px).
+- The kernel centroid gives Δz = −0.00289, which is −106 km/s, or −0.25 px.
+- Hβ alone is consistent with Hα alone within its ±0.0023 interval.
+
+(b) Hα at the red edge:
+- The Hα peak pixel is at 5.28161 µm. Only 3 valid pixels lie redward of the peak (S/N 37.1, 25.6, 5.2). The last
+  valid pixel is at 5.30382 µm, and the pixels after it are masked.
+- Centroid half-width scan, with z at hw = 1.5/2.0/2.5/3.0/3.5/4.0 px:
+  7.04316 / 7.04452 / 7.04226 / 7.02165 / 7.03533 / 7.03533.
+  So the centroid is not stable against window choice.
+- LSF-fit window scan for Hα, ±6/±9/±12 px: 7.04189 / 7.04106 / 7.04053.
+- Red truncation, keeping 1 or 0 pixels beyond the peak: 7.04007 and 7.04323.
+- Every variant stays below 7.0451. The largest value, 7.04452 (centroid at hw = 2.0 px), is still 0.0006 low.
+
+(c) Injection–recovery (SYNTHETIC, noise-free):
+- Setup: the fitted continuum plus an LSF-binned Gaussian at z_true = 7.0451, placed on the real wavelength grid
+  and mask.
+- LSF fit: recovers z_true with an error of 0 (Hβ) and 0 (Hα), within the 1e-5 grid.
+- Point-sampled fit: errors of +2e-5 (Hβ) and 0 (Hα).
+- Centroid bias for hw = 1.5…4.0 px:
+  - Hβ: −3.10e-3, +2.03e-3, −1.11e-3, +5.2e-4, −2.1e-4, +7e-5.
+  - Hα: −1.6e-4, +1.62e-3, −5.4e-4, −2.07e-3, −4.3e-4, −4.3e-4.
+- What this shows:
+  - Undersampling, LSF binning, the red-edge mask and the window do not bias the Gaussian fits enough to matter.
+  - For the kernel centroid at hw = 2.5 px, the Hα bias is −5.4e-4. That is about 19% of the −0.00289 offset.
+  - The centroid estimator is window-sensitive at the ±2e-3 level. The kernel's centroid z sits closer to the
+    published value than the fits do, and that should not be read as confirmation.
+
+Not explained, so the item stays OPEN. Candidates not tested here:
+- Wavelength-calibration differences between CAL_VER 3.0.0 and the reduction used by Furtak et al. (2023 data,
+  all three lensed images stacked).
+- Intrinsic line asymmetry or non-Gaussian profiles.
+- Source position and compactness in the shutter. The JDox curve assumes a 2.2-px element; a compact source may
+  have a narrower LSF (not tested here).
+
+Numerical sensitivity check, not a claim about the published analysis: using air rather than vacuum rest wavelengths
+(Edlén/Morton conversion) would move the fitted values from 7.04053 to 7.04275 (Hα) and from 7.03795 to 7.04020 (Hβ).
+Hα and Hβ would then disagree by 0.0026.
+
+Tests (tests/fortran/run.sh):
+- zinvest_reproducible
+- zinvest_lsf_file_sha256
+- zinvest_lsf_fwhm_2p2pix
+- zinvest_injection_fit_unbiased

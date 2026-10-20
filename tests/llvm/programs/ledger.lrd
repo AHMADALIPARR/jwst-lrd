@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Ledger append proposal over payload $1 (any unit); emits serialization to $2.
+lrdir 1
+let p : arr<f64> = load($1, "arbitrary")
+let prop : rec = ledger_proposal("0000000000000000000000000000000000000000000000000000000000000000", 1, p)
+print prop
+emit prop $2

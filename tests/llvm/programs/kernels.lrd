@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Residuals and chi-square. $1 obs, $2 model, $3 sigma; outputs $4 residuals, $5 chi2.
+lrdir 1
+let obs : arr<f64> = load($1, "arbitrary")
+let model : arr<f64> = load($2, "arbitrary")
+let sigma : arr<f64> = load($3, "arbitrary")
+let r : arr<f64> = residuals(obs, model)
+let c : f64 = chi2(obs, model, sigma)
+store r $4
+store c $5
+print c

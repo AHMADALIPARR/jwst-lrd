@@ -1,0 +1,82 @@
+SELF SYNTHETIC_vertex field=GF(2) counts=(1) betti=(1) chi=1 altsum=1 incidence_ok=true header_ok=true root=feb1e0ba7d1cc10df79b7622150ffbbbe922956844e3df6b0da786166dc7afa6
+PASS self_incidence_symmetric_SYNTHETIC_vertex
+PASS self_header_matches_root_SYNTHETIC_vertex
+PASS self_euler_poincare_SYNTHETIC_vertex
+PASS self_positions_cover_vertices_SYNTHETIC_vertex
+SELF SYNTHETIC_two_vertices field=GF(2) counts=(2) betti=(2) chi=2 altsum=2 incidence_ok=true header_ok=true root=3cba68aabd36dba18d59b746a6e03cba7a9a3a8eec4dc459efe8e5273b86a822
+PASS self_incidence_symmetric_SYNTHETIC_two_vertices
+PASS self_header_matches_root_SYNTHETIC_two_vertices
+PASS self_euler_poincare_SYNTHETIC_two_vertices
+PASS self_positions_cover_vertices_SYNTHETIC_two_vertices
+SELF SYNTHETIC_edge field=GF(2) counts=(2,1) betti=(1,0) chi=1 altsum=1 incidence_ok=true header_ok=true root=989de48d2ae9e006bd81991cb2029a461428704ce63278c289470ea0fb7682c8
+PASS self_incidence_symmetric_SYNTHETIC_edge
+PASS self_header_matches_root_SYNTHETIC_edge
+PASS self_euler_poincare_SYNTHETIC_edge
+PASS self_positions_cover_vertices_SYNTHETIC_edge
+SELF SYNTHETIC_hollow_triangle field=GF(2) counts=(3,3) betti=(1,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=016e59dca0049b472dd5d6886b558cc68bd65abdf3ddb6709b5fb07b70c8c5d0
+PASS self_incidence_symmetric_SYNTHETIC_hollow_triangle
+PASS self_header_matches_root_SYNTHETIC_hollow_triangle
+PASS self_euler_poincare_SYNTHETIC_hollow_triangle
+PASS self_positions_cover_vertices_SYNTHETIC_hollow_triangle
+SELF SYNTHETIC_filled_triangle field=GF(2) counts=(3,3,1) betti=(1,0,0) chi=1 altsum=1 incidence_ok=true header_ok=true root=0551d2bd0e274b56b0b7133ac2168ee8f6f45f7e59c1b4b8c41ed22390ed378e
+PASS self_incidence_symmetric_SYNTHETIC_filled_triangle
+PASS self_header_matches_root_SYNTHETIC_filled_triangle
+PASS self_euler_poincare_SYNTHETIC_filled_triangle
+PASS self_positions_cover_vertices_SYNTHETIC_filled_triangle
+SELF SYNTHETIC_tetra_boundary field=GF(2) counts=(4,6,4) betti=(1,0,1) chi=2 altsum=2 incidence_ok=true header_ok=true root=e04a47d3c33bcfd57cf5a45076e9e9263edba514ca08adc9f82268b918ee1868
+PASS self_incidence_symmetric_SYNTHETIC_tetra_boundary
+PASS self_header_matches_root_SYNTHETIC_tetra_boundary
+PASS self_euler_poincare_SYNTHETIC_tetra_boundary
+PASS self_positions_cover_vertices_SYNTHETIC_tetra_boundary
+SELF SYNTHETIC_solid_tetra field=GF(2) counts=(4,6,4,1) betti=(1,0,0,0) chi=1 altsum=1 incidence_ok=true header_ok=true root=96c53d6e52358277343f942d4c6f42b5046daf95bc46ee9d112fce9f406b0dcd
+PASS self_incidence_symmetric_SYNTHETIC_solid_tetra
+PASS self_header_matches_root_SYNTHETIC_solid_tetra
+PASS self_euler_poincare_SYNTHETIC_solid_tetra
+PASS self_positions_cover_vertices_SYNTHETIC_solid_tetra
+SELF SYNTHETIC_hollow_square field=GF(2) counts=(4,4) betti=(1,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=b9b3ab153d35bd7f60d455120e441434ffbb83c304d3488fb7e41340ec01886d
+PASS self_incidence_symmetric_SYNTHETIC_hollow_square
+PASS self_header_matches_root_SYNTHETIC_hollow_square
+PASS self_euler_poincare_SYNTHETIC_hollow_square
+PASS self_positions_cover_vertices_SYNTHETIC_hollow_square
+SELF SYNTHETIC_hollow_triangle_relab field=GF(2) counts=(3,3) betti=(1,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=5a0883624f52a6b221ade8ed6dcb9e405d044432bf151ed0fe7c1c62258d7712
+PASS self_incidence_symmetric_SYNTHETIC_hollow_triangle_relab
+PASS self_header_matches_root_SYNTHETIC_hollow_triangle_relab
+PASS self_euler_poincare_SYNTHETIC_hollow_triangle_relab
+PASS self_positions_cover_vertices_SYNTHETIC_hollow_triangle_relab
+SELF SYNTHETIC_rp2_6v field=GF(2) counts=(6,15,10) betti=(1,1,1) chi=1 altsum=1 incidence_ok=true header_ok=true root=7028a3669a449aca908a1ddcae9f78861dc5c95804d1b736cf8c11323d18c4ba
+PASS self_incidence_symmetric_SYNTHETIC_rp2_6v
+PASS self_header_matches_root_SYNTHETIC_rp2_6v
+PASS self_euler_poincare_SYNTHETIC_rp2_6v
+PASS self_positions_cover_vertices_SYNTHETIC_rp2_6v
+SELF SYNTHETIC_torus_7v field=GF(2) counts=(7,21,14) betti=(1,2,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=1ade24dfc483099f9e4cf1f9125b40320a35aa552b819ec3359e5f0b4e0655d3
+PASS self_incidence_symmetric_SYNTHETIC_torus_7v
+PASS self_header_matches_root_SYNTHETIC_torus_7v
+PASS self_euler_poincare_SYNTHETIC_torus_7v
+PASS self_positions_cover_vertices_SYNTHETIC_torus_7v
+SELF SYNTHETIC_torus_grid3x3 field=GF(2) counts=(9,27,18) betti=(1,2,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=7a67e778291ed76fc53d7e917a7e6e2d3a7dbdd567a1fe499041d285ee9ee1d4
+PASS self_incidence_symmetric_SYNTHETIC_torus_grid3x3
+PASS self_header_matches_root_SYNTHETIC_torus_grid3x3
+PASS self_euler_poincare_SYNTHETIC_torus_grid3x3
+PASS self_positions_cover_vertices_SYNTHETIC_torus_grid3x3
+SELF SYNTHETIC_klein_grid4x4 field=GF(2) counts=(16,48,32) betti=(1,2,1) chi=0 altsum=0 incidence_ok=true header_ok=true root=0b4685ed56686468a48e0c6c4f948c201f0b6195b7f961c4c7e3f068b0e1decd
+PASS self_incidence_symmetric_SYNTHETIC_klein_grid4x4
+PASS self_header_matches_root_SYNTHETIC_klein_grid4x4
+PASS self_euler_poincare_SYNTHETIC_klein_grid4x4
+PASS self_positions_cover_vertices_SYNTHETIC_klein_grid4x4
+SELF SYNTHETIC_random_seed20261019 field=GF(2) counts=(24,178,101,4) betti=(1,58,0,0) chi=-57 altsum=-57 incidence_ok=true header_ok=true root=422dfd5fa7115e5badc22f86375256fbbaf5c61e40740a1d3d21b7759bee1121
+PASS self_incidence_symmetric_SYNTHETIC_random_seed20261019
+PASS self_header_matches_root_SYNTHETIC_random_seed20261019
+PASS self_euler_poincare_SYNTHETIC_random_seed20261019
+PASS self_positions_cover_vertices_SYNTHETIC_random_seed20261019
+SELF QUERY faces(2:0,1,2) = 1:1,2 1:0,2 1:0,1
+PASS self_query_faces_filled_triangle
+SELF QUERY cofaces(0:0) = 1:0,1 1:0,2
+PASS self_query_cofaces_vertex0
+PASS self_query_betti_filled_triangle
+SELF QUERY cofaces(1:0,1) in tetra_boundary = 2:0,1,2 2:0,1,3
+PASS self_query_cofaces_tetra_edge
+PASS self_query_betti_tetra_boundary
+PASS self_query_betti_torus_7v
+SELF QUERY empty-key record -> LRD-REC-v1: empty key rejected (CONTRACTS v1.1) at 13
+PASS self_lrdrec_rejects_empty_key
+PASS self_lrdrec_accepts_minimal

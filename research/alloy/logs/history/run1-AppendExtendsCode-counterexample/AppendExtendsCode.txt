@@ -1,0 +1,5 @@
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License. Lines below this header are
+# verbatim stdout+stderr of: nice -n 19 java -jar alloy exec -f -o logs/solutions/GodelLedger/AppendExtendsCode -t text -c AppendExtendsCode GodelLedger.als
+00. check AppendExtendsCode        0    1/1     SAT expects=0
+Error
+  0. 'Check AppendExtendsCode for 5 but 5 int, 4 seq expect 0' was satisfied against expectation

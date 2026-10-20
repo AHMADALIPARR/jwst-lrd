@@ -1,0 +1,17 @@
+# fixture k nnz(d_{k-1} d_k) max|entry|  (exact int64 matmul)
+SYNTHETIC_vertex 2 0 0
+SYNTHETIC_two_vertices 2 0 0
+SYNTHETIC_edge 2 0 0
+SYNTHETIC_hollow_triangle 2 0 0
+SYNTHETIC_filled_triangle 2 0 0
+SYNTHETIC_tetra_boundary 2 0 0
+SYNTHETIC_solid_tetra 2 0 0
+SYNTHETIC_solid_tetra 3 0 0
+SYNTHETIC_hollow_square 2 0 0
+SYNTHETIC_hollow_triangle_relab 2 0 0
+SYNTHETIC_rp2_6v 2 0 0
+SYNTHETIC_torus_7v 2 0 0
+SYNTHETIC_torus_grid3x3 2 0 0
+SYNTHETIC_klein_grid4x4 2 0 0
+SYNTHETIC_random_seed20261019 2 0 0
+SYNTHETIC_random_seed20261019 3 0 0

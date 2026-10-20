@@ -1,0 +1,9 @@
+# torus_7v GF(2) trusted root 1ade24dfc483099f9e4cf1f9125b40320a35aa552b819ec3359e5f0b4e0655d3
+orientation_flip_edge: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,2,1)(UNCHANGED)
+incidence_sign_edge: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,2,1)(UNCHANGED)
+incidence_face_order_edge: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,2,1)(UNCHANGED)
+incidence_face_index_triangle: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,2,1)(UNCHANGED)
+vertex_label_triangle: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,1,0)
+coface_list_vertex: merkle_ok=F struct_ok=F root_ok=T betti_after=(1,2,1)(UNCHANGED)
+orientation_flip_with_recomputed_merkle: merkle_ok=T struct_ok=F root_ok=F
+consistent_reoriented_complex: betti=(1,2,1) merkle_ok=T struct_ok=T root_ok=F root=e7d89a306dbdfef46d0b9182150a3167b2eba9f90e14b597e9470ee38d11a0bc

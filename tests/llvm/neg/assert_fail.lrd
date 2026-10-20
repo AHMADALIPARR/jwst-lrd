@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: assert on a false constraint
+lrdir 1
+let a : arr<f64> = load($1, "um")
+let f : bool = all_finite(a)
+assert f "spectrum must be finite"

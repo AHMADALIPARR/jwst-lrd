@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: variable bound twice
+lrdir 1
+let z : f64 = 1.0
+let z : f64 = 2.0

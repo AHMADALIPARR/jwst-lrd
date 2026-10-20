@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# NEGATIVE TEST: unknown unit conversion
+lrdir 1
+let a : arr<f64> = load($1, "um")
+let b : arr<f64> = convert(a, "um", "parsec")

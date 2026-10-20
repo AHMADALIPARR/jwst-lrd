@@ -1,0 +1,6 @@
+date: 2026-10-19 22:56:44 PDT
+gfortran: GNU Fortran (Debian 14.2.0-19) 14.2.0
+futhark: Futhark 0.25.27.
+gcc (C backend for futhark): gcc (Debian 14.2.0-19) 14.2.0
+kernel: Linux 6.12.94+ x86_64
+self: /workspace/_topology_tools/self-src/build32/vm/Self (objects /workspace/_topology_tools/self-src/objects); source commit abb0d5c 2026-10-15

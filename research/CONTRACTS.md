@@ -1,3 +1,12 @@
+# Charter (Ahmad, 2026-10-19)
+
+1. Preserve observations exactly.
+2. Verify computations independently.
+3. Keep competing explanations alive.
+4. Never confuse mathematical proof with empirical discovery.
+
+Every track and every review is held to these.
+
 # JWST-LRD shared contracts (v1)
 
 Licensed AGPL-3.0 plus the SnapKitty Opaque License. Written by the orchestrator (Hilbert). Change it only through Hilbert.
@@ -63,3 +72,6 @@ Agda mirrors this ABI in `agda/Core/State.agda`. The proof obligations for each 
 - License header text: `AGPL-3.0-only` plus the SnapKitty Opaque License (not -or-later).
 - `new_commit` is the LRD-REC-v1 commitment of the new state record `{commit=<prev_commit>, kind, payload_sha256, seq}`. Kind-specific fields are not part of the state record.
 - A subsystem may expose a wrapper with extra explicit arguments (for example `air_transition(public, inputs, proof)`). The wrapper must reduce to an `lrd_transition_fn` with the context bound.
+- The ledger header `ledger/abi/lrd_state.h` has been on main since 7c0c393 (627fda7). Merge main to pick it up.
+- A branch that Hilbert has re-tested but that has not yet been reviewed goes into the `integration` branch (worktree /workspace/jwst-lrd-integration). It reaches main only after review.
+- v1.2 (2026-10-19): `payload_sha256` for an LRD-ARR-v1 payload is the SHA-256 of the raw `.f64` bytes only, excluding the `.hdr`. Masking is always an explicit, logged step that writes a mask array. Kernels reject non-finite or non-positive sigma rather than masking it silently. License text is AGPL-3.0-only everywhere (Ahmad).

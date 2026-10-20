@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also licensed under the SnapKitty Opaque License; see SNAPKITTY_OPAQUE_LICENSE.md.
+# Pinned toolchain for lrdc (tool|exact first line of the version command).
+clang|/usr/bin/clang --version|Debian clang version 19.1.7 (3+b1)
+llc|/usr/bin/llc --version|Debian LLVM version 19.1.7
+llvm-config|/usr/bin/llvm-config --version|19.1.7
+llvm-as|/usr/bin/llvm-as --version|Debian LLVM version 19.1.7
+opt|/usr/bin/opt --version|Debian LLVM version 19.1.7
