@@ -1,6 +1,26 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
 # Little Red Dots experiment workspace
 
+## Standalone 2D demo
+
+The `/jwst-lrd/demo/` route plays a 30-second MP4 without the VM. Self exports
+720 vector frames at 24 fps, including smooth camera moves into the red-dot
+state, helix, phase wave and archived spectrum. The 1080p video and 4K master
+are independently rasterized from those vectors; the 4K version is not a
+bitmap upscale. Separate SVG detail views preserve subpixel geometry for zoom.
+
+```sh
+SELF_BIN=/path/to/Self SELF_OBJECTS=/path/to/self/objects \
+  sh self/experiment/transport/demo.sh
+```
+
+Outputs are written under `build/out/demo/`: two MP4 files, detail SVGs,
+poster, FFprobe metadata, decode logs and SHA-256 sums. Native Self is required
+only to regenerate the geometry; viewing the finished media needs no VM.
+The exporter retains floating-point coordinates until vector rasterization.
+The model nucleus/helix/wave are illustrative, and the archived spectral
+samples are observational. A geometry zoom does not increase JWST resolution.
+
 ## Live browser route
 
 `/jwst-lrd/live/` embeds a running Self/Morphic process on the NUC through
