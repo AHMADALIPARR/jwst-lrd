@@ -23,13 +23,37 @@ proof layer over them.
 
 | label | statement | C source certified | Coq | Liquid Haskell |
 |---|---|---|---|---|
-| THM-AIR-FP-ADD-001 | fp_add(a,b) = (a+b) mod p, canonical, for canonical a,b | air/include/air/field.h fp_add | PROVED (fp_add_correct) | pending toolchain |
-| THM-AIR-FP-SUB-002 | fp_sub(a,b) = (a−b) mod p, canonical | air/include/air/field.h fp_sub | PROVED (fp_sub_correct) | pending toolchain |
-| THM-AIR-FP-NEG-003 | fp_neg(a) = (−a) mod p, canonical | air/include/air/field.h fp_neg | PROVED (fp_neg_correct) | pending toolchain |
-| THM-AIR-FP-RED128-004 | fp_reduce128(x) = x mod p, canonical, for all x < 2^128 | air/include/air/field.h fp_reduce128 | PROVED (fp_reduce128_correct) | pending toolchain |
-| THM-AIR-FP-MUL-005 | fp_mul(a,b) = (a·b) mod p, canonical | air/include/air/field.h fp_mul | PROVED (fp_mul_correct) | pending toolchain |
+| THM-AIR-FP-ADD-001 | fp_add(a,b) = (a+b) mod p, canonical, for canonical a,b | air/include/air/field.h fp_add | PROVED (fp_add_correct) | PROVED (refined type of fpAdd) |
+| THM-AIR-FP-SUB-002 | fp_sub(a,b) = (a−b) mod p, canonical | air/include/air/field.h fp_sub | PROVED (fp_sub_correct) | PROVED (refined type of fpSub) |
+| THM-AIR-FP-NEG-003 | fp_neg(a) = (−a) mod p, canonical | air/include/air/field.h fp_neg | PROVED (fp_neg_correct) | PROVED (refined type of fpNeg) |
+| THM-AIR-FP-RED128-004 | fp_reduce128(x) = x mod p, canonical, for all x < 2^128 | air/include/air/field.h fp_reduce128 | PROVED (fp_reduce128_correct) | PROVED (refined type of fpReduce128) |
+| THM-AIR-FP-MUL-005 | fp_mul(a,b) = (a·b) mod p, canonical | air/include/air/field.h fp_mul | PROVED (fp_mul_correct) | PROVED (refined type of fpMul) |
 
-p = 2^64 − 2^32 + 1 (Goldilocks). All five Coq theorems verified with
+p = 2^64 − 2^32 + 1 (Goldilocks).
+
+## Liquid Haskell layer (2026-10-20)
+
+Checked with Liquid Haskell 0.9.6.3 (GHC 9.6.6) + Z3 4.8.12, plugin
+invoked directly (no `liquid` CLI in this build):
+`ghc -fplugin=LiquidHaskell -package liquidhaskell -c <file>`, z3 on
+PATH.
+
+- `haskell/theorems/AirField.hs` — the five THM-AIR-FP-* statements
+  as refined types of the operations: **LIQUID: SAFE, 70 constraints
+  checked**. Same Z-model as the Coq file (LH's logic treats Int as
+  unbounded); constants assembled from 2^32 and pinned to their true
+  literals by a machine-checked canary (constantsOk) — see the file
+  header for why.
+- `haskell/growth/GrowthClassify.hs` — the Curry growth classifier
+  refined (LH-GR-1 counterexampleSound, LH-GR-2 membership, LH-GR-3
+  simpleComplete, LH-GR-4 gapChar/gapCharRev, LH-GR-5 benchmarkHeavy):
+  **LIQUID: SAFE, 20 constraints checked**. Theorems are proved on
+  the bit-vector form of the classification; the list API is a
+  definitional projection of it (disclosed in the file header).
+
+The runtimes are unchanged: Liquid Haskell is a proof layer over
+the Fortran solver, the Curry classifier and the C code, exactly as
+the Coq layer is. All five Coq theorems verified with
 `Print Assumptions`: **closed under the global context** — no axioms,
 no admits (Coq 8.18.0). The Coq definitions model the C line by line
 over Z, uint64 wraparound written as (mod 2^64); inputs are canonical
