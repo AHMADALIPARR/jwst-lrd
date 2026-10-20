@@ -18,7 +18,7 @@ Licensed AGPL-3.0 plus the SnapKitty Opaque License. Maintained by Hilbert, the 
 | 009 AIR/STARK | Alapeno RTL / t009-air | not yet received | - |
 | 011 Agda core | HCALC Lean / t011-agda | not yet received | - |
 | 012 Curry engine | HCALC Spec / t012-curry | not yet received | - |
-| 013 Futhark | Foundry J Core / agent2-futhark | not yet received | - |
+| 013 Futhark | Foundry J Core / agent2-futhark | in review (HCALC Alloy); repairs assigned | head 1a9dd6e: Hilbert re-ran tests/futhark/run.sh, pass=58 fail=0 unavailable=2 (fortran-ref-diff-x1d, fortran-diff) |
 | 013 MATLAB/SAS | Foundry J Verify | not yet received | expected UNAVAILABLE (licensed) |
 | 014 LRD-IR/LLVM + validation | Alapeno Silicon / t014-llvm | not yet received | - |
 | 015 Self/Morphic | Grok Bot / t015-self | not yet received | - |
@@ -47,4 +47,6 @@ None recorded yet.
 None recorded yet.
 
 ## Real observation identifiers
-None ingested yet.
+Ingested on t001-ingest-fortran, not merged yet. Both products come from the MAST cone search at the cited QSO1 Image A position (Furtak et al. 2023, ApJ 952, 142, Table 1); the header-coordinate check is still pending.
+- jw02561-o002_s000013123_nirspec_clear-prism_x1d.fits: obsid 300843505, 10941120 bytes, sha256 09bcd9077647ebf4fdaa766807de832bf6a94b92e3ed73fdb8a3c0281ae50c31, CAL_VER 3.0.0, DATE-OBS 2023-07-31
+- jw02561-o006_s000024175_nirspec_clear-prism_x1d.fits: obsid 230168921, 6347520 bytes, sha256 c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7
