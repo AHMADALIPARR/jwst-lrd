@@ -61,3 +61,5 @@ Agda mirrors this ABI in `agda/Core/State.agda`. The proof obligations for each 
 - Added decision reason tokens: `malformed`, `wrong_kind`, `bad_payload`, `bad_epoch`, `epoch_exhausted`.
 - Hamiltonian step check order is normative: `epoch_exhausted`, then `infeasible`, then the energy check.
 - License header text: `AGPL-3.0-only` plus the SnapKitty Opaque License (not -or-later).
+- `new_commit` is the LRD-REC-v1 commitment of the new state record `{commit=<prev_commit>, kind, payload_sha256, seq}`. Kind-specific fields are not part of the state record.
+- A subsystem may expose a wrapper with extra explicit arguments (for example `air_transition(public, inputs, proof)`). The wrapper must reduce to an `lrd_transition_fn` with the context bound.
