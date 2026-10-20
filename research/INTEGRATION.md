@@ -12,9 +12,9 @@ Licensed AGPL-3.0 plus the SnapKitty Opaque License. Maintained by Hilbert, the 
 | 005 RSA accumulator | Foundry J Verify / t005-rsaacc | not yet received | - |
 | 006 causal | HCALC Alloy / t006-causal (review: HCALC Spec) | not yet received | - |
 | 007 topology/homology | HCALC Alloy / t-topology (review: HCALC Spec) | not yet received | - |
-| 010 capabilities + verifier | HCALC Alloy / t010-capability (review: HCALC Lean) | not yet received | - |
+| 010 capabilities + verifier | HCALC Alloy / t010-capability (review: HCALC Lean) | in review; canonical over reverted a0873f6 | head 0323cbc: agent reports 67 PASS; Hilbert re-run in progress. Rust, not in the stated stack (rationale requested) |
 | 011 Agda kernel | HCALC Alloy / t011-agda-kernel (review: HCALC Lean) | not yet received | - |
-| 008 Hamiltonian | Foundry J Verify / t008-hamiltonian | not yet received | - |
+| 008 Hamiltonian | Foundry J Verify / t008-hamiltonian | in review (HCALC Alloy) | head c67266f: Hilbert re-ran tests/hamiltonian/run.sh, 40 PASS |
 | 009 AIR/STARK | Alapeno RTL / t009-air | not yet received | - |
 | 011 Agda core | HCALC Lean / t011-agda | not yet received | - |
 | 012 Curry engine | HCALC Spec / t012-curry | not yet received | - |

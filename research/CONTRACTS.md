@@ -55,3 +55,9 @@ The decision is an LRD-REC-v1 record:
 Rejection never constructs a new state. The C header lives at `ledger/abi/lrd_state.h` and is owned by the ledger track. Other tracks include it and do not fork it.
 
 Agda mirrors this ABI in `agda/Core/State.agda`. The proof obligations for each kind are listed in `agda/OBLIGATIONS.md`, which the Agda track owns and other tracks contribute entries to through Hilbert.
+
+## Amendments (v1.1, Hilbert, 2026-10-19)
+- Empty LRD-REC-v1 keys are rejected.
+- Added decision reason tokens: `malformed`, `wrong_kind`, `bad_payload`, `bad_epoch`, `epoch_exhausted`.
+- Hamiltonian step check order is normative: `epoch_exhausted`, then `infeasible`, then the energy check.
+- License header text: `AGPL-3.0-only` plus the SnapKitty Opaque License (not -or-later).
