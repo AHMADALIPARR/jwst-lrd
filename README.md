@@ -87,6 +87,7 @@ Test counts below are from independent re-runs:
 | `research/INTEGRATION.md` | Integration log: verified heads, build commands, test counts |
 | `research/BLIND-PROTOCOL.md` | Blind four-model analysis of the QSO1 spectrum |
 | `research/MISSION-QSO1-DCBH-001.md` | Black-hole seed and growth-history study |
+| `research/CITATIONS.md` | Retrieved papers with DOIs/arXiv IDs (starting with Juodžbalis et al. 2026) |
 | `research/assets/` | Illustrations, not data |
 
 Each subsystem is developed on its own branch and merged to `main` after independent re-test and review.
