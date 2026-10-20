@@ -84,7 +84,7 @@ decide : Model → Cfg → EState → Bytes → Decision          [ham_decide]
 decision and nothing constructed; this is outside `decide` — model it as
 `Err ⊎ Decision` if desired.)
 
-`decide M Cfg σ p` checks in this exact order and returns the first failure:
+**Normative (ratified by the coordinator, 2026-10-19):** `decide M Cfg σ p` checks in this exact order and returns the first failure. In particular, for `step`, `epoch_exhausted` (row 8) is checked before `infeasible` (row 9), which is checked before `energy_not_decreasing` (row 10). Implementations and proofs must preserve this order; H-9 depends on it.
 
 | # | condition (failure) | reason |
 |---|---|---|

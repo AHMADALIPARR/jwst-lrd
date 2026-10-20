@@ -83,18 +83,13 @@ There is no ctest target; testing is make + run.sh only.
 - No Agda proofs: this track does not own agda/, so it supplies obligations only.
 
 ## Open issues
-1. **Extra reason tokens.** CONTRACTS.md v1 names `ok, stale_seq, bad_prev, energy_not_decreasing, infeasible`, and both CONTRACTS.md and the ledger header
-   allow further tokens. This engine also emits `epoch_exhausted` (from the owner spec), `malformed`, `wrong_kind`, `bad_payload` and `bad_epoch`.
-   Hilbert needs to ratify these.
-2. **Track-defined formats.** The kind-specific proposal fields (`op`, `assign`, `epoch`) and the payload and model record formats
-   (`LRD-HAM-PAYLOAD-v1`, `LRD-HAM-MODEL-v1`) are defined by this track. payload_sha256 is plain SHA-256 of the payload record bytes, without
-   the commit-domain prefix, because CONTRACTS.md does not say which applies.
-3. **Check order.** For steps, `epoch_exhausted` is checked before `infeasible` and the energy check (the budget gate comes first).
-   This is documented in OBLIGATIONS.md §1.6 and needs the owner's confirmation.
+1. **Extra reason tokens (RESOLVED 2026-10-19).** `malformed`, `wrong_kind`, `bad_payload`, `bad_epoch` and `epoch_exhausted` were ratified by the coordinator and are being added to CONTRACTS.md.
+2. **Track-defined formats (RESOLVED 2026-10-19).** The proposal fields `op`/`assign`/`epoch`, `LRD-HAM-PAYLOAD-v1`, `LRD-HAM-MODEL-v1`, and `payload_sha256` as plain SHA-256 of the payload bytes (no commit-domain prefix) were accepted as track-defined.
+3. **Check order (RESOLVED 2026-10-19).** epoch_exhausted, then infeasible, then the energy check was accepted and is now marked normative in OBLIGATIONS.md §1.6.
 4. **SAT cost.** SAT is exhaustive backtracking, exponential in the worst case, with a node limit (default 10^7). Large models get
    `search_limit`, never a guessed answer.
 5. **Stray log.** `tests/hamiltonian/logs/20261019T223711-0700.log` is untracked and was not created by this track's agent. Another process ran run.sh
-   on the pre-rebase commit d694bc4. It was left in place and not committed.
+   on the pre-rebase commit d694bc4. It was left in place and not committed. Per the coordinator it stays untracked and is never committed.
 6. Waiting on the HCALC Alloy review.
 
 ## Verbatim output of `tests/hamiltonian/run.sh` (final run)
