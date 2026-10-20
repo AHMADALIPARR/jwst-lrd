@@ -11,6 +11,13 @@
   check value: 'morphic_grid_1200' With: m grid nRows = 1200.
   check value: 'morphic_benchmark' With: ((m seedFor: m selectedRow) > 480.0) &&
     [(m seedFor: m selectedRow) < 525.0].
+  check value: 'morphic_benchmark_100_seed_excluded' With: (m seedReachesTarget: 100.0) not.
+  check value: 'morphic_benchmark_1000_seed_reaches' With: (m seedReachesTarget: 1000.0).
+  check value: 'morphic_benchmark_final_mass' With: ((m finalMassForSeed: 100.0) > 9900000.0) &&
+    [(m finalMassForSeed: 100.0) < 10000000.0].
+  m cycleLambda.
+  check value: 'morphic_higher_rate_rescues_light_seed' With: (m seedReachesTarget: 100.0).
+  m reset.
   6 do: [
     5 do: [
       8 do: [

@@ -44,6 +44,14 @@ lobby _AddSlots: (|
     seedKey = ( saturated ifTrue: 'seed_sat' False: 'seed_simple' ).
     feasibleKey = ( saturated ifTrue: 'feas_sat' False: 'feas_simple' ).
     seedFor: r = ( r at: seedKey ).
+    targetMass = ( grid floatFromES: (grid header at: 'm_target_msun') ).
+    selectedLogFactor = ( targetMass base10Log - (seedFor: selectedRow) base10Log ).
+    finalMassForSeed: seed = ( seed * (targetMass / (seedFor: selectedRow)) ).
+    seedReachesTarget: seed = ( seed >= (seedFor: selectedRow) ).
+    growthConclusion = (
+      (seedReachesTarget: 100.0)
+        ifTrue: '100 Msun seed REACHES target for this tuple.'
+        False: '100 Msun seed EXCLUDED for this tuple.' ).
     rowIsFeasible: r = ( (r at: feasibleKey) = 1.0 ).
     sliceRows = ( | r |
       r: list copyRemoveAll.

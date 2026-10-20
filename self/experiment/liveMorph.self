@@ -77,25 +77,40 @@ lrdLiveMorph _AddSlots: (|
     a: ((t * 5.0) * model sphere pi) + phase + offset.
     (1105 + (a cos * 165.0) asInteger) @
       (270 + (t * 390.0) asInteger + (a sin * 28.0) asInteger) ).
-  drawHelix: cv = ( | previousA. previousB. a. b |
-    panelAt: (830 @ 145) Extent: (565 @ 655) Title: '03 / LIVE HELIX   -   MODEL PHASE GEOMETRY' On: cv.
-    previousA: nil. previousB: nil.
-    161 do: [|:i|
-      a: helixPoint: i Offset: 0.0.
-      b: helixPoint: i Offset: model sphere pi.
-      ((i % 8) = 0) ifTrue: [ lineFrom: a To: b On: cv Color: muted ].
-      previousA isNil ifFalse: [
-        lineFrom: previousA To: a On: cv Color: accent.
-        lineFrom: previousB To: b On: cv Color: ember ].
-      previousA: a. previousB: b ].
-    cv fillCircleCenteredAt: baseBounds origin + (helixPoint: tick % 161 Offset: 0.0) Diameter: 10 Color: ink.
-    text: 'Self computes each frame from an integer phase state.' At: (850 @ 720) On: cv.
-    text: ('frame phase=', tick printString, ' | ', (playing ifTrue: 'RUNNING' False: 'PAUSED')) At: (850 @ 745) On: cv.
-    text: 'A model visualization; not observed red-dot morphology.' At: (850 @ 775) On: cv ).
+  growthPointFor: seed Progress: t = ( | lg |
+    lg: seed base10Log + (model selectedLogFactor * t).
+    (885 + (t * 460.0) asInteger) @
+      (625 - ((lg - 1.0) * 38.4) asInteger) ).
+  drawHelix: cv = ( | previous. p. col. targetY |
+    panelAt: (830 @ 145) Extent: (565 @ 655) Title: '03 / SOLVED GROWTH CONSTRAINT' On: cv.
+    text: 'Mass [Msun, log scale] versus elapsed growth time' At: (850 @ 203) On: cv.
+    (1 & 3 & 5 & 7 & 9 & 11) asVector do: [|:lg. y|
+      y: (625 - ((lg - 1) asFloat * 38.4)) asInteger.
+      lineFrom: (885 @ y) To: (1345 @ y) On: cv Color: muted.
+      text: ('10^', lg printString) At: (844 @ y) On: cv ].
+    targetY: 625 - ((model targetMass base10Log - 1.0) * 38.4) asInteger.
+    lineFrom: (885 @ targetY) To: (1345 @ targetY) On: cv Color: ink.
+    text: '50 million target' At: (1120 @ (targetY - 8)) On: cv.
+    (100.0 & 1000.0 & 100000.0) asVector do: [|:seed|
+      previous: nil. col: accent. seed = 100.0 ifTrue: [ col: ember ].
+      101 do: [|:i|
+        p: growthPointFor: seed Progress: i asFloat / 100.0.
+        ((p y >= 241) && [p y <= 625]) ifTrue: [
+          previous isNil ifFalse: [ lineFrom: previous To: p On: cv Color: col ].
+          previous: p ] False: [ previous: nil ] ].
+      p: growthPointFor: seed Progress: tick asFloat / 255.0.
+      ((p y >= 241) && [p y <= 625]) ifTrue: [
+        cv fillCircleCenteredAt: baseBounds origin + p Diameter: 9 Color: col ] ].
+    text: 'Seeds: red=100; cyan=1000 and 100000 Msun' At: (850 @ 654) On: cv.
+    text: ('Minimum seed=', (model seedFor: model selectedRow) printString) At: (850 @ 680) On: cv.
+    text: model growthConclusion At: (850 @ 706) On: cv.
+    text: 'ln(M/Mseed) - rate*t = 0 for constant-rate growth.' At: (850 @ 732) On: cv.
+    text: 'Agda: no mass loss / composition / factor monotonicity.' At: (850 @ 756) On: cv.
+    text: 'This tuple constrains growth; it does not identify origin.' At: (850 @ 780) On: cv ).
   baseDrawOn: cv = ( | r |
     cv fillRectangle: baseBounds Color: background.
     text: 'L R D  /  LIVE SELF-MORPHIC OBSERVATORY' At: (24 @ 32) On: cv.
-    text: 'ABELL 2744-QSO1  |  archived spectrum + animated model geometry  |  native Self frames'
+    text: 'ABELL 2744-QSO1  |  archived spectrum + computed growth constraints  |  native Self frames'
       At: (24 @ 61) On: cv.
     drawObservedWave: cv. drawRedDot: cv. drawHelix: cv.
     panelAt: (24 @ 820) Extent: (1371 @ 130) Title: 'INVARIANTS / PROVENANCE' On: cv.

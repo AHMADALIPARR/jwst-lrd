@@ -1,5 +1,9 @@
 PASS morphic_grid_1200
 PASS morphic_benchmark
+PASS morphic_benchmark_100_seed_excluded
+PASS morphic_benchmark_1000_seed_reaches
+PASS morphic_benchmark_final_mass
+PASS morphic_higher_rate_rescues_light_seed
 PASS morphic_all_1200_selectors_resolve
 PASS morphic_model_changes_seed_field
 PASS morphic_ui_preserves_commitment

@@ -1,6 +1,20 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
 # Little Red Dots experiment workspace
 
+## Computed growth conclusion
+
+The live view now plots selected growth histories, marks the target, and
+computes whether a 100-solar-mass seed reaches it. Controls change the
+constraint result. The former right-hand decorative helix is replaced by
+this calculation. The archived spectrum and illustrative phase panel remain
+separately identified.
+
+Run `sh tests/morphic/results.sh` for an independent analytic-clock/RK4
+check of all 1,200 stored rows and explicit competing-history counterexamples.
+Read [the result and invariant inventory](../../research/QSO1-GROWTH-RESULT.md).
+The standalone earlier MP4 remains a geometry demonstration; it is not
+evidence for physical red-dot structure.
+
 ## Standalone 2D demo
 
 The `/jwst-lrd/demo/` route plays a 30-second MP4 without the VM. Self exports
