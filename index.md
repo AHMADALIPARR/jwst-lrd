@@ -5,6 +5,12 @@ title: Little Red Dots Experiment
 
 # Observations. Hypotheses. Invariants.
 
+## [Read the computed growth result →](results/)
+
+Which seeds reach QSO1's declared mass benchmark? Actual growth curves,
+an independently tested invariant, exclusions and competing-history
+counterexamples. The earlier geometry video does not establish morphology.
+
 ## [Watch the crisp 2D demo →](demo/)
 
 Thirty seconds of Self-generated vector geometry with red-dot, helix and
@@ -13,8 +19,8 @@ waveform close-ups. Plays directly in the browser without the VM, with a
 
 ## [Open the live Self / Morphic route →](live/)
 
-On the NUC, this route embeds the running native renderer: archived waveform,
-animated helix, phase wave and red-dot state. It connects only to localhost;
+On the NUC, this route embeds the running native renderer: archived spectrum,
+computed growth constraints, phase wave and red-dot state. It connects only to localhost;
 allow this-device access if the browser asks. The controls operate the Self
 process, and no public remote-control tunnel is enabled.
 

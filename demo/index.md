@@ -11,6 +11,7 @@ title: Little Red Dots — 2D Demo
 <header style="padding:24px 4% 18px">
 <h1 style="margin:0;font-size:clamp(24px,3vw,42px);font-weight:500">LITTLE RED DOTS <span style="color:#56e0ea">/ SELF 2D</span></h1>
 <p style="color:#a6b7cb">30 seconds · native vector geometry · red-dot, helix and waveform close-ups · plays without the VM</p>
+<p><a style="color:#56e0ea" href="../results/">See the computed growth result, tested invariant and competing-history counterexamples →</a></p>
 </header>
 <video controls playsinline muted preload="metadata" poster="../demo-poster.png" style="display:block;width:100%;background:#080d18">
 <source src="../Self-Morphic-LRD-2D-Demo.mp4" type="video/mp4">

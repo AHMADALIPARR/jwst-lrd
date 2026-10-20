@@ -1,0 +1,20 @@
+QSO1 COMPUTED GROWTH CONSTRAINTS
+Declared benchmark: Mtarget=5e7 Msun; zobs=7.04221; zform=20; epsilon=0.1; duty=1; lambda=1.
+Flat matter+Lambda cosmology H0=67.36, Om=.3153, Ol=.6847; radiation neglected.
+Available growth time: 576.058867350 Myr
+Eddington time: 450.490412230 Myr
+Growth exponent: 11.508635179329
+Minimum seed (continuous numerical model): 502.149751046 Msun
+100 Msun seed final mass: 9957189.043827308 Msun (EXCLUDED for benchmark tuple)
+1000 Msun seed final mass: 99571890.448693246 Msun (REACHES target)
+100 Msun seed required lambda, simple: 1.140218902844
+100 Msun seed required lambda, saturation prescription: 1.150525624625
+Minimum seed at duty .5: 158453.423921052 Msun
+Minimum seed at duty .25: 2814723.999978082 Msun
+Max log-growth invariant residual over 2000 RK4 steps: 1.04646957766e-10
+Independent analytic-clock comparison: 1200 rows; max relative seed difference 4.76011063899e-09
+Grid feasibility labels changed by saturation: 82 (grid counts are not probabilities).
+CONCLUSION: a 100 Msun seed fails under the benchmark Eddington tuple, but reaches the same target at the computed higher rate. These constraints do not uniquely require heavy-seed or primordial formation.
+Agda: Growth.grow-no-loss, grow-compose, factor-mono, sufficient and Benchmark.cert prove rational model statements. The separate 9000 Msun certificate is conservative and its continuous interpretation requires A-GR-1.
+The numerical 502-ish threshold above is NOT an Agda-certified floating-point error interval.
+No dynamical-mass fit, uncertainty inference, gas-supply bound or likelihood comparison is performed.
