@@ -1,0 +1,119 @@
+# hamiltonian run.sh  log=/workspace/jwst-lrd-t008/tests/hamiltonian/logs/20261019T223948-0700.log
+# date: 2026-10-19 22:39:48 PDT
+# git: t008-hamiltonian 36db32a1a56ddf67b894a0cfda3895d50bac6bd6
+# gcc: gcc (Debian 14.2.0-19) 14.2.0
+# clang: Debian clang version 19.1.7 (3+b1)
+# make: GNU Make 4.4.1
+# valgrind: valgrind-3.24.0
+# gmp: libgmp-dev 2:6.3.0+dfsg-3
+# abi header: ledger/abi/lrd_state.h sha256=563d0ea4bc82442f302be397721e26697916efccff8d4f194d190d3b4f515920 last-commit=627fda7
+PASS ledger_abi_header
+PASS no_float_in_engine
+PASS no_py_ts_js
+PASS build_gcc_c17_werror
+PASS sha256_fips_vectors
+PASS rec_canonical_bytes
+PASS rec_commit_matches_sha256sum
+PASS rec_parse_rejects_noncanonical
+PASS rational_canonical_forms
+PASS energy_exact_model_a
+PASS soft_constraints_energy
+PASS satisfiable
+PASS unsatisfiable
+PASS conflict_report_irreducible
+PASS conflict_single_empty_constraint
+PASS search_limit_explicit
+PASS genesis_infeasible_no_state
+PASS genesis_state_fields
+PASS valid_descent_accepted
+PASS equal_energy_rejected
+PASS energy_increasing_rejected
+PASS infeasible_transition_rejected
+PASS epoch_exhausted
+PASS epoch_transition_explicit
+PASS envelope_rejects
+PASS replay_rejected
+PASS reject_never_constructs_state
+PASS determinism_bytes
+PASS script_expected_reasons
+PASS exact_thirds_equal
+PASS exact_tenths_double_would_accept
+PASS exact_huge_values
+PASS model_commit_binds
+PASS abi_adapter_ledger_header
+PASS reason_tokens_abi_conformant
+# SUMMARY pass=31 fail=0 unavailable=0
+PASS build_clang_c17_werror
+#   PASS sha256_fips_vectors
+#   PASS rec_canonical_bytes
+#   PASS rec_commit_matches_sha256sum
+#   PASS rec_parse_rejects_noncanonical
+#   PASS rational_canonical_forms
+#   PASS energy_exact_model_a
+#   PASS soft_constraints_energy
+#   PASS satisfiable
+#   PASS unsatisfiable
+#   PASS conflict_report_irreducible
+#   PASS conflict_single_empty_constraint
+#   PASS search_limit_explicit
+#   PASS genesis_infeasible_no_state
+#   PASS genesis_state_fields
+#   PASS valid_descent_accepted
+#   PASS equal_energy_rejected
+#   PASS energy_increasing_rejected
+#   PASS infeasible_transition_rejected
+#   PASS epoch_exhausted
+#   PASS epoch_transition_explicit
+#   PASS envelope_rejects
+#   PASS replay_rejected
+#   PASS reject_never_constructs_state
+#   PASS determinism_bytes
+#   PASS script_expected_reasons
+#   PASS exact_thirds_equal
+#   PASS exact_tenths_double_would_accept
+#   PASS exact_huge_values
+#   PASS model_commit_binds
+#   PASS abi_adapter_ledger_header
+#   PASS reason_tokens_abi_conformant
+#   # SUMMARY pass=31 fail=0 unavailable=0
+PASS clang_suite
+# clang_suite: 31 tests passed, 0 failed, exit 0
+PASS build_asan_ubsan
+#   PASS sha256_fips_vectors
+#   PASS rec_canonical_bytes
+#   PASS rec_commit_matches_sha256sum
+#   PASS rec_parse_rejects_noncanonical
+#   PASS rational_canonical_forms
+#   PASS energy_exact_model_a
+#   PASS soft_constraints_energy
+#   PASS satisfiable
+#   PASS unsatisfiable
+#   PASS conflict_report_irreducible
+#   PASS conflict_single_empty_constraint
+#   PASS search_limit_explicit
+#   PASS genesis_infeasible_no_state
+#   PASS genesis_state_fields
+#   PASS valid_descent_accepted
+#   PASS equal_energy_rejected
+#   PASS energy_increasing_rejected
+#   PASS infeasible_transition_rejected
+#   PASS epoch_exhausted
+#   PASS epoch_transition_explicit
+#   PASS envelope_rejects
+#   PASS replay_rejected
+#   PASS reject_never_constructs_state
+#   PASS determinism_bytes
+#   PASS script_expected_reasons
+#   PASS exact_thirds_equal
+#   PASS exact_tenths_double_would_accept
+#   PASS exact_huge_values
+#   PASS model_commit_binds
+#   PASS abi_adapter_ledger_header
+#   PASS reason_tokens_abi_conformant
+#   # SUMMARY pass=31 fail=0 unavailable=0
+PASS asan_ubsan_suite
+# asan_ubsan_suite: 31 tests passed, 0 failed, exit 0
+#   ==1426755== All heap blocks were freed -- no leaks are possible
+#   ==1426755== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+PASS valgrind_memcheck
+# runner: fails=0
