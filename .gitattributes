@@ -1,0 +1,8 @@
+# Length-prefixed records and observational arrays must retain committed bytes.
+fixtures/** -text
+self/topology/geometry/** -text
+self/**/*.self text eol=lf
+agda/**/*.agda text eol=lf
+tests/morphic/** text eol=lf
+tests/morphic/evidence/*.png -text
+tests/morphic/evidence/*.rec -text

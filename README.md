@@ -59,6 +59,14 @@ Licensed AGPL-3.0-only plus the SnapKitty Opaque License (see `LICENSE` and `SNA
 
 ## Build and test
 
+### Interactive Self/Morphic experiment
+
+The [native experiment workspace](self/experiment/README.md) connects the
+archived QSO1 spectrum, all 1,200 growth-grid rows, synthetic topology
+invariants and the bounded state projection. It includes executable Agda
+and GUI checks, recorded proof boundaries, and actual Morphic screenshots.
+
+
 ```sh
 git clone https://github.com/AHMADALIPARR/jwst-lrd.git && cd jwst-lrd
 git checkout <branch>

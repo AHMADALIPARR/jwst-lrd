@@ -30,8 +30,7 @@ open import Data.Nat using (ℕ; suc)
 import Data.Nat.Properties as ℕP
 open import Data.Fin using (Fin) renaming (zero to fz)
 import Data.Fin.Properties as FinP
-open import Data.Vec using (Vec; replicate)
-import Data.Vec.Properties as VecP
+open import Data.Vec.Base using (Vec; replicate; []; _∷_)
 open import Data.List using (List)
 open import Data.String using (String)
 open import Data.Product using (_×_; _,_; Σ; ∃)
@@ -46,8 +45,15 @@ Hex = Fin 16
 Digest : Set
 Digest = Vec Hex 64
 
+hex-vector-equality : ∀ {n} (a b : Vec Hex n) → Dec (a ≡ b)
+hex-vector-equality [] [] = yes refl
+hex-vector-equality (x ∷ xs) (y ∷ ys) with FinP._≟_ x y | hex-vector-equality xs ys
+... | yes refl | yes refl = yes refl
+... | no x≢y   | _ = no (λ { refl → x≢y refl })
+... | yes _    | no xs≢ys = no (λ { refl → xs≢ys refl })
+
 _≟d_ : (a b : Digest) → Dec (a ≡ b)
-_≟d_ = VecP.≡-dec FinP._≟_
+_≟d_ = hex-vector-equality
 
 -- "64 zeros": the genesis commit
 zeros : Digest

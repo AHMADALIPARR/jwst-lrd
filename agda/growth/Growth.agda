@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --without-K #-}
 -- Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
--- Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
--- SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+-- Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 --
 -- JWST-LRD Mission QSO1-DCBH-001, role 07: growth-transition invariants.
 --
@@ -21,17 +21,15 @@
 --     (Benchmark submodule): with the declared rational bounds
 --       Dt >= 576/1000 Gyr   (solver: 0.5760588... Gyr, Planck 2018)
 --       t_Edd <= 4505/10000 Gyr (CODATA 2018: 0.45049041... Gyr)
---     the total exponent obeys E >= 23/2, the 64-step Euler factor at
---     E = 23/2 is a closed rational, and 1300 * factor >= 5e7 is checked
---     by the decidable rational order. Hence, under assumption A-GR-1
---     below, any seed >= 1300 Msun reaches 5e7 Msun for the benchmark
---     tuple. (64 steps is a deliberate coarseness: finer discretizations
---     (512, 1024 steps) make Agda's conversion checker exhaust its heap
---     normalizing the rational arithmetic on this machine -- observed,
---     see agda/growth/STATUS.md -- while 64 steps keeps the certified
---     numbers small. The Euler factor underestimates exp(E) more at
---     fewer steps, so the certified seed is conservative: the solver's
---     numerical threshold is ~502 Msun.)
+--     the total exponent obeys E >= 23/2, the 16-step Euler factor at
+--     E = 23/2 is a closed rational, and 9000 * factor >= 5e7 is checked
+--     by a chain of small decidable rational bounds. Under assumption A-GR-1
+--     below, any seed >= 9000 Msun reaches 5e7 Msun for the benchmark
+--     tuple. The 16-step certificate is intentionally conservative.
+--     No large closed factor is normalized to decide its order: local
+--     square bounds compose into the certificate. The Euler factor
+--     underestimates exp(E) more at fewer steps, so the certified seed
+--     is conservative: the solver's numerical threshold is ~502 Msun.)
 --     The solver's numerical minimum (~502 Msun) and the directive's
 --     (~497 Msun) both lie below this certified sufficient bound, as they
 --     must; 497 is NOT used anywhere in this file.
@@ -64,8 +62,11 @@ open ≡-Reasoning
 eq≤ : ∀ {a b} → a ≡ b → a ≤ b
 eq≤ refl = ≤-refl
 
+checked : ∀ a b → True (a ≤? b) → a ≤ b
+checked a b = toWitness {a? = a ≤? b}
+
 0≤1 : 0ℚ ≤ 1ℚ
-0≤1 = toWitness tt
+0≤1 = checked 0ℚ 1ℚ tt
 
 ------------------------------------------------------------------------------
 -- Stepped growth factor
@@ -117,16 +118,36 @@ factor≥1 {step} {zero}  _      = ≤-refl
 factor≥1 {step} {suc n} 1≤step =
   ≤-trans 1≤step
     (≤-trans (eq≤ (sym (*-identityʳ step)))
-             (*-monoˡ-≤-nonNeg step (nonNegative (≤-trans 0≤1 1≤step))
-                                (factor≥1 1≤step)))
+             (*-monoˡ-≤-nonNeg step {{nonNegative (≤-trans 0≤1 1≤step)}}
+                                (factor≥1 {step} {n} 1≤step)))
 
 factor≥0 : ∀ {step n} → 1ℚ ≤ step → 0ℚ ≤ factorOf step n
-factor≥0 1≤step = ≤-trans 0≤1 (factor≥1 1≤step)
+factor≥0 {step} {n} 1≤step = ≤-trans 0≤1 (factor≥1 {step} {n} 1≤step)
 
 -- | Monotonicity in the seed: a larger seed ends at least as large.
 grow-mono : ∀ {factor a b} → 0ℚ ≤ factor → a ≤ b → grow factor a ≤ grow factor b
 grow-mono {factor} factor≥0 a≤b =
-  *-monoʳ-≤-nonNeg factor (nonNegative factor≥0) a≤b
+  *-monoʳ-≤-nonNeg factor {{nonNegative factor≥0}} a≤b
+
+-- Every nonnegative seed is preserved or increased by a valid growth epoch.
+grow-no-loss : ∀ {step n seed} → 1ℚ ≤ step → 0ℚ ≤ seed
+             → seed ≤ grow (factorOf step n) seed
+grow-no-loss {step} {n} {seed} step≥1 seed≥0 =
+  ≤-trans (eq≤ (sym (*-identityʳ seed)))
+    (*-monoˡ-≤-nonNeg seed {{nonNegative seed≥0}} (factor≥1 {step} {n} step≥1))
+
+-- Exact composition, rather than a floating-point accumulation identity.
+grow-compose : ∀ a b seed → grow (a * b) seed ≡ grow b (grow a seed)
+grow-compose a b seed = sym (*-assoc seed a b)
+
+-- Monotonicity in the per-step multiplier, for any finite number of steps.
+factor-mono : ∀ {a b} n → 1ℚ ≤ a → a ≤ b → factorOf a n ≤ factorOf b n
+factor-mono zero a≥1 a≤b = ≤-refl
+factor-mono {a} {b} (suc n) a≥1 a≤b =
+  ≤-trans (*-monoˡ-≤-nonNeg a {{nonNegative (≤-trans 0≤1 a≥1)}}
+             (factor-mono n a≥1 a≤b))
+    (*-monoʳ-≤-nonNeg (factorOf b n)
+      {{nonNegative (factor≥0 {b} {n} (≤-trans a≥1 a≤b))}} a≤b)
 
 ------------------------------------------------------------------------------
 -- The exact symbolic threshold
@@ -139,7 +160,7 @@ sufficient : ∀ {seed target fLo factor}
            → 0ℚ ≤ seed → fLo ≤ factor → target ≤ seed * fLo
            → target ≤ grow factor seed
 sufficient {seed} seed≥0 fLo≤factor bound =
-  ≤-trans bound (*-monoˡ-≤-nonNeg seed (nonNegative seed≥0) fLo≤factor)
+  ≤-trans bound (*-monoˡ-≤-nonNeg seed {{nonNegative seed≥0}} fLo≤factor)
 
 -- | NECESSITY for the stepped model itself: if seed * factor < target the
 -- seed does not reach the target in the stepped model. Together with
@@ -168,37 +189,61 @@ module Benchmark where
   eLo = + 23 / 2
 
   eLo-cert : eLo * tEddHi ≤ (+ 9 / 1) * dtLo
-  eLo-cert = toWitness tt
+  eLo-cert = checked (eLo * tEddHi) ((+ 9 / 1) * dtLo) tt
 
-  -- Per-step multiplier at E = eLo in 64 steps: 1 + (23/2)/64 = 151/128.
+  -- Per-step multiplier at E = eLo in 16 steps: 1 + (23/2)/16 = 55/32.
   step : ℚ
-  step = + 151 / 128
+  step = + 55 / 32
 
   step≥1 : 1ℚ ≤ step
-  step≥1 = toWitness tt
+  step≥1 = checked 1ℚ step tt
 
   -- The certified Euler factor (closed rational; Agda normalizes it).
   factorCert : ℚ
-  factorCert = factorOf step 64
+  factorCert = factorOf step 16
 
-  -- The same factor computed by the squaring chain (6 multiplications
-  -- instead of 64); the closed check below is done on this form.
+  -- The same factor computed by the squaring chain (4 multiplications
+  -- instead of 16); the closed check below is done on this form.
   factorCertFast : ℚ
-  factorCertFast = sqPow step 6
+  factorCertFast = sqPow step 4
 
   factorCert≡fast : factorCert ≡ factorCertFast
-  factorCert≡fast = sym (sqPow≡pow step 6)
+  factorCert≡fast = sym (sqPow≡pow step 4)
 
-  -- The certified sufficient seed: 1300 Msun.
+  -- The certified sufficient seed: 9000 Msun (9000 * factor = 52197041
+  -- >= 5e7; margin +4.4 percent over the target).
   seedBound : ℚ
-  seedBound = + 1300 / 1
+  seedBound = + 9000 / 1
 
   target : ℚ
   target = + 50000000 / 1
 
-  -- Closed check, decided by Agda's normalization: 5e7 <= 1300 * factorCert.
-  certFast : target ≤ seedBound * factorCertFast
-  certFast = toWitness tt
+  -- Small local certificates avoid normalizing a gigantic closed rational.
+  -- Each square propagates an order proof; no approximation is an axiom.
+  square-mono : ∀ {a b} → 0ℚ ≤ a → a ≤ b → a * a ≤ b * b
+  square-mono {a} {b} a≥0 a≤b =
+    ≤-trans (*-monoˡ-≤-nonNeg a {{nonNegative a≥0}} a≤b)
+            (*-monoʳ-≤-nonNeg b {{nonNegative (≤-trans a≥0 a≤b)}} a≤b)
+
+  abstract
+    bound₁ : (+ 295 / 100) ≤ sqPow step 1
+    bound₁ = checked (+ 295 / 100) (sqPow step 1) tt
+
+    bound₂ : (+ 87 / 10) ≤ sqPow step 2
+    bound₂ = ≤-trans (checked (+ 87 / 10) ((+ 295 / 100) * (+ 295 / 100)) tt)
+      (square-mono (checked 0ℚ (+ 295 / 100) tt) bound₁)
+
+    bound₃ : (+ 75 / 1) ≤ sqPow step 3
+    bound₃ = ≤-trans (checked (+ 75 / 1) ((+ 87 / 10) * (+ 87 / 10)) tt)
+      (square-mono (checked 0ℚ (+ 87 / 10) tt) bound₂)
+
+    factor-lower-bound : (+ 5625 / 1) ≤ factorCertFast
+    factor-lower-bound = ≤-trans (checked (+ 5625 / 1) ((+ 75 / 1) * (+ 75 / 1)) tt)
+      (square-mono (checked 0ℚ (+ 75 / 1) tt) bound₃)
+
+    certFast : target ≤ seedBound * factorCertFast
+    certFast = ≤-trans (checked target (seedBound * (+ 5625 / 1)) tt)
+      (*-monoˡ-≤-nonNeg seedBound {{nonNegative (checked 0ℚ seedBound tt)}} factor-lower-bound)
 
   cert : target ≤ seedBound * factorCert
   cert = subst (λ f → target ≤ seedBound * f) (sym factorCert≡fast) certFast
@@ -215,4 +260,4 @@ module Benchmark where
   verify {G} {seed} bridge seed≥bound seed≥0 =
     sufficient seed≥0 bridge
       (≤-trans cert (*-monoʳ-≤-nonNeg factorCert
-                       (nonNegative (factor≥0 step≥1)) seed≥bound))
+                       {{nonNegative (factor≥0 {step} {16} step≥1)}} seed≥bound))

@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-only. Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license). -->
 # self/growth/STATUS.md — QSO1 growth front end (Mission QSO1-DCBH-001, role 10)
 
+Update 2026-10-20: the integrated workspace in `self/experiment/` now runs
+on the NUC/WSL X11-enabled Self VM. `tests/morphic/run.sh` executes the
+growth reader, spectrum reader, all selectors, projection bounds and GUI
+controls. The environment limitation below is historical. Native execution
+exposed integer-iteration and binary-expression syntax errors, now fixed.
+
 Written 2026-10-20 under the SUNDAY EXECUTION directive: "build out the front
 end using the self code only morphic no python typescript don't add any code
 that's not already there." The growth front end is built ONLY from the

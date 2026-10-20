@@ -1,0 +1,9 @@
+LRD-REC-v1
+8:compiler20:Agda version 2.6.4.3
+18:source_tree_sha25664:49e1a72a7874cee46fe29154dc2cfe9f6b1d3b3ed5eaf58ad7ba0dff8d6b6f22
+11:status.core4:PASS
+13:status.growth4:PASS
+13:status.kernel4:PASS
+18:stdlib_tree_sha25664:7d94a0be91a11e866a76f5b63a93335479835fdd4e4f2c7febfd20b0b8728fe4
+14:stdlib_version3:2.1
+14:trust_boundary90:continuous-growth bridge, cryptographic binding, and runtime refinement remain conditional

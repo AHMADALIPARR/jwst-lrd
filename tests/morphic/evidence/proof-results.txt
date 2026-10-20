@@ -1,0 +1,6 @@
+PASS morphic_agda_core
+PASS morphic_agda_growth
+PASS morphic_agda_kernel
+PASS morphic_agda_false_certificate_rejected
+Agda version 2.6.4.3
+source_tree_sha256=49e1a72a7874cee46fe29154dc2cfe9f6b1d3b3ed5eaf58ad7ba0dff8d6b6f22
