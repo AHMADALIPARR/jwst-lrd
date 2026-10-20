@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # End-to-end bash scenario with two real processes: lrd-authority serve (own directory) and
 # lrd-worker (untrusted). Includes the ACCEPTANCE test: worker memory + state file corrupted with a
 # valid-format forged commitment; the separately running authority refuses it.

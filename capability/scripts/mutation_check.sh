@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # Mutation check: copies the crate to a temp dir (sources here are never modified), disables one
 # authority check at a time, and requires the adversarial suite to FAIL. Prints PASS/FAIL lines.
 set -uo pipefail

@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! Vendored FIPS 180-4 SHA-256 (no external crates). Tested against NIST vectors.
 
 const K: [u32; 64] = [

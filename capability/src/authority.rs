@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! The independent monotonic-state authority (verifier). Owns:
 //!   - K_auth (authority.key), the MAC key for capabilities;
 //!   - the monotonic counter + head commitment + accepted-state history + capability table

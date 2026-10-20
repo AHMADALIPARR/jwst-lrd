@@ -1,32 +1,32 @@
-authority pid=1431363 worker_sees_dir=/tmp/lrdcap-int.16Bwxh/worker (authority dir /tmp/lrdcap-int.16Bwxh/authority is never passed to the worker)
-[worker] synced seq=0 head=1c5009c82b06ce2d41252963cba7c4ed6ae01007a2eb6bb7007db80a65ffa092
-[worker] pid=1431544 loaded state seq=0 head=1c5009c82b06ce2d41252963cba7c4ed6ae01007a2eb6bb7007db80a65ffa092
-[worker] ACCEPT seq=1 new_commit=3775edfedb0b19725091568b8431c9ed5feccda8faf93c2d46d6af6bc60fdefb (recomputed locally, witness verified)
-[worker] pid=1431619 loaded state seq=1 head=3775edfedb0b19725091568b8431c9ed5feccda8faf93c2d46d6af6bc60fdefb
-[worker] ACCEPT seq=2 new_commit=1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2 (recomputed locally, witness verified)
+authority pid=1633656 worker_sees_dir=/tmp/lrdcap-int.ZoVeeD/worker (authority dir /tmp/lrdcap-int.ZoVeeD/authority is never passed to the worker)
+[worker] synced seq=0 head=e08f43ac8aa96f72b8ead46d524b9f412d1e22d87845b547473ca91425f71092
+[worker] pid=1633665 loaded state seq=0 head=e08f43ac8aa96f72b8ead46d524b9f412d1e22d87845b547473ca91425f71092
+[worker] ACCEPT seq=1 new_commit=214fc18ca240bb7d440845893fb2bdc44d1ec88c664adb15f83496b262896c51 (recomputed locally, witness verified)
+[worker] pid=1633670 loaded state seq=1 head=214fc18ca240bb7d440845893fb2bdc44d1ec88c664adb15f83496b262896c51
+[worker] ACCEPT seq=2 new_commit=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82 (recomputed locally, witness verified)
 === ACCEPTANCE corrupt-memory attack ===
-[worker] pid=1431766 loaded state seq=2 head=1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2
-[worker] ATTACK corrupt-memory: in-memory head_commit 1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2 -> 5903ee5440fae37bc7a7292047b74e6edb5ba0fe2a1168c0887cc7da268820fa
-[worker] ATTACK corrupt-memory: state file /tmp/lrdcap-int.16Bwxh/worker/worker.state rewritten with forged commit
+[worker] pid=1633688 loaded state seq=2 head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[worker] ATTACK corrupt-memory: in-memory head_commit 5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82 -> 3bf1aa588fdb953a2ff671f1a0968a3c6c2857e0a6fbb9b1fadf4b22eedd4fe4
+[worker] ATTACK corrupt-memory: state file /tmp/lrdcap-int.ZoVeeD/worker/worker.state rewritten with forged commit
 [worker] authority REJECTED: reason=bad_prev
-[worker] synced seq=2 head=1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2
-[worker] pid=1431891 loaded state seq=2 head=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+[worker] synced seq=2 head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[worker] pid=1633715 loaded state seq=2 head=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
 [worker] authority REJECTED: reason=bad_prev
-[worker] synced seq=2 head=1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2
-[worker] pid=1431973 loaded state seq=2 head=1d06458ad067f663da0a40782e2940fefef928ef7e45ad57c1023af3a651e6d2
-[worker] ACCEPT seq=3 new_commit=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1 (recomputed locally, witness verified)
-[worker] RAW resend of /tmp/lrdcap-int.16Bwxh/worker/replay.line
-[worker] history seq=1 commit=3775edfedb0b19725091568b8431c9ed5feccda8faf93c2d46d6af6bc60fdefb local_witness_check=true
-[worker] pid=1432242 loaded state seq=3 head=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1
+[worker] synced seq=2 head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[worker] pid=1633721 loaded state seq=2 head=5843b11848dca45bf598c72a6918fd9f156ffed20e8df282947972ba1509ef82
+[worker] ACCEPT seq=3 new_commit=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf (recomputed locally, witness verified)
+[worker] RAW resend of /tmp/lrdcap-int.ZoVeeD/worker/replay.line
+[worker] history seq=1 commit=214fc18ca240bb7d440845893fb2bdc44d1ec88c664adb15f83496b262896c51 local_witness_check=true
+[worker] pid=1633742 loaded state seq=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf
 [worker] authority REJECTED: reason=bad_scope
-[worker] pid=1432369 loaded state seq=3 head=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1
+[worker] pid=1633747 loaded state seq=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf
 [worker] ATTACK rollback-seq: claiming seq=2
 [worker] authority REJECTED: reason=stale_seq
-[worker] pid=1432405 loaded state seq=3 head=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1
-[worker] ATTACK forge-mac: cap_mac -> 2a36057d032d162d60bfc72492b19498b69e06a02f991fe2da9e8066a86eb710
+[worker] pid=1633752 loaded state seq=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf
+[worker] ATTACK forge-mac: cap_mac -> de55aab1744ba2d73c71b000935dfb523b6790f01348f829aec8f3a2c2fe0d60
 [worker] authority REJECTED: reason=bad_mac
-[worker] pid=1432423 loaded state seq=3 head=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1
+[worker] pid=1633757 loaded state seq=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf
 [worker] ATTACK bad-witness: prev_witness altered
 [worker] authority REJECTED: reason=bad_witness
-[worker] pid=1432487 loaded state seq=3 head=f017c8a3986ece89823cd289dbf3c46b83b04ac55155284bdf4aa90e625ed2a1
-[worker] ACCEPT seq=4 new_commit=daccb764b53edb3bd8ca4f3131b7ab779fff9867fa1d39f87e1d96cef8ca5f92 (recomputed locally, witness verified)
+[worker] pid=1633766 loaded state seq=3 head=6ae0950da1272b4c9f8f611e992af76dd2540e8baed48b6f301ab448e76b84bf
+[worker] ACCEPT seq=4 new_commit=113304e661fa9cf693f6e0968e8d4d96f35939022ba7ba022c26a31dafa895bf (recomputed locally, witness verified)

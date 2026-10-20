@@ -1,5 +1,5 @@
-<!-- SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque -->
-<!-- Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License. -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
+<!-- Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License. -->
 # capability/ STATUS: TASK 010, cryptographic linear addressing and proof-gated transitions
 
 Branch `t010-capability` (worktree `/workspace/jwst-lrd-capability`), based on main `6b9cef6`.

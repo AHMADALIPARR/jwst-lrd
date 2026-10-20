@@ -1,5 +1,5 @@
-<!-- SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque -->
-<!-- Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License. -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
+<!-- Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License. -->
 # TASK 010: security model (capability addressing and proof-gated transitions)
 
 ## Read this first

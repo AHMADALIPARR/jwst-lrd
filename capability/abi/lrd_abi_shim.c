@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+/* SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
  * Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
- * Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+ * Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
  *
  * FFI shim: exposes the static-inline helpers and the struct layout of the ledger track's
  * LRD-STATE-v1 header (ledger/abi/lrd_state.h, included UNMODIFIED) to Rust. This file does

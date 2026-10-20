@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 # Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # TASK 010 capability track test runner (CONTRACTS.md test convention).
 # Prints PASS <name> | FAIL <name> <why> | UNAVAILABLE <name> <reason>; exits nonzero only on FAIL.
 # Evidence: capability/evidence/*.log (overwritten each run).

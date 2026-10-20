@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! Authenticated logical capabilities. A capability is the LRD-REC-v1 record
 //!   {cap_expiry, cap_id, cap_nonce, cap_prev, cap_scope, cap_seq}
 //! plus cap_mac = HMAC-SHA256(K_auth, "LRD-CAP-v1\0" || LRD-REC-v1(serialization of those 6 fields)).

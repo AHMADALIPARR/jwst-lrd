@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! RSA accumulator (Benaloh-de Mare / Baric-Pfitzmann style, membership only).
 //!   A_0 = g,  add(x): A <- A^{H_prime(x)} mod N,  witness(x) = g^{prod_{y != x} H_prime(y)},
 //!   verify(A, x, w): w in [1, N) and w^{H_prime(x)} == A (mod N).

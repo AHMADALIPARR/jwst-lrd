@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # Cross-checks the vendored bigint modexp and hash-to-prime against openssl 3.
 # Prints PASS/FAIL lines. usage: openssl_crosscheck.sh PATH_TO_lrd-authority
 set -uo pipefail

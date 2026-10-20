@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! Compiles abi/lrd_abi_shim.c against the ledger track's lrd_state.h (no external crates).
 //! Header directory: $LRD_STATE_H_DIR if set (e.g. a t004-ledger worktree's ledger/abi),
 //! else the read-only vendored copy in abi/vendor (provenance in abi/vendor/SOURCE).

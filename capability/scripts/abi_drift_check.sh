@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # Fails if the vendored lrd_state.h drifts from the ledger track's t004-ledger branch.
 # Prints one PASS/FAIL/UNAVAILABLE line.
 set -uo pipefail

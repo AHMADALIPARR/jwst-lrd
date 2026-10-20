@@ -1,7 +1,7 @@
 {
   "format": "LRD-OBLIGATIONS-v1",
   "track": "t010-capability",
-  "license": "AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque (dual, intentional)",
+  "license": "AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque (dual, intentional)",
   "note": "Emitted for the Agda track (agda/OBLIGATIONS.md is owned by the Agda track; entries go through Hilbert). 'runtime_checked' means the Rust authority enforces it with a runtime check and the adversarial suite exercises it. It is NOT a machine-checked proof. Assumptions are never discharged here.",
   "agda_alignment": {
     "source": "/workspace/jwst-lrd-agda-kernel/agda/kernel/src/Kernel/Assumptions/{Crypto,Runtime}.agda (branch t011-agda-kernel, uncommitted working tree, read-only, observed 2026-10-19)",

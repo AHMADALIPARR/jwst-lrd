@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
-# Dual-licensed (intentionally): AGPL-3.0-or-later plus the SnapKitty Opaque License.
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed (intentionally): AGPL-3.0-only plus the SnapKitty Opaque License.
 # TEST-ONLY trusted-setup stand-in: generate an RSA modulus with openssl and delete the private
 # key. This is NOT a trustworthy ceremony: the factors existed in this process's memory and on
 # disk (tmpfs/disk, not shredded securely). Anyone who saw them can forge accumulator witnesses.

@@ -1,5 +1,5 @@
    Compiling lrd-capability v0.1.0 (/workspace/jwst-lrd-capability/capability)
-    Finished `release` profile [optimized] target(s) in 2.07s
+    Finished `release` profile [optimized] target(s) in 1.38s
      Running unittests src/lib.rs (target/release/deps/lrd_capability-82a7f9c0ae2d0949)
 
 running 19 tests
@@ -14,16 +14,16 @@ test bigint::tests::small_known_values ... ok
 test cap::tests::mac_binds_every_field ... ok
 test hmac::tests::ct_eq_works ... ok
 test hmac::tests::rfc4231 ... ok
+test prime::tests::known_primes_and_composites ... ok
 test rec::tests::line_roundtrip_and_rejects ... ok
 test rec::tests::nat_canonical ... ok
 test rec::tests::serialization_is_sorted_and_length_prefixed ... ok
-test prime::tests::known_primes_and_composites ... ok
 test sha256::tests::streaming_equals_oneshot ... ok
-test sha256::tests::nist_vectors ... ok
 test prime::tests::hash_to_prime_deterministic_256bit ... ok
+test sha256::tests::nist_vectors ... ok
 test accumulator::tests::membership_roundtrip_and_tamper ... ok
 
-test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
 
      Running unittests src/bin/lrd-authority.rs (target/release/deps/lrd_authority-360eaa9aa042a4c6)
 
@@ -43,48 +43,48 @@ running 14 tests
 test capability_bound_to_exactly_one_slot ... ok
 test bad_accumulator_witness_rejected ... ok
 ACCEPTANCE worker stderr (attack run):
-[worker] pid=1426950 loaded state seq=1 head=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a
-[worker] ATTACK corrupt-memory: in-memory head_commit e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd
-[worker] ATTACK corrupt-memory: state file /tmp/lrdcap-accept-1426917/worker/worker.state rewritten with forged commit
+[worker] pid=1632898 loaded state seq=1 head=4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2
+[worker] ATTACK corrupt-memory: in-memory head_commit 4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2 -> 95973e206d4beb97d241757ef30baf7f8cf1ff26f1caf50ab6ae2e17d6c2677c
+[worker] ATTACK corrupt-memory: state file /tmp/lrdcap-accept-1632812/worker/worker.state rewritten with forged commit
 [worker] authority REJECTED: reason=bad_prev
 ACCEPTANCE authority log excerpt:
-[authority] ISSUE cap_id=ca8f3403dd1b2eb0802c63117889d406 scope=read cap_seq=0 expiry=1792474854
-[authority] ISSUE cap_id=ae2243308dd59dcdb0fdbb2103b85205 scope=transition cap_seq=1 expiry=1792474854
-[authority] SUBMIT seq=1 prev=d5157305d33a95fd01bd9179a4340c6bea31318412060c36a543e26e57493dbd -> ACCEPT reason=ok new_commit=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a counter=1
-[authority] ISSUE cap_id=72ddf3e5f04030d1ec24b131436e5c2e scope=transition cap_seq=2 expiry=1792474854
-[authority] SUBMIT seq=2 prev=d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd -> REJECT reason=bad_prev authority_head=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a
-[authority] ISSUE cap_id=fd002b1392040e3b321c015c3582f71e scope=read cap_seq=1 expiry=1792474854
-[authority] ISSUE cap_id=29519616ba958c11c1a3dcc42ad6bfed scope=transition cap_seq=2 expiry=1792474854
-[authority] SUBMIT seq=2 prev=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> REJECT reason=bad_commit claimed=372128d82f52e452fe3a003401ccebf85b92ca2f8581a8691ee8ae8bd2a3f4d3
-[authority] VERIFY -> REJECT reason=bad_witness element=d6c63271c5a6f237f8268499046b74547555dfc9ed68349fc6fb1166f64a41fd
-[authority] ISSUE cap_id=2636974d378b0aea568fe87eb3bfd499 scope=read cap_seq=1 expiry=1792474854
-[authority] ISSUE cap_id=157e66866cab9b3603b653f0600fc717 scope=transition cap_seq=2 expiry=1792474854
-[authority] SUBMIT seq=2 prev=e373920973b5af78db6b1bc595a736a13e7010c9fb0a38954dab812d032f0e5a -> ACCEPT reason=ok new_commit=29166b30402a11b6bb8214b16921881a525e409e77d21033504994dc596b86c4 counter=2
+[authority] ISSUE cap_id=13567e6a4fe24342d68232e798228d62 scope=read cap_seq=0 expiry=1792475225
+[authority] ISSUE cap_id=3a5c510c92d0225eb724ad3beac03bf2 scope=transition cap_seq=1 expiry=1792475225
+[authority] SUBMIT seq=1 prev=fc03680e74a1bf903276f82645cfb2972609f30924a44891fd52675aecf56dae -> ACCEPT reason=ok new_commit=4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2 counter=1
+[authority] ISSUE cap_id=9b132ffe23ff50b23b3e2abe90989853 scope=transition cap_seq=2 expiry=1792475225
+[authority] SUBMIT seq=2 prev=95973e206d4beb97d241757ef30baf7f8cf1ff26f1caf50ab6ae2e17d6c2677c -> REJECT reason=bad_prev authority_head=4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2
+[authority] ISSUE cap_id=c73874241ad858b0ef3b6819c0f9a3e2 scope=read cap_seq=1 expiry=1792475225
+[authority] ISSUE cap_id=2253547edb546a231ce6cd750ba1885e scope=transition cap_seq=2 expiry=1792475225
+[authority] SUBMIT seq=2 prev=4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2 -> REJECT reason=bad_commit claimed=372128d82f52e452fe3a003401ccebf85b92ca2f8581a8691ee8ae8bd2a3f4d3
+[authority] VERIFY -> REJECT reason=bad_witness element=95973e206d4beb97d241757ef30baf7f8cf1ff26f1caf50ab6ae2e17d6c2677c
+[authority] ISSUE cap_id=973639314e566c30ce99a20254050b94 scope=read cap_seq=1 expiry=1792475225
+[authority] ISSUE cap_id=d90632bed0ec6288d06ff7ad97dcc1b6 scope=transition cap_seq=2 expiry=1792475225
+[authority] SUBMIT seq=2 prev=4461ef186c6138cb0201577c43c727e7360a47d79e6f9d5c6256128a0964ecb2 -> ACCEPT reason=ok new_commit=20be2d5a573909abbab5997dd003e54b1a91b6043191d356435da7035cd36984 counter=2
 test acceptance_corrupted_worker_memory_is_refused_by_independent_authority ... ok
-test forged_mac_rejected ... ok
 test consumed_capability_rejected_after_authority_restart ... ok
+test forged_mac_rejected ... ok
 test counter_monotonic_and_no_silent_reset ... ok
 OUT_OF_SCOPE demonstrated: attacker holding authority.key computes valid MACs
 test out_of_scope_key_read_allows_mac_forgery ... ok
-test historical_read_cannot_transition ... ok
 OUT_OF_SCOPE demonstrated: store rollback + replay accepted (decision=Some("ACCEPT"))
 test out_of_scope_store_write_allows_rollback_and_replay ... ok
+test historical_read_cannot_transition ... ok
 POSITIVE CONTROL authority log:
 [authority] ready
-[authority] ISSUE cap_id=a83d083693d6022bb81e716ebb4b25ce scope=read cap_seq=0 expiry=1792474855
-[authority] ISSUE cap_id=9938207dc456516a985dce45f8cda1b3 scope=transition cap_seq=1 expiry=1792474855
-[authority] SUBMIT seq=1 prev=f76454ce0c190b2037fd31b48510bd20e5a348aa8c1de6fc1e81ca2f6ac22185 -> ACCEPT reason=ok new_commit=b2afa84d1079a0182b72d21889c62fce2ce7212982d32f6d1508ef5edde70821 counter=1
-[authority] ISSUE cap_id=e314fc3b43846442a6441adaae3f9528 scope=transition cap_seq=2 expiry=1792474855
-[authority] SUBMIT seq=2 prev=b2afa84d1079a0182b72d21889c62fce2ce7212982d32f6d1508ef5edde70821 -> ACCEPT reason=ok new_commit=5a9ac6d6d7a5889ae982a08866f63cf974bc1fb80c4540c2c5c2e502385f8cfb counter=2
-[authority] ISSUE cap_id=a10bd62b4551536762e23253128a31c3 scope=transition cap_seq=3 expiry=1792474855
-[authority] SUBMIT seq=3 prev=5a9ac6d6d7a5889ae982a08866f63cf974bc1fb80c4540c2c5c2e502385f8cfb -> ACCEPT reason=ok new_commit=0e6a6679638edbee01a771cd8b6c21fcb60c0f844450ec6c36b1930d58e45594 counter=3
+[authority] ISSUE cap_id=451dfdfef0a05704d0cca95f0857ad81 scope=read cap_seq=0 expiry=1792475225
+[authority] ISSUE cap_id=df42ce6288659df5948905b4b09c65ef scope=transition cap_seq=1 expiry=1792475225
+[authority] SUBMIT seq=1 prev=f0d28471cb3f7361edefeecffb8a877a5b239c2d33766f9e4133566592926339 -> ACCEPT reason=ok new_commit=f27ca3817b9d99b8c7ec2ee55308525e67598bb9e9e593d69a098f7cc029e670 counter=1
+[authority] ISSUE cap_id=15610a5a3f7145977fcefa9c7d83fb36 scope=transition cap_seq=2 expiry=1792475225
+[authority] SUBMIT seq=2 prev=f27ca3817b9d99b8c7ec2ee55308525e67598bb9e9e593d69a098f7cc029e670 -> ACCEPT reason=ok new_commit=8fb90df8eb003daa89d38aba5720c71df42b8c25875c5f997ab682dca5970ef7 counter=2
+[authority] ISSUE cap_id=5bc60b39b3d6822101cdd3091510b2fb scope=transition cap_seq=3 expiry=1792475226
+[authority] SUBMIT seq=3 prev=8fb90df8eb003daa89d38aba5720c71df42b8c25875c5f997ab682dca5970ef7 -> ACCEPT reason=ok new_commit=c9c3d39302f6e2d9145d4dfa6ae22a244bdb3e4d5d49b290fff22b8d3df4fe9e counter=3
 test positive_control_honest_transitions_accepted ... ok
 test replay_of_consumed_capability_rejected ... ok
-test state_file_tampered_externally_is_refused ... ok
 test rollback_rejected ... ok
+test state_file_tampered_externally_is_refused ... ok
 test expiry_and_revocation ... ok
 
-test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.43s
 
    Doc-tests lrd_capability
 

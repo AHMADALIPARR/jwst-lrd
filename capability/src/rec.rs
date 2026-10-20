@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-SnapKitty-Opaque
+// SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 // Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-// Dual-licensed (intentionally): GNU AGPL-3.0-or-later plus the SnapKitty Opaque License.
+// Dual-licensed (intentionally): GNU AGPL-3.0-only plus the SnapKitty Opaque License.
 //! LRD-REC-v1 canonical records (research/CONTRACTS.md) and the LRD-COMMIT-v1 commitment.
 //! Wire form used on the socket: one line, fields `key=value` separated by single spaces.
 //! Keys are [a-z0-9_]+, values must not contain space, newline, or be empty (hex, decimal, tokens).
