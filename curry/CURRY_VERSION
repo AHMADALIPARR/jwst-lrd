@@ -1,0 +1,8 @@
+# Pinned Curry toolchain for curry/ (TASK 012). Checked by tests/curry/run.sh.
+# SPDX-License-Identifier: AGPL-3.0-only. Also subject to the SnapKitty Opaque License (dual license).
+curry_system=pakcs
+pakcs_numeric_version=3.10.0
+pakcs_tarball=https://www.curry-lang.org/pakcs/download/pakcs-3.10.0-amd64-Linux.tar.gz
+pakcs_tarball_sha256=ef632f91016a0c83b95b3b047421dea16556ce0107ee12834c5a969072abf51f
+prolog_backend=SWI-Prolog
+swipl_version=9.2.9

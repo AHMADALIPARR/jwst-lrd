@@ -1,0 +1,4 @@
+# Build products of curry/build.sh (TASK 012). curry/causal/ is not covered here.
+/build/
+/src/.curry/
+/src/LrdEngine

@@ -1,0 +1,196 @@
+LRD-REC-v1
+2:id24:SYNTHETIC-FIXTURE-HEADER
+4:kind14:fixture_header
+4:note108:SYNTHETIC FIXTURE - NOT REAL DATA. All values invented for engine tests; no measurement or literature value.
+9:synthetic32:SYNTHETIC: fixture header record
+LRD-REC-v1
+2:id10:PROV-SYN-1
+4:kind10:provenance
+6:source66:SYNTHETIC fixture generator (hand-written), not an archive product
+9:synthetic54:SYNTHETIC: invented provenance record for engine tests
+LRD-REC-v1
+2:id10:PROV-SYN-2
+4:kind10:provenance
+6:source65:SYNTHETIC second reduction (hand-written), not an archive product
+9:synthetic54:SYNTHETIC: invented provenance record for engine tests
+LRD-REC-v1
+2:id9:OBS-SYN-A
+10:instrument35:NIRSpec-PRISM (label only; no data)
+4:kind11:observation
+10:provenance10:PROV-SYN-1
+8:redshift1:6
+14:redshift_sigma5:1/100
+9:synthetic78:SYNTHETIC: invented observation, broad line + V-shape + X-ray weak + flat MIRI
+6:target9:SYN-LRD-A
+LRD-REC-v1
+7:feature12:broad_halpha
+8:fwhm_kms4:3100
+14:fwhm_kms_sigma3:250
+2:id17:FEAT-SYN-A-HALPHA
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+9:synthetic30:SYNTHETIC: invented line width
+LRD-REC-v1
+8:beta_opt3:6/5
+14:beta_opt_sigma3:1/5
+7:beta_uv4:-8/5
+13:beta_uv_sigma3:1/5
+7:feature10:sed_vshape
+2:id14:FEAT-SYN-A-SED
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+9:synthetic36:SYNTHETIC: invented continuum slopes
+LRD-REC-v1
+7:feature4:xray
+2:id15:FEAT-SYN-A-XRAY
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+6:status12:not_detected
+9:synthetic32:SYNTHETIC: invented X-ray status
+LRD-REC-v1
+7:feature14:miri_nir_slope
+2:id15:FEAT-SYN-A-MIRI
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+6:status4:flat
+9:synthetic36:SYNTHETIC: invented MIRI slope class
+LRD-REC-v1
+7:feature12:balmer_break
+2:id16:FEAT-SYN-A-BREAK
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+6:status8:detected
+9:synthetic39:SYNTHETIC: invented Balmer-break status
+LRD-REC-v1
+7:feature17:balmer_absorption
+2:id15:FEAT-SYN-A-BABS
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-A
+10:provenance10:PROV-SYN-1
+6:status8:detected
+9:synthetic44:SYNTHETIC: invented Balmer-absorption status
+LRD-REC-v1
+2:id9:OBS-SYN-B
+10:instrument35:NIRSpec-G395M (label only; no data)
+4:kind11:observation
+10:provenance10:PROV-SYN-1
+8:redshift1:5
+14:redshift_sigma5:1/100
+9:synthetic75:SYNTHETIC: invented observation, line width only marginally above threshold
+6:target9:SYN-LRD-B
+LRD-REC-v1
+7:feature12:broad_halpha
+8:fwhm_kms4:2300
+14:fwhm_kms_sigma3:250
+2:id17:FEAT-SYN-B-HALPHA
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-B
+10:provenance10:PROV-SYN-1
+9:synthetic30:SYNTHETIC: invented line width
+LRD-REC-v1
+8:beta_opt3:1/2
+14:beta_opt_sigma4:1/10
+7:beta_uv4:-9/5
+13:beta_uv_sigma4:1/10
+7:feature10:sed_vshape
+2:id14:FEAT-SYN-B-SED
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-B
+10:provenance10:PROV-SYN-1
+9:synthetic36:SYNTHETIC: invented continuum slopes
+LRD-REC-v1
+7:feature4:xray
+2:id15:FEAT-SYN-B-XRAY
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-B
+10:provenance10:PROV-SYN-1
+6:status12:not_observed
+9:synthetic32:SYNTHETIC: invented X-ray status
+LRD-REC-v1
+7:feature14:miri_nir_slope
+2:id15:FEAT-SYN-B-MIRI
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-B
+10:provenance10:PROV-SYN-1
+6:status6:rising
+9:synthetic36:SYNTHETIC: invented MIRI slope class
+LRD-REC-v1
+2:id9:OBS-SYN-C
+10:instrument35:NIRSpec-PRISM (label only; no data)
+4:kind11:observation
+10:provenance10:PROV-SYN-1
+8:redshift1:7
+14:redshift_sigma4:1/50
+9:synthetic64:SYNTHETIC: invented observation, narrow line, V-shape, flat MIRI
+6:target9:SYN-LRD-C
+LRD-REC-v1
+7:feature12:broad_halpha
+8:fwhm_kms3:900
+14:fwhm_kms_sigma3:100
+2:id17:FEAT-SYN-C-HALPHA
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-C
+10:provenance10:PROV-SYN-1
+9:synthetic30:SYNTHETIC: invented line width
+LRD-REC-v1
+8:beta_opt3:4/5
+14:beta_opt_sigma4:1/10
+7:beta_uv2:-2
+13:beta_uv_sigma4:1/10
+7:feature10:sed_vshape
+2:id14:FEAT-SYN-C-SED
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-C
+10:provenance10:PROV-SYN-1
+9:synthetic36:SYNTHETIC: invented continuum slopes
+LRD-REC-v1
+7:feature14:miri_nir_slope
+2:id15:FEAT-SYN-C-MIRI
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-C
+10:provenance10:PROV-SYN-1
+6:status4:flat
+9:synthetic36:SYNTHETIC: invented MIRI slope class
+LRD-REC-v1
+2:id9:OBS-SYN-D
+10:instrument35:NIRSpec-G395H (label only; no data)
+4:kind11:observation
+10:provenance10:PROV-SYN-1
+8:redshift4:11/2
+14:redshift_sigma5:1/100
+9:synthetic69:SYNTHETIC: invented observation, two mutually inconsistent reductions
+6:target9:SYN-LRD-D
+LRD-REC-v1
+7:feature12:broad_halpha
+8:fwhm_kms4:3500
+14:fwhm_kms_sigma3:200
+2:id20:FEAT-SYN-D-HALPHA-R1
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-D
+10:provenance10:PROV-SYN-1
+9:synthetic43:SYNTHETIC: invented line width, reduction 1
+LRD-REC-v1
+7:feature12:broad_halpha
+8:fwhm_kms4:1500
+14:fwhm_kms_sigma3:200
+2:id20:FEAT-SYN-D-HALPHA-R2
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-D
+10:provenance10:PROV-SYN-2
+9:synthetic43:SYNTHETIC: invented line width, reduction 2
+LRD-REC-v1
+8:beta_opt1:1
+14:beta_opt_sigma3:1/5
+7:beta_uv4:-3/2
+13:beta_uv_sigma3:1/5
+7:feature10:sed_vshape
+2:id14:FEAT-SYN-D-SED
+4:kind16:spectral_feature
+3:obs9:OBS-SYN-D
+10:provenance10:PROV-SYN-1
+9:synthetic36:SYNTHETIC: invented continuum slopes
