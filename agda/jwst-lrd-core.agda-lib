@@ -1,0 +1,7 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+-- Pinned dependency: agda-stdlib 2.1 (library name standard-library-2.1), Agda 2.6.4.3.
+-- See agda/VERSIONS.
+name: jwst-lrd-core
+depend: standard-library-2.1
+include: .
+flags: --safe --without-K
