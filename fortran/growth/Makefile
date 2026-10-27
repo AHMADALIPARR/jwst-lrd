@@ -3,7 +3,9 @@
 # QSO1 growth solver (Mission QSO1-DCBH-001 role 04). Reuses the kernel modules
 # lrd_const/lrd_cosmo and the causal track's LRD-REC-v1 writer + SHA-256
 # (linked, not modified; fortran/causal is owned by its own track).
-FC     ?= gfortran
+ifeq ($(origin FC),default)
+FC := gfortran
+endif
 FFLAGS ?= -O2 -Wall -std=f2018 -fimplicit-none
 B      := ../../build/out/growth
 BIN    := ../../build/out/bin

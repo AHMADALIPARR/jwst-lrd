@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-# Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
-# SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+# Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 #
 # CONTRACTS.md test runner for the hamiltonian module (TASK 008).
 # Prints "PASS <name>" | "FAIL <name> <why>" | "UNAVAILABLE <name> <reason>";

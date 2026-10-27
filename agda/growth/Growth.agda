@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --without-K #-}
 -- Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
--- Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
--- SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+-- Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+-- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 --
 -- JWST-LRD Mission QSO1-DCBH-001, role 07: growth-transition invariants.
 --
@@ -66,7 +66,7 @@ eq≤ : ∀ {a b} → a ≡ b → a ≤ b
 eq≤ refl = ≤-refl
 
 0≤1 : 0ℚ ≤ 1ℚ
-0≤1 = toWitness tt
+0≤1 = toWitness {a? = 0ℚ ≤? 1ℚ} tt
 
 ------------------------------------------------------------------------------
 -- Stepped growth factor
@@ -118,16 +118,16 @@ factor≥1 {step} {zero}  _      = ≤-refl
 factor≥1 {step} {suc n} 1≤step =
   ≤-trans 1≤step
     (≤-trans (eq≤ (sym (*-identityʳ step)))
-             (*-monoˡ-≤-nonNeg step (nonNegative (≤-trans 0≤1 1≤step))
-                                (factor≥1 1≤step)))
+             (*-monoˡ-≤-nonNeg step {{nonNegative (≤-trans 0≤1 1≤step)}}
+                                (factor≥1 {step} {n} 1≤step)))
 
 factor≥0 : ∀ {step n} → 1ℚ ≤ step → 0ℚ ≤ factorOf step n
-factor≥0 1≤step = ≤-trans 0≤1 (factor≥1 1≤step)
+factor≥0 {step} {n} 1≤step = ≤-trans 0≤1 (factor≥1 {step} {n} 1≤step)
 
 -- | Monotonicity in the seed: a larger seed ends at least as large.
 grow-mono : ∀ {factor a b} → 0ℚ ≤ factor → a ≤ b → grow factor a ≤ grow factor b
 grow-mono {factor} factor≥0 a≤b =
-  *-monoʳ-≤-nonNeg factor (nonNegative factor≥0) a≤b
+  *-monoʳ-≤-nonNeg factor {{nonNegative factor≥0}} a≤b
 
 ------------------------------------------------------------------------------
 -- The exact symbolic threshold
@@ -140,7 +140,7 @@ sufficient : ∀ {seed target fLo factor}
            → 0ℚ ≤ seed → fLo ≤ factor → target ≤ seed * fLo
            → target ≤ grow factor seed
 sufficient {seed} seed≥0 fLo≤factor bound =
-  ≤-trans bound (*-monoˡ-≤-nonNeg seed (nonNegative seed≥0) fLo≤factor)
+  ≤-trans bound (*-monoˡ-≤-nonNeg seed {{nonNegative seed≥0}} fLo≤factor)
 
 -- | NECESSITY for the stepped model itself: if seed * factor < target the
 -- seed does not reach the target in the stepped model. Together with
@@ -169,14 +169,14 @@ module Benchmark where
   eLo = + 23 / 2
 
   eLo-cert : eLo * tEddHi ≤ (+ 9 / 1) * dtLo
-  eLo-cert = toWitness tt
+  eLo-cert = toWitness {a? = (eLo * tEddHi) ≤? ((+ 9 / 1) * dtLo)} tt
 
   -- Per-step multiplier at E = eLo in 16 steps: 1 + (23/2)/16 = 55/32.
   step : ℚ
   step = + 55 / 32
 
   step≥1 : 1ℚ ≤ step
-  step≥1 = toWitness tt
+  step≥1 = toWitness {a? = 1ℚ ≤? step} tt
 
   -- The certified Euler factor (closed rational; Agda normalizes it).
   factorCert : ℚ
@@ -200,7 +200,7 @@ module Benchmark where
 
   -- Closed check, decided by Agda's normalization: 5e7 <= 9000 * factorCert.
   certFast : target ≤ seedBound * factorCertFast
-  certFast = toWitness tt
+  certFast = toWitness {a? = target ≤? (seedBound * factorCertFast)} tt
 
   cert : target ≤ seedBound * factorCert
   cert = subst (λ f → target ≤ seedBound * f) (sym factorCert≡fast) certFast
@@ -217,4 +217,4 @@ module Benchmark where
   verify {G} {seed} bridge seed≥bound seed≥0 =
     sufficient seed≥0 bridge
       (≤-trans cert (*-monoʳ-≤-nonNeg factorCert
-                       (nonNegative (factor≥0 step≥1)) seed≥bound))
+                       {{nonNegative (factor≥0 {step} {16} step≥1)}} seed≥bound))

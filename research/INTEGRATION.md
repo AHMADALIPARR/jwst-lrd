@@ -94,7 +94,7 @@ Priority order for reaching production quality on the integration branch:
 4. **Pending reviews** — Hamiltonian, capability, Futhark, AIR, ledger, topology still need Alloy/Lean/Spec sign-off. Tracks are not done until review per CONTRACTS.md.
 5. **Real-fixture end-to-end** — Trace the primary product c0b87857… (obsid 230168921) through ingest → Fortran/Futhark numerics → ledger proposal → Hamiltonian decision → AIR proof. Resolve the open z = 7.04221 vs published 7.0451 discrepancy.
 6. **Test hygiene** — Re-run `tests/run_all.sh` on the current integration head and record the exact PASS/FAIL/UNAVAILABLE counts. Confirm shebang handling eliminates the earlier false FAILs.
-7. **License consistency** — A few Agda files still carry AGPL-3.0-or-later; project standard is AGPL-3.0-only + SnapKitty Opaque. Normalize on next Agda touch.
+7. **License consistency** — Resolved 2026-10-26: every file now carries `AGPL-3.0-only` + SnapKitty Opaque (the earlier `-or-later` Agda, hamiltonian, air, capability and test headers were normalized to `-only`).
 8. **Mission tracks** — Growth (Fortran sweeps), DCBH scenarios, and adversarial harnesses remain to be completed against the retrieved dynamical-mass benchmark. No invented numbers.
 
 All verification claims require an independent Hilbert re-run. No force-push to main.

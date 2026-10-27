@@ -1,8 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
 # Fortran 2018 kernel; CFITSIO only behind src/lrd_fits_shim.c (ISO_C_BINDING boundary).
-FC     ?= gfortran
-CC     ?= gcc
+ifeq ($(origin FC),default)
+FC := gfortran
+endif
+# GNU make predefines CC=cc and FC=f77, so a plain "?=" never takes effect; override
+# only the built-in default (an environment or command-line value still wins).
+ifeq ($(origin CC),default)
+CC := gcc
+endif
 FFLAGS ?= -O2 -Wall -std=f2018 -fimplicit-none
 CFLAGS ?= -O2 -Wall -Wextra
 B      := ../build/out/fortran

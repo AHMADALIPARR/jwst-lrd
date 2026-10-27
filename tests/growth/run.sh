@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # SPDX-License-Identifier: AGPL-3.0-only
 # Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
 #
@@ -64,7 +64,7 @@ else
     [ "$FT" = "382" ] && pass growth_feasible_sat_382 || fail growth_feasible_sat_382 "count=$FT"
     # commitment, recomputed independently with coreutils sha256sum
     WANT=$(cat "$REC.commit")
-    GOT=$((printf 'LRD-COMMIT-v1\0'; cat "$REC") | sha256sum | cut -d' ' -f1)
+    GOT=$( (printf 'LRD-COMMIT-v1\0'; cat "$REC") | sha256sum | cut -d' ' -f1)
     [ "$GOT" = "$WANT" ] && pass growth_rec_commitment_sha256 || fail growth_rec_commitment_sha256 "got=$GOT want=$WANT"
   fi
 fi
@@ -88,6 +88,10 @@ else
     NFAIL=$((NFAIL + $(grep -c '^FAIL ' "$EVD/curry_run.log")))
     grep -q CURRY_GROWTH_DONE "$EVD/curry_run.log" \
       && pass growth_curry_completed || fail growth_curry_completed "see evidence/curry_run.log"
+  elif grep -q "incompatible VM-signature" "$EVD/curry_run.log"; then
+    # The PAKCS binary was built against a different SWI-Prolog than the one running here:
+    # the toolchain is unusable on this machine, which is not a defect of the classifier.
+    unav growth_curry "PAKCS VM-signature mismatch (PAKCS built with a different SWI-Prolog; rebuild via build/install-curry-self.sh), see evidence/curry_run.log"
   else
     fail growth_curry_build "pakcs did not run the classifier, see evidence/curry_run.log"
   fi
@@ -97,15 +101,18 @@ fi
 if ! command -v agda >/dev/null 2>&1; then
   unav growth_agda "no agda on PATH"
 else
+  # Agda stdlib 2.1 (pinned by agda/VERSIONS) keeps its sources in <lib>/src; the older 1.7.x
+  # layout had them at the library root.
   STDLIB_INC=""
-  [ -d /usr/share/agda-stdlib ] && STDLIB_INC="-i/usr/share/agda-stdlib"
+  if [ -d /usr/share/agda-stdlib/src ]; then STDLIB_INC="-i/usr/share/agda-stdlib/src"
+  elif [ -d /usr/share/agda-stdlib/Data ]; then STDLIB_INC="-i/usr/share/agda-stdlib"; fi
   if [ -n "$STDLIB_INC" ]; then
     ( cd "$ROOT/agda/growth" && LC_ALL=C.UTF-8 timeout 1200 agda -i. $STDLIB_INC Growth.agda ) \
       > "$EVD/agda.log" 2>&1
     [ $? -eq 0 ] && pass growth_agda_typechecks \
       || fail growth_agda_typechecks "see evidence/agda.log"
   else
-    unav growth_agda "agda-stdlib not found under /usr/share/agda-stdlib"
+    unav growth_agda "agda-stdlib sources not found under /usr/share/agda-stdlib/src"
   fi
 fi
 
@@ -136,10 +143,12 @@ else
   SLINE=$(grep '^SELF GROWTH ' "$EVD/self_headless.log" | head -1)
   SFS=$(echo "$SLINE" | sed 's/.*feasible_simple=\([0-9]*\).*/\1/')
   SFT=$(echo "$SLINE" | sed 's/.*feasible_sat=\([0-9]*\).*/\1/')
-  if [ -n "$FS" ] && [ "$SFS" = "$FS" ] && [ "$SFT" = "$FT" ]; then
+  if [ -z "$SLINE" ]; then
+    fail growth_self_counts_equal_fortran "no SELF GROWTH summary line was printed (Self script aborted before the summary; see evidence/self_headless_full.log)"
+  elif [ -n "${FS:-}" ] && [ "$SFS" = "$FS" ] && [ "$SFT" = "$FT" ]; then
     pass growth_self_counts_equal_fortran
   else
-    fail growth_self_counts_equal_fortran "self=$SFS/$SFT csv=$FS/$FT"
+    fail growth_self_counts_equal_fortran "self=$SFS/$SFT csv=${FS:-}/${FT:-}"
   fi
   # GUI under Xvfb (pattern from tests/topology/run.sh)
   if command -v Xvfb >/dev/null && command -v import >/dev/null; then

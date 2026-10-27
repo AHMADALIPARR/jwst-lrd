@@ -2,10 +2,8 @@
  * Additional terms: SnapKitty Opaque License (SNAPKITTY_OPAQUE_LICENSE.md, repository root).
  * Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
  *
- * LRD-STATE-v1 binding for kind=air_proof. Uses the LRD-STATE-v1 C ABI types from
- * "lrd_state.h" -- currently air/abi_mirror/lrd_state.h, a byte-identical mirror of
- * ledger/abi/lrd_state.h on branch t004-ledger (TODO: switch the include path to ledger/abi
- * once merged; see air/STATUS.md).
+ * LRD-STATE-v1 C ABI types come from "lrd_state.h", resolved via -I../ledger/abi to the
+ * canonical ledger/abi/lrd_state.h (the former air/abi_mirror copy was removed).
  *
  * air_proof proposal (LRD-REC-v1): common fields kind=air_proof, prev_commit, seq,
  * payload_sha256 = SHA-256(serialized proof bytes); kind-specific fields

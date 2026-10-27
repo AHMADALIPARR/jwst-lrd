@@ -7,8 +7,10 @@ The code is Rust with no external crates. SHA-256, HMAC-SHA256, bigint, Miller-R
 and the RSA accumulator are all vendored. A small C shim compiles the ledger track's
 `lrd_state.h` unmodified.
 
-## Result of the last run (verbatim counts from `evidence/run_sh.log`)
-`bash tests/capability/run.sh`: **67 PASS, 0 FAIL, 0 UNAVAILABLE**, exit 0, wall time 51 s.
+## Result of the last run (re-run 2026-10-26 on branch repairs-oct26; counts are the PASS/FAIL/UNAVAILABLE lines printed by the script)
+`bash tests/capability/run.sh`: **67 PASS, 0 FAIL, 0 UNAVAILABLE**, exit 0, wall time 47 s.
+(Before the ABI-drift fix the same run gave 66 PASS, 0 FAIL, 1 UNAVAILABLE: the drift check wanted a
+branch `t004-ledger` that is not in this repository.)
 - `cargo test --release --offline`: `test result: ok. 19 passed; 0 failed` (unit) and
   `test result: ok. 14 passed; 0 failed` (multi-process adversarial suite)
 - openssl cross-checks: 11 PASS. These compare modexp against `openssl pkeyutl` raw RSA with the
@@ -16,7 +18,7 @@ and the RSA accumulator are all vendored. A small C shim compiles the ledger tra
   `openssl prime`.
 - bash end-to-end with two real processes: 12 PASS
 - mutation check: 8 of 8 disabled checks were detected by the suite
-- ABI drift vs t004-ledger: PASS. obligations.json parses (jq): PASS
+- ABI drift of `abi/vendor/lrd_state.h` vs the in-repo `ledger/abi/lrd_state.h` (t004-ledger branch if present): PASS. obligations.json parses (jq): PASS
 
 ## Versions (evidence/versions.log)
 ```

@@ -29,29 +29,21 @@ CONSTRAINTS). File: `agda/growth/Growth.agda` (`--safe --without-K`).
   the certificate is deliberately conservative (coarse Euler steps
   underestimate the exponential).
 
-## Typecheck status: NOT YET COMPLETED — read before citing
-As of writing, the file has **not** been typechecked end to end, and no
-result is claimed:
-- Scope/type errors found by Agda 2.6.3 during iteration were fixed
-  (missing `tt` import; ambiguous `_+_`; `_/_` literal imports; the
-  stdlib 1.7.3 `*-mono*-<=-nonNeg` signature, which takes the value and
-  a `NonNegative` wrapper explicitly) — each fix was verified to move the
-  checker past the previous error.
-- The remaining failure is resource exhaustion, not a reported type
-  error: full checks repeatedly hit Agda's default heap cap
-  (3,584 MB, "Heap exhausted") during normalization, at 1024, 512, and
-  64 certificate steps alike, and one raised-heap run was OOM-killed on
-  this 7 GB VM. The size-independence points at the certificate's
-  normalization encoding, not the arithmetic magnitude; the planned next
-  step is a bisect (generic part vs. Benchmark part) and, if the
-  `toWitness (<=?)` encoding is the sink, restating the closed check over
-  unnormalised rationals (Data.Rational.Unnormalised), where
-  multiplication does not trigger gcd normalization.
-- Environment note: this VM provides Agda 2.6.3 / stdlib 1.7.3 (Ubuntu
-  noble apt), while `agda/agda-dir/libraries` pins stdlib 2.1 for the
-  core library. The growth module is written against 1.7.3 as installed;
-  the version discrepancy is recorded here rather than papered over.
+## Typecheck status: PASSES on Agda 2.6.4.3 / stdlib 2.1 (re-checked 2026-10-26)
+`agda -i. -i/usr/share/agda-stdlib/src Growth.agda` (run from `agda/growth/`,
+`--safe --without-K`) completes without error in about 7 s; no postulates.
+`tests/growth/run.sh` reports `PASS growth_agda_typechecks`.
 
-The repository's full-suite entry point reports this section through
-`tests/growth/run.sh` (`growth_agda_typechecks`); until that prints
-PASS on a completed run, treat the certificate as **stated, not checked**.
+An earlier revision of this file was written against stdlib 1.7.3 and never
+typechecked end to end. Porting it to stdlib 2.1 (the version pinned in
+`agda/VERSIONS` and `agda/agda-dir/libraries`) needed only these changes; no
+statement or proof obligation was altered:
+- `*-monoˡ-≤-nonNeg` / `*-monoʳ-≤-nonNeg` take the `NonNegative` witness as an
+  instance argument (`{{ ... }}`) instead of an explicit one.
+- `toWitness tt` got the decision procedure spelled out (`toWitness {a? = x ≤? y} tt`),
+  otherwise the `Dec` argument is an unsolved meta.
+- `factor≥1` / `factor≥0` are applied with their implicit `step`/`n` given,
+  because `factorOf step n = pow step n` is not invertible for unification.
+The "Heap exhausted" problem recorded in the earlier revision did not occur.
+The stdlib source tree is `/usr/share/agda-stdlib/src` (the 2.1 layout), which is
+what `tests/growth/run.sh` now passes as the include path.

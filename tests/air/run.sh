@@ -74,16 +74,18 @@ if make -C "$AIR" BUILD=build-san CFLAGS="-O1 -g -fno-omit-frame-pointer" \
   else fail asan_ubsan_test_air "exit $rc, see air/build/logs/test_air_san.log"; fi
 else unav asan_ubsan_test_air "sanitizer build failed (see air/build/logs/build-san.log)"; fi
 
-# 7. local LRD-STATE-v1 header mirror equals the ledger track's header
-if git -C "$ROOT" rev-parse --verify -q t004-ledger >/dev/null 2>&1; then
-  git -C "$ROOT" show t004-ledger:ledger/abi/lrd_state.h >"$LOG/lrd_state.owner.h" 2>/dev/null
-  tail -n +10 "$AIR/abi_mirror/lrd_state.h" >"$LOG/lrd_state.mirror.h"
-  if cmp -s "$LOG/lrd_state.owner.h" "$LOG/lrd_state.mirror.h"; then pass lrd_state_mirror_matches_t004_ledger
-  else fail lrd_state_mirror_matches_t004_ledger "air/abi_mirror/lrd_state.h differs from t004-ledger:ledger/abi/lrd_state.h"; fi
-elif [ -f "$ROOT/ledger/abi/lrd_state.h" ]; then
-  tail -n +10 "$AIR/abi_mirror/lrd_state.h" | cmp -s - "$ROOT/ledger/abi/lrd_state.h" &&
-    pass lrd_state_mirror_matches_ledger || fail lrd_state_mirror_matches_ledger "mirror differs from ledger/abi/lrd_state.h"
-else unav lrd_state_mirror_matches_t004_ledger "neither branch t004-ledger nor ledger/abi/lrd_state.h is present"; fi
+# 7. air builds against the canonical ledger/abi/lrd_state.h: no local copy of the header remains
+#    under air/ (the former air/abi_mirror was deleted) and the compile line uses -I../ledger/abi
+if [ ! -f "$ROOT/ledger/abi/lrd_state.h" ]; then
+  unav air_uses_canonical_ledger_abi_header "ledger/abi/lrd_state.h is not present"
+else
+  COPIES=$(find "$AIR" -path "$AIR/build*" -prune -o -name lrd_state.h -print)
+  if [ -n "$COPIES" ]; then fail air_uses_canonical_ledger_abi_header "local copy of lrd_state.h under air/: $COPIES"
+  elif ! make -C "$AIR" -n -B BUILD=build 2>/dev/null | grep -q -- '-I../ledger/abi'; then
+    fail air_uses_canonical_ledger_abi_header "air/Makefile does not compile with -I../ledger/abi"
+  elif grep -q 'abi_mirror' "$AIR/Makefile"; then fail air_uses_canonical_ledger_abi_header "air/Makefile still references abi_mirror"
+  else pass air_uses_canonical_ledger_abi_header; fi
+fi
 
 # 8. real JWST input (pluggable: any non-SYNTHETIC LRD-ARR-v1 under fixtures/; scale via AIR_REAL_SCALE)
 REAL=""
