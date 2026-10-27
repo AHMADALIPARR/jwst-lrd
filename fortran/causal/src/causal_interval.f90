@@ -11,7 +11,10 @@
 ! exact (e.g. coincident events give dt = [0,0]).  Where the error-free
 ! transformation is not valid (non-finite, |x| > 1e290, |product| < 1e-280) both
 ! bounds are widened by one ulp unconditionally.  Requires IEEE binary64 arithmetic
-! without value-changing optimisations (no -ffast-math).
+! without value-changing optimisations (no -ffast-math).  The error-free
+! transformations also require that the compiler does not contract a*b+c into a fused
+! multiply-add (that would change the rounding of the split products in two_prod and
+! of the two_sum residual); fortran/causal/Makefile therefore passes -ffp-contract=off.
 module causal_interval
   use causal_units, only: dp
   use, intrinsic :: ieee_arithmetic, only: ieee_is_nan, ieee_is_finite

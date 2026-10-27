@@ -26,6 +26,36 @@
 ! Frame policy (-> INVALID_FRAME): unknown frame id, either frame of kind invalid or
 ! cosmological/redshift, or distinct inertial frames with no registered transform.
 ! Non-finite or inverted intervals -> INVALID_INPUT.
+!
+! Scope of the classification (read before relying on an accepted edge):
+!   * Cone membership is NECESSARY but NOT SUFFICIENT for causation.  An accepted edge a -> b
+!     means only that (i) b lies in the closed future light cone of a in the stated inertial
+!     frame, within the tolerance and uncertainty below, and (ii) the event kinds are in the
+!     allowed order.  Whether a influenced b is an assertion made by whoever proposed the
+!     edge; nothing here establishes it.  A spacelike or past-directed pair can never be
+!     causal under this model, but a timelike future pair need not be.
+!   * The model is flat Minkowski space, one inertial frame at a time.  Cosmological
+!     redshift frames are refused (INVALID_FRAME); a redshift reaches this module only
+!     through redshift_to_local with an explicitly declared spacetime model.
+!
+! Why rel_tol = 1e-12 (an engineering margin from the arithmetic below, not a proven bound):
+!   * The interval S itself already encloses its own rounding: every +, -, * on the bounds
+!     in causal_interval is widened outward, so S needs no tolerance for its own arithmetic.
+!   * What S does not enclose is the error of the frame transform: boost_matrix entries
+!     (gamma from sqrt and division, beta_i*beta_j/b2) are plain round-to-nearest doubles,
+!     and apply_transform treats them as exact.  Each term of S is as large as `scale`
+!     while s2 can be near zero, so an entry error of a few units in the last place
+!     (epsilon(1.0_dp) = 2.2e-16) leaves an error in s2 of a few epsilon times `scale`.
+!   * Measured: tests/causal/test_boost.f90 compares s2 in two inertial frames for 200
+!     deterministic pseudo-random pairs; the worst |s2_L - s2_B| / scale it printed was
+!     2.6064e-15.  rel_tol = 1e-12 is about 380 times that, and about 4500 epsilon.
+!     The margin is generous on purpose; it is not derived from a worst-case bound, and a
+!     boost with beta very close to 1 (large gamma) has not been characterised here.
+!   * Effect on the decision: for a nearly lightlike pair with spatial distance r,
+!     |s2| = |r - c|dt|| (r + c|dt|) ~ 2 r |r - c|dt||, and tol ~ 2e-12 r^2, so a pair is
+!     labelled LIGHTLIKE when r and c|dt| differ by up to about 1e-12 of r.  Such a pair is
+!     accepted as an edge (closed cone) even if it is marginally spacelike in exact
+!     arithmetic.  That is the intended behaviour of the decision rule above.
 module causal_classify
   use causal_units
   use causal_interval

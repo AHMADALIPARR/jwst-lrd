@@ -62,6 +62,7 @@ program test_serial
              'cf5b16a778af8380036ce59e7b0492370b249b11e8f07a51afac45037afee9d1')
 
   call set_suite('fortran.lrdrec')
+  call ensure_dir('out')
   call rec_init(r)
   call rec_set(r, 'b', '2', ok)
   call rec_set(r, 'aa', 'x', ok)

@@ -8,7 +8,7 @@
 #   make ftest      run only the Fortran test programs; nonzero on any FAIL
 #   make clean
 FC      := /usr/bin/gfortran
-FFLAGS  := -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -fimplicit-none
+FFLAGS  := -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -fimplicit-none -ffp-contract=off
 NICE    := nice -n 19
 BLD     := build
 TESTSRC := ../../tests/causal
@@ -60,6 +60,7 @@ $(BLD)/test_%: $(TESTSRC)/test_%.f90 $(LIB) $(BLD)/test_util.o $(BLD)/fixture_gr
 	$(NICE) $(FC) $(FFLAGS) -I$(BLD) $< $(BLD)/test_util.o $(BLD)/fixture_graph.o $(LIB) -o $@
 
 ftest: all
+	@mkdir -p $(TESTSRC)/out
 	@fail=0; for t in $(TESTS); do (cd $(TESTSRC) && $(NICE) ../../fortran/causal/$(BLD)/$$t) || fail=1; done; exit $$fail
 
 test: all
