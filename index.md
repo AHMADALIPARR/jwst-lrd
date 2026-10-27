@@ -5,12 +5,6 @@ title: Little Red Dots Experiment
 
 # Observations. Hypotheses. Invariants.
 
-## [See the observed JWST spectrum and fits for QSO1 →](observed/)
-
-Archived NIRSpec data from MAST with Hα fits and an unresolved redshift gap.
-The red-dot, helix and waveform demo graphics on this site are Self-generated
-illustrations, not telescope data.
-
 ## [Read the computed growth result →](results/)
 
 Which seeds reach QSO1's declared mass benchmark? Actual growth curves,
