@@ -190,3 +190,19 @@ Tests (tests/fortran/run.sh):
 - zinvest_lsf_file_sha256
 - zinvest_lsf_fwhm_2p2pix
 - zinvest_injection_fit_unbiased
+
+## Re-baselined reference assertions (BLOCKERS.md (d), branch blocker-d-ingest)
+The numbers above (e.g. "PASS redshift_vs_furtak2024…", the unconditional `reference_lrd_arr_v1_headers`) describe the earlier
+`tests/fortran/run.sh`. It now behaves as follows; counts below are from `make test` on this branch (fortran suite: 51 PASS, 0 FAIL,
+0 UNAVAILABLE, 2 OPEN; before: 45 PASS, 0 FAIL, 0 UNAVAILABLE).
+- Every count assertion prints `expected=<n> got=<m>` (arrays 8; pixels 429, valid 408, masked 21; kernel unit tests 36).
+- `PASS reference_lrd_arr_v1_headers` is printed only if every listed array passed. `LRD_TEST_EXTRA_ARRAY=bogus_array sh tests/fortran/run.sh`
+  prints `FAIL reference_lrd_arr_bogus_array`, withholds the PASS and exits non-zero; the suite checks this itself
+  (`PASS negative_injection_bogus_array_detected`).
+- `PASS reference_sigma_independent n=408 …`: FLUX_ERROR is re-read from the raw FITS with od+awk and compared with the CFITSIO-extracted
+  `flux_error.f64` and with the Fortran `flam_err` (after the Jy → F_lambda conversion); max relative difference ≤ 1e-12 over the valid pixels.
+- The one-pixel redshift gate is `OPEN redshift_vs_furtak2024 dz=0.0029 tol=0.0113 …` and does not count as PASS. The strict check
+  `FAIL-EXPECTED/OPEN redshift_strict dz=0.0029 > 3*formal_err=0.000808` keeps the offset visible. The 0.0029 offset (about 10.7× the formal
+  error) is still unexplained; nothing in this change resolves it.
+- `tests/run_all.sh` counts OPEN (including FAIL-EXPECTED/OPEN) separately from PASS/FAIL/UNAVAILABLE; OPEN never fails the run.
+- `fixtures/FIXTURES.sha256` records the sha256 of all 67 fixture files as at db089a3; `tests/ingest` (`fixtures_sha256_unchanged`) fails on any change.
