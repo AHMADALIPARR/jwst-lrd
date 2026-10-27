@@ -109,6 +109,18 @@ if command -v valgrind >/dev/null && [ -x "$HAM/build/std/test_ham" ]; then
 else
   unav valgrind_memcheck "valgrind not installed or std build missing"
 fi
+# --- mutation gate: swap of ham_decide rows 8/9 (epoch_exhausted vs infeasible) ---
+if [ -x "$HAM/mutants/run.sh" ] && command -v patch >/dev/null; then
+  mout="$("$HAM/mutants/run.sh" 2>&1)"; mrc=$?
+  echo "$mout" | indent
+  if [ $mrc -eq 0 ] && echo "$mout" | grep -q '^KILLED swap_8_9$'; then
+    pass mutant_swap_8_9_killed
+  else
+    fail mutant_swap_8_9_killed "exit=$mrc: $(echo "$mout" | tail -n 1)"
+  fi
+else
+  unav mutant_swap_8_9_killed "hamiltonian/mutants/run.sh missing or patch(1) not installed"
+fi
 rm -f "$HERE"/logs/.build_*.txt
 
 echo "# runner: fails=$fails"

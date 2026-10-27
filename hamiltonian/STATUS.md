@@ -214,3 +214,47 @@ PASS asan_ubsan_suite
 PASS valgrind_memcheck
 # runner: fails=0
 ```
+
+## Blocker (b): `epoch_exhausted` before `infeasible` is now mutation-pinned (branch `blocker-b-hamiltonian`)
+Scope: only research/BLOCKERS.md (b). Based on origin/main `db089a3`. Measured 2026-10-27 (America/Los_Angeles), gcc 14.2.0, clang 19.1.7.
+This is a completed implementation, not a verified integration; requires owner review. No PR was opened and nothing was merged.
+
+- **Baseline correction.** BLOCKERS.md says the surviving mutant gave `pass=30 fail=0`. On `db089a3` the unit suite has 31 tests;
+  the survival was re-measured here with the unmodified tests: `# SUMMARY pass=31 fail=0 unavailable=0` (full `tests/hamiltonian/run.sh`
+  against the mutant copy: `# runner: fails=0`). So the survival claim holds, with baseline 31, not 30.
+- **Added.**
+  - `t_exhausted_beats_infeasible` in `tests/hamiltonian/test_ham.c` (prints `PASS exhausted_beats_infeasible`). Model A, budget 1:
+    (1) exhausted state with energy 6 (energy check would pass for candidate (2,2), H=11/2) and exhausted state with energy 0 (energy check would fail):
+    reason exactly `epoch_exhausted`, `decision=REJECT`, no `violated`/`violated_count`, `ham_states_constructed()` unchanged, `*next` byte-identical;
+    (2) the same candidate in a non-exhausted state: `infeasible`, `violated=no_22`, `violated_count >= 1`.
+    No existing test was edited (diff is additions only); the `epoch_advance` exhausted coverage (`epoch_transition_explicit`, `reject_never_constructs_state`) is unchanged.
+  - `hamiltonian/mutants/swap_8_9.patch` (rows 8 and 9 exchanged in `ham_engine.c`) and `hamiltonian/mutants/run.sh` (POSIX sh, tested under bash and dash).
+    It copies sources plus the unit suite to a temp dir, first checks the unmutated copy passes, applies the patch to the copy only, builds with the module
+    Makefile and runs the suite. Exit 0 KILLED, 1 SURVIVED, 2 error. The tree is never modified.
+  - `tests/hamiltonian/run.sh` gained one block (`mutant_swap_8_9_killed`) before the final summary; nothing else in it changed.
+- **Mutant BEFORE the new test** (commit `df347aa`, tests unmodified), verbatim, same output under `bash` and `dash`:
+  ```
+  # unmutated: pass=31 fail=0 unavailable=0 exit=0
+  # mutant swap_8_9: pass=31 fail=0 unavailable=0 exit=0
+  SURVIVED swap_8_9
+  ```
+  (runner exit status 1)
+- **Mutant AFTER the new test** (commit `a7d516f`), verbatim, same output under `bash` and `dash`:
+  ```
+  # unmutated: pass=32 fail=0 unavailable=0 exit=0
+  #   FAIL exhausted_beats_infeasible field reason = infeasible, want epoch_exhausted
+  # mutant swap_8_9: pass=31 fail=1 unavailable=0 exit=1
+  KILLED swap_8_9
+  ```
+  (runner exit status 0). The new test is the only one that fails against the mutant.
+- **Real source, `tests/hamiltonian/run.sh`** at `a7d516f`: unit suite `# SUMMARY pass=32 fail=0 unavailable=0` (gcc), identical under clang and ASan+UBSan;
+  valgrind `ERROR SUMMARY: 0 errors from 0 contexts`; `PASS mutant_swap_8_9_killed`; `# runner: fails=0`. Runner top level: 42 PASS, 0 FAIL, 0 UNAVAILABLE. Unit tests 31 -> 32 (+1).
+  The BLOCKERS.md target ">= 32" is met from the real baseline of 31, but the rise is +1, not the +2 that "30 -> >= 32" implied.
+- **Reproduce.** `tests/hamiltonian/run.sh`; `hamiltonian/mutants/run.sh` (also `sh hamiltonian/mutants/run.sh`).
+  To see BEFORE, check out `df347aa`; for the new test alone against the mutant, read the `FAIL` line above.
+- **Not done / open.**
+  - `tests/run_all.sh` did **not** complete: killed by a 600 s timeout while in the `curry-growth` suite, which also printed
+    `UNAVAILABLE real_input ... AIR_REAL_SCALE ... is not set`. The `hamiltonian` suite is after it in order and was not reached through run_all.
+    No run_all totals are claimed; no FAIL line appeared in the partial output. Running it also rewrote tracked `capability/evidence/*` files, which were restored with `git checkout`.
+  - Only the 8/9 order is mutation-tested. Other row orders (e.g. 9/10) and the `epoch_advance` row 7/8 order have no mutant here.
+  - Reviewer sign-off (HCALC Alloy): not yet.
