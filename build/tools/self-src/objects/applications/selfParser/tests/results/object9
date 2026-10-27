@@ -1,6 +1,0 @@
-
-expressionSeries
-  object (
-    slotList |
-      slot
-        objectAnnotationSlotName {} = 'snort' | )

@@ -1,7 +1,0 @@
-
-expressionSeries
-  keywordSend: a:
-    <implicitSelf>
-    keywordSend: b:
-      <implicitSelf>
-      3

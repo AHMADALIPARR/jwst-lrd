@@ -1,9 +1,0 @@
-{- AbstractCurry 3.0 -}
-CurryProg "JSON.Data"
-[]
-Nothing
- []
- []
- [CType ("JSON.Data","JValue") Public [] [CCons ("JSON.Data","JTrue") Public [],CCons ("JSON.Data","JFalse") Public [],CCons ("JSON.Data","JNull") Public [],CCons ("JSON.Data","JString") Public [CTCons ("Prelude","String")],CCons ("JSON.Data","JNumber") Public [CTCons ("Prelude","Float")],CCons ("JSON.Data","JArray") Public [CTApply (CTCons ("Prelude","[]")) (CTCons ("JSON.Data","JValue"))],CCons ("JSON.Data","JObject") Public [CTApply (CTCons ("Prelude","[]")) (CTApply (CTApply (CTCons ("Prelude","(,)")) (CTCons ("Prelude","String"))) (CTCons ("JSON.Data","JValue")))]] [("Prelude","Eq"),("Prelude","Show")]]
- []
- []
