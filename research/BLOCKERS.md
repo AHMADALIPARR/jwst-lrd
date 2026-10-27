@@ -37,7 +37,7 @@ the genesis (`seq 0`) convention is not pinned.
 3. *Prime source specified.* The prime table is deterministic and exact (trial division today); document the largest index supported and the failure token beyond it.
    Pass: `p_1..p_k` equals a checked-in table (first 1000 primes, sha256 recorded) and index `k+1` beyond the cap returns the documented error.
 4. *Negative / unknown exponents (Alloy G2) closed.* Decoding refuses every non-positive exponent and every exponent that is not a canonical symbol/record.
-   Pass: C tests for `L` with exponent 0, a negative exponent (represented via rational/zero-denominator input rejected at parse), and a non-canonical exponent return
+   Pass: C tests for `L` with exponent 0, a non-canonical exponent, and an input whose parsed exponent is negative (must be rejected at parse, never decoded) return
    `E_NOTPOS` / `E_GAP` / `E_EXTRA` / `E_NONCANON` as appropriate; Alloy `check` commands for G2 are added to `expectations.tsv` and return 0 (no counterexample) in scope.
 5. *Genesis `seq 0` convention fixed.* State in `ledger/README.md` whether position 0 / `seq 0` is the empty ledger (`L = 1`) or the genesis record, and that `lrd_state.h`'s `seq` agrees.
    Pass: test `godel_genesis_seq0_convention` asserts `L = 1` (or the chosen value) at `seq 0`, and the first append yields `seq 1`.
@@ -54,7 +54,7 @@ Pass: `PASS godel_record_roundtrip_gt2bytes` and `PASS godel_max_len_boundary`; 
 
 **Current state.** `hamiltonian/OBLIGATIONS.md` §1.6 makes the order normative (row 8 `epoch_exhausted` → row 9 `infeasible` → row 10 `energy_not_decreasing`) and
 `hamiltonian/src/ham_engine.c` (`ham_decide`, step path, lines ~273–301) implements it. But no test pins it: every existing exhaustion test (`t_epoch_exhausted`, `tests/hamiltonian/test_ham.c` ~L428 and ~L582)
-uses a *feasible* candidate, and every infeasible test uses a non-exhausted state. A mutant that swaps rows 8 and 9 therefore survived with `pass=30 fail=0` (mutation result as reported by the owner of this track; not re-run here).
+uses a *feasible* candidate, and every infeasible test uses a non-exhausted state. A mutant that swaps rows 8 and 9 therefore survived with `pass=30 fail=0` (survival result as reported in the task brief; not re-run in this branch).
 
 **Resolution criteria.**
 1. A test constructs an epoch whose budget is used up (`steps_used == budget`) and proposes a candidate assignment that **violates a hard constraint** and **would also fail or pass energy** (cover both).
@@ -99,7 +99,7 @@ Pass: three `PASS persist_failed_<site>` lines asserting the exact token, and a 
 
 **Current state (`tests/fortran/run.sh`, reference-run block ~L25–49; ingest tests in `tests/ingest/run.sh`).**
 - The redshift check passes if |z − 7.0451| ≤ one Hα prism pixel expressed in z (`pixel_ang/6564.632`); the measured gap is **0.0029**, which this tolerance hides (`fortran/STATUS.md` L53 says it is ≈ 10× the formal error). It is reported as `PASS redshift_vs_furtak2024…`.
-- `PASS reference_lrd_arr_v1_headers` (L49) is printed **unconditionally** after the loop; a failing array `continue`s the loop but the loop's own `fail` is a different line, so a bogus array name in the list is only caught by chance of the `|| { fail …; continue; }` branch and is followed by an unconditional PASS.
+- `PASS reference_lrd_arr_v1_headers` (L49) is printed **unconditionally** after the loop: a bad array makes the loop print its own `FAIL reference_lrd_arr_<name>` and `continue`, but the line after the loop still prints `PASS reference_lrd_arr_v1_headers`, so one FAIL is followed by a contradictory PASS (and an array name that is simply wrong is never required to exist).
 - No test prints the expected pixel/array **count** it asserts against; and no independent check of the σ (flux_error) values against the source FITS exists.
 
 **Resolution criteria.**
