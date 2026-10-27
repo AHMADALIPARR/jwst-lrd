@@ -37,7 +37,7 @@ lobby _AddSlots: (|
         ((i < s size) && [(s at: i) = '+']) ifTrue: [ i: i + 1 ].
         [(i < s size) && [(s at: i) isDigit]] whileTrue: [
           ex: (ex * 10) + ((s at: i) asByte - '0' asByte). i: i + 1 ] ].
-      ex timesRepeat: [ eneg ifTrue: [ mant: mant / 10.0 ] False: [ mant: mant * 10.0 ] ].
+      1 to: ex Do: [|:k| eneg ifTrue: [ mant: mant / 10.0 ] False: [ mant: mant * 10.0 ] ].
       neg ifTrue: [ 0.0 - mant ] False: [ mant ] ).
 
     "Approximate log10 of a positive float by scaling; for chart layout only."
@@ -64,7 +64,7 @@ lobby _AddSlots: (|
       g header: rec.
       n: (rec at: 'n_rows') asInteger.
       g rows: vector copySize: n.
-      (1 to: n) do: [|:i. pre. row |
+      1 to: n Do: [|:i. pre. row |
         pre: 'row.', (g pad6: i), '.'.
         row: dictionary copyRemoveAll.
         ('lam eps zform duty dt_myr mdot seed_simple seed_sat feas_simple feas_sat'
