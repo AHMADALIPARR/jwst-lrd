@@ -1,0 +1,21 @@
+LRD-REC-v1
+4:kind15:placeholder_fit
+5:model10:point_mass
+5:owner12:t018-dynmass
+6:status11:PLACEHOLDER
+9:synthetic95:SYNTHETIC PLACEHOLDER - not data; replaced automatically when the owning track writes LRD files
+5:value11:PLACEHOLDER
+LRD-REC-v1
+4:kind15:placeholder_fit
+5:model8:extended
+5:owner12:t018-dynmass
+6:status11:PLACEHOLDER
+9:synthetic95:SYNTHETIC PLACEHOLDER - not data; replaced automatically when the owning track writes LRD files
+5:value11:PLACEHOLDER
+LRD-REC-v1
+4:kind15:placeholder_fit
+5:model9:composite
+5:owner12:t018-dynmass
+6:status11:PLACEHOLDER
+9:synthetic95:SYNTHETIC PLACEHOLDER - not data; replaced automatically when the owning track writes LRD files
+5:value11:PLACEHOLDER
