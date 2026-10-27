@@ -8,7 +8,7 @@
 #   make ftest      run only the Fortran test programs; nonzero on any FAIL
 #   make clean
 FC      := /usr/bin/gfortran
-FFLAGS  := -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -fimplicit-none
+FFLAGS  := -std=f2018 -Wall -Wextra -fcheck=all -g -O1 -fimplicit-none -ffp-contract=off
 NICE    := nice -n 19
 BLD     := build
 TESTSRC := ../../tests/causal
