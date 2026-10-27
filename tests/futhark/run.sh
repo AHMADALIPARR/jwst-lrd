@@ -7,11 +7,11 @@
 # Output (research/CONTRACTS.md): one line per test
 #   PASS <name> | FAIL <name> <why> | UNAVAILABLE <name> <reason>
 # then a SUMMARY line.  Exit status 1 iff any FAIL.
-# Environment: LRD_SHARED (shared checkout, read-only; default
-# /workspace/jwst-lrd), KEEP_WORK=1 keeps the scratch directory.
+# Environment: LRD_SHARED (shared checkout, read-only; default is this repo root,
+# i.e. the checkout containing this script), KEEP_WORK=1 keeps the scratch directory.
 set -u
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
-SHARED=${LRD_SHARED:-/workspace/jwst-lrd}
+SHARED=${LRD_SHARED:-$ROOT}
 FUT=$ROOT/futhark/lrd-fut
 FREF_SRC=$ROOT/tests/futhark/fortran-ref
 W=$(mktemp -d "${TMPDIR:-/tmp}/lrd-futhark-test.XXXXXX")
@@ -81,6 +81,7 @@ REF=$FB/lrdref
 if make -C "$FREF_SRC" B="$FB" all > "$W/fortran-build.log" 2>&1 && [ -x "$REF" ]; then
   pass fortran-ref-build
   "$FB/test_lrd_kernels" > "$W/fortran-unit.log" 2>&1
+  FUNIT_RC=$?
   while IFS= read -r line; do
     case "$line" in
       PASS\ *) pass "${line#PASS }" ;;
@@ -88,6 +89,11 @@ if make -C "$FREF_SRC" B="$FB" all > "$W/fortran-build.log" 2>&1 && [ -x "$REF" 
     esac
   done < "$W/fortran-unit.log"
   grep -q '^PASS fortran-ref-unit-' "$W/fortran-unit.log" || fail fortran-ref-unit "$(oneline "$W/fortran-unit.log")"
+  # A crash or non-zero exit of the unit binary must never count as a pass, even if some
+  # PASS lines were printed before it died. Explicit FAIL lines are already counted above.
+  if [ "$FUNIT_RC" -ne 0 ] && ! grep -q '^FAIL ' "$W/fortran-unit.log"; then
+    fail fortran-ref-unit-exit "test_lrd_kernels exited with status $FUNIT_RC: $(oneline "$W/fortran-unit.log")"
+  fi
 else
   fail fortran-ref-build "$(tail -n 3 "$W/fortran-build.log" | tr '\n' ' ')"
   REF=
