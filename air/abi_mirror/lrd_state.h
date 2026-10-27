@@ -8,8 +8,8 @@
  * research/CONTRACTS.md LRD-STATE-v1. Do not edit below this block; it is not a fork.
  */
 /* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
- * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License.
- * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+ * Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
+ * SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
  *
  * JWST-LRD Sovereign Scientific Runtime -- LRD-STATE-v1 shared state-transition ABI (C17).
  * Specification: research/CONTRACTS.md, sections "LRD-REC-v1" and "LRD-STATE-v1".

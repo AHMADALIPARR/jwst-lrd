@@ -1,6 +1,6 @@
 /* Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
- * Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
- * SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque
+ * Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+ * SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
  *
  * Test suite for the Frustration Hamiltonian Action-WORM engine (TASK 008).
  * Prints one line per test: "PASS <name>" | "FAIL <name> <why>" |

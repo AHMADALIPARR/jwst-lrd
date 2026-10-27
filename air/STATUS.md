@@ -172,7 +172,7 @@ Diagnostic lines from `air/build/logs/test_air.log`, verbatim (`new_commit` chan
 
 1. **`ledger/abi/lrd_state.h` is not on main.** `air/abi_mirror/lrd_state.h` is a byte-identical copy of `ledger/abi/lrd_state.h` from branch `t004-ledger` at commit `627fda7` (ledger track), preceded by a 9-line TODO header. `run.sh` checks that it matches (`lrd_state_mirror_matches_t004_ledger`).
    **TODO:** once t004-ledger is merged, delete `air/abi_mirror/` and change `-Iabi_mirror` to `-I../ledger/abi` in `air/Makefile`. No source changes are needed.
-   The mirror's own SPDX line (`AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque`) is the ledger track's. air/ files use `AGPL-3.0-only` plus the SnapKitty Opaque License line, as instructed.
+   The mirror's own SPDX line was `AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque` after the 2026-10-26 licence normalization (earlier `-or-later`); air/ files use `AGPL-3.0-only` plus the SnapKitty Opaque License line, as instructed.
 2. **`new_commit` derivation** is an assumption (see above). It needs confirmation from the ledger track and Hilbert.
 3. **`air_transition` signature:** it takes the public record, the inputs and the proof bytes explicitly, so it doesn't match the bare `lrd_transition_fn` typedef. It needs a context mechanism from the ledger track to plug in.
 4. **No real JWST fixture:** `real_input` is UNAVAILABLE. Choosing a fixed-point scale for the real flux unit is still open.

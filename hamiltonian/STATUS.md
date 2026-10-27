@@ -1,6 +1,6 @@
 <!-- Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited
-     Dual-licensed: AGPL-3.0-or-later plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
-     SPDX-License-Identifier: AGPL-3.0-or-later AND LicenseRef-SnapKitty-Opaque -->
+     Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License (see LICENSE, SNAPKITTY_OPAQUE_LICENSE.md).
+     SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque -->
 # hamiltonian/STATUS.md — TASK 008 Frustration Hamiltonian Action-WORM engine
 
 - Branch: `t008-hamiltonian`, worktree `/workspace/jwst-lrd-t008`, based on main `db41431`
