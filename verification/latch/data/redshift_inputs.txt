@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Inputs for the redshift measurement-evidence producer (key=value, '#' comments).
+#
+# Provenance (read, not recomputed here):
+#  - z_measured = 7.04221, z_measured_sigma = 0.00027: Fortran fit of Hbeta+Halpha to the
+#    QSO1 NIRSpec PRISM x1d spectrum (obsid 230168921), as stated in
+#    /workspace/jwst-lrd/README.md line 24 and research/INTEGRATION.md line 70.
+#    These numbers were copied from that text; this prototype did not re-run the Fortran.
+#  - z_published = 7.0451: "published 7.0451" per research/INTEGRATION.md line 70.
+#  - z_published_sigma: no uncertainty for the published value was found in the
+#    repository text searched (README.md, research/INTEGRATION.md); recorded as unknown.
+#  - sigma_computed = 0.00027 is the Fortran z uncertainty above; sigma_reference
+#    (a Futhark/other reference sigma) was not found on disk: recorded as unknown.
+inputs_id=qso1-fortran-t001-readme-2026-10
+z_measured=7.04221
+z_measured_sigma=0.00027
+z_published=7.0451
+z_published_sigma=unknown
+k_sigma=3
+sigma_computed=0.00027
+sigma_reference=unknown
+sigma_abs_tol=unknown

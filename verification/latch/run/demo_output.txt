@@ -1,0 +1,221 @@
+nats-server nats-server: v2.15.2 pid=2402874 port=14222 jetstream on
+streams VERIFY, VERIFYOUT ready
+
+######## PHASE 1: publish scripted batch 1, start service (durable consumer 'latch')
+  pub verify.signal.runner id=S1-runner-pass -> stream seq 1
+  pub verify.signal.agda id=S1-agda-pass -> stream seq 2
+  pub verify.signal.futhark id=S1-futhark-pass -> stream seq 3
+  pub verify.signal.ledger id=S1-ledger-unavail -> stream seq 4
+  pub verify.signal.hamiltonian id=S1-ham-pass-1 -> stream seq 5
+published scripted batch 1 (5 events)
+--- service log so far:
+[latch] start consumer=latch state_file=latch.state events_seen=0 state_hash=ceb8e67200945c6e91cc898a228ba76a71527cf760495ed695eecef4dd9b3590
+[latch] js_seq=1 delivered=1 verify.signal.runner id=S1-runner-pass -> ACCEPTED (pass_recorded) latch PENDING -> PENDING
+[latch] js_seq=2 delivered=1 verify.signal.agda id=S1-agda-pass -> ACCEPTED (pass_recorded) latch PENDING -> PENDING
+[latch] js_seq=3 delivered=1 verify.signal.futhark id=S1-futhark-pass -> ACCEPTED (pass_recorded) latch PENDING -> PENDING
+[latch] js_seq=4 delivered=1 verify.signal.ledger id=S1-ledger-unavail -> ACCEPTED (critical_unavailable_quarantines) latch PENDING -> QUARANTINE
+[latch] js_seq=5 delivered=1 verify.signal.hamiltonian id=S1-ham-pass-1 -> ACCEPTED (pass_recorded) latch QUARANTINE -> QUARANTINE
+[latch] IDLE processed_this_run=5 state_hash=bc12e26b3352acd98a98ada2aecafc1e7de5824779abc2a39331d3b0346abc56
+  rev scripted-rev-S1 latch=QUARANTINE passed=[<<"agda.kernel">>,
+                                               <<"futhark.diff">>,
+                                               <<"hamiltonian.suite">>,
+                                               <<"runner.suite">>] failed=[] unavailable=[<<"ledger.abi">>]
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=1
+  stream verify.signal.ledger last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=5
+
+>>> kill -9 service (pid 2402973)
+state file persisted: 584 bytes
+
+######## PHASE 2: publish batch 2 + Octave evidence while the service is DOWN
+  pub verify.signal.ledger id=S1-ledger-pass -> stream seq 6
+  pub verify.signal.hamiltonian id=S1-ham-fail -> stream seq 7
+  pub verify.signal.hamiltonian id=S1-ham-pass-2 -> stream seq 8
+  pub verify.signal.hamiltonian id=S1-ham-fail -> stream seq 9
+  pub verify.signal.runner id=S1-runner-stale -> stream seq 10
+  pub verify.signal.license id=S1-license-pass -> stream seq 11
+  pub verify.signal.ingest id=S1-ingest-pass -> stream seq 12
+  pub verify.signal.redshift id=S1-redshift-pass -> stream seq 13
+  pub verify.signal.qso1 id=S1-qso1-pass -> stream seq 14
+published scripted batch 2 (9 events)
+published verify.evidence.measurement id=octave-redshift.z_residual-1ed57a4f5b94-qso1-fortran-t001-readme-2026-10 -> stream seq 15
+published verify.evidence.measurement id=octave-redshift.sigma_residual-1ed57a4f5b94-qso1-fortran-t001-readme-2026-10 -> stream seq 16
+>>> restart service: durable consumer must resume (unacked messages only), state from snapshot
+[latch] start consumer=latch state_file=latch.state events_seen=5 state_hash=bc12e26b3352acd98a98ada2aecafc1e7de5824779abc2a39331d3b0346abc56
+[latch] js_seq=6 delivered=1 verify.signal.ledger id=S1-ledger-pass -> UNAVAILABLE_RESOLVED (same_check_pass_on_same_revision) latch QUARANTINE -> PENDING
+[latch] js_seq=7 delivered=1 verify.signal.hamiltonian id=S1-ham-fail -> ACCEPTED (fail_latched) latch PENDING -> BLOCK
+[latch] js_seq=8 delivered=1 verify.signal.hamiltonian id=S1-ham-pass-2 -> PASS_IGNORED (cannot_clear_latched_failure) latch BLOCK -> BLOCK
+[latch] js_seq=9 delivered=1 verify.signal.hamiltonian id=S1-ham-fail -> DUPLICATE (event_already_processed) latch BLOCK -> BLOCK
+[latch] js_seq=10 delivered=1 verify.signal.runner id=S1-runner-stale -> STALE_EVENT ({seq_not_after_last_for_stream,<<"verify.signal.runner">>,1}) latch BLOCK -> BLOCK
+[latch] js_seq=11 delivered=1 verify.signal.license id=S1-license-pass -> ACCEPTED (pass_recorded) latch BLOCK -> BLOCK
+[latch] js_seq=12 delivered=1 verify.signal.ingest id=S1-ingest-pass -> ACCEPTED (pass_recorded) latch BLOCK -> BLOCK
+[latch] js_seq=13 delivered=1 verify.signal.redshift id=S1-redshift-pass -> ACCEPTED (pass_recorded) latch BLOCK -> BLOCK
+[latch] js_seq=14 delivered=1 verify.signal.qso1 id=S1-qso1-pass -> ACCEPTED (pass_recorded) latch BLOCK -> BLOCK
+[latch] js_seq=15 delivered=1 verify.evidence.measurement id=octave-redshift.z_residual-1ed57a4f5b94-qso1-fortran-t001-readme-2026-10 -> ACCEPTED (fail_latched) latch PENDING -> BLOCK
+[latch] js_seq=16 delivered=1 verify.evidence.measurement id=octave-redshift.sigma_residual-1ed57a4f5b94-qso1-fortran-t001-readme-2026-10 -> ACCEPTED (critical_unavailable_quarantines) latch BLOCK -> BLOCK
+[latch] IDLE processed_this_run=11 state_hash=9a48cbb0bd1fde80c14a0a08badbbd2f48378166d05fa3d203402b8a4ed2cbed
+  rev 1ed57a4f5b94443c9c224fc9b751ec94a816c1bf latch=BLOCK passed=[] failed=[<<"redshift.z_residual">>] unavailable=[<<"redshift.sigma_residual">>]
+  rev scripted-rev-S1 latch=BLOCK passed=[<<"agda.kernel">>,
+                                          <<"futhark.diff">>,
+                                          <<"ingest.replay">>,
+                                          <<"ledger.abi">>,<<"license.spdx">>,
+                                          <<"qso1.fixture">>,
+                                          <<"redshift.z_residual">>,
+                                          <<"runner.suite">>] failed=[<<"hamiltonian.suite">>] unavailable=[]
+  stream verify.evidence.measurement last_seq=2
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=3
+  stream verify.signal.ingest last_seq=1
+  stream verify.signal.ledger last_seq=2
+  stream verify.signal.license last_seq=1
+  stream verify.signal.qso1 last_seq=1
+  stream verify.signal.redshift last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=14
+
+>>> kill -9 service (pid 2403146)
+
+######## PHASE 3: batch 3 (repairs, invalid status). Fault injection: service halts after
+######## persisting state but BEFORE acking event S1-repair-good (LATCH_CRASH_AFTER_EVENT)
+  pub verify.signal.qso1 id=S2-qso1-invalid -> stream seq 17
+  pub verify.evidence.repair id=S1-repair-badsig -> stream seq 18
+  pub verify.evidence.repair id=S1-repair-wrongrev -> stream seq 19
+  pub verify.evidence.repair id=S1-repair-good -> stream seq 20
+  pub verify.signal.hamiltonian id=S1-ham-pass-3 -> stream seq 21
+published scripted batch 3 (5 events)
+>>> service exited with status 137 (137 = injected halt)
+[latch] start consumer=latch state_file=latch.state events_seen=14 state_hash=9a48cbb0bd1fde80c14a0a08badbbd2f48378166d05fa3d203402b8a4ed2cbed
+[latch] js_seq=17 delivered=1 verify.signal.qso1 id=S2-qso1-invalid -> ACCEPTED (invalid_status_latched) latch PENDING -> BLOCK
+[latch] js_seq=18 delivered=1 verify.evidence.repair id=S1-repair-badsig -> REPAIR_REJECTED (bad_signature) latch BLOCK -> BLOCK
+[latch] js_seq=19 delivered=1 verify.evidence.repair id=S1-repair-wrongrev -> REPAIR_REJECTED (no_latched_failure_for_this_revision_and_check) latch BLOCK -> BLOCK
+[latch] js_seq=20 delivered=1 verify.evidence.repair id=S1-repair-good -> REPAIR_ACCEPTED (failure_cleared_check_needs_fresh_pass) latch BLOCK -> PENDING
+[latch] FAULT INJECTION: halting after persist, BEFORE ack of S1-repair-good
+
+>>> restart service WITHOUT fault: unacked repair is redelivered after ack_wait (3s)
+[latch] start consumer=latch state_file=latch.state events_seen=16 state_hash=6e49c57651df69f49e6ffcdf6ff9500f1fb03fa9ca93a56acf4c347dafefef77
+[latch] js_seq=21 delivered=1 verify.signal.hamiltonian id=S1-ham-pass-3 -> ACCEPTED (pass_recorded) latch PENDING -> RELEASE_CANDIDATE
+[latch] IDLE processed_this_run=1 state_hash=5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+  rev 1ed57a4f5b94443c9c224fc9b751ec94a816c1bf latch=BLOCK passed=[] failed=[<<"redshift.z_residual">>] unavailable=[<<"redshift.sigma_residual">>]
+  rev scripted-rev-S1 latch=CANDIDATE passed=[<<"agda.kernel">>,
+                                              <<"futhark.diff">>,
+                                              <<"hamiltonian.suite">>,
+                                              <<"ingest.replay">>,
+                                              <<"ledger.abi">>,
+                                              <<"license.spdx">>,
+                                              <<"qso1.fixture">>,
+                                              <<"redshift.z_residual">>,
+                                              <<"runner.suite">>] failed=[] unavailable=[]
+  rev scripted-rev-S2 latch=BLOCK passed=[] failed=[<<"qso1.fixture">>] unavailable=[]
+  stream verify.evidence.measurement last_seq=2
+  stream verify.evidence.repair last_seq=3
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=4
+  stream verify.signal.ingest last_seq=1
+  stream verify.signal.ledger last_seq=2
+  stream verify.signal.license last_seq=1
+  stream verify.signal.qso1 last_seq=2
+  stream verify.signal.redshift last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=17
+[latch] js_seq=20 delivered=2 verify.evidence.repair id=S1-repair-good -> DUPLICATE (event_already_processed) latch RELEASE_CANDIDATE -> RELEASE_CANDIDATE
+[latch] IDLE processed_this_run=2 state_hash=5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+  rev 1ed57a4f5b94443c9c224fc9b751ec94a816c1bf latch=BLOCK passed=[] failed=[<<"redshift.z_residual">>] unavailable=[<<"redshift.sigma_residual">>]
+  rev scripted-rev-S1 latch=CANDIDATE passed=[<<"agda.kernel">>,
+                                              <<"futhark.diff">>,
+                                              <<"hamiltonian.suite">>,
+                                              <<"ingest.replay">>,
+                                              <<"ledger.abi">>,
+                                              <<"license.spdx">>,
+                                              <<"qso1.fixture">>,
+                                              <<"redshift.z_residual">>,
+                                              <<"runner.suite">>] failed=[] unavailable=[]
+  rev scripted-rev-S2 latch=BLOCK passed=[] failed=[<<"qso1.fixture">>] unavailable=[]
+  stream verify.evidence.measurement last_seq=2
+  stream verify.evidence.repair last_seq=3
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=4
+  stream verify.signal.ingest last_seq=1
+  stream verify.signal.ledger last_seq=2
+  stream verify.signal.license last_seq=1
+  stream verify.signal.qso1 last_seq=2
+  stream verify.signal.redshift last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=17
+
+######## COLD REPLAY: new empty state, new durable consumer 'latch-replay' (deliver all), no publishing
+[latch] start consumer=latch-replay state_file=replay.state events_seen=0 state_hash=ceb8e67200945c6e91cc898a228ba76a71527cf760495ed695eecef4dd9b3590
+[latch] IDLE processed_this_run=21 state_hash=5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+  rev 1ed57a4f5b94443c9c224fc9b751ec94a816c1bf latch=BLOCK passed=[] failed=[<<"redshift.z_residual">>] unavailable=[<<"redshift.sigma_residual">>]
+  rev scripted-rev-S1 latch=CANDIDATE passed=[<<"agda.kernel">>,
+                                              <<"futhark.diff">>,
+                                              <<"hamiltonian.suite">>,
+                                              <<"ingest.replay">>,
+                                              <<"ledger.abi">>,
+                                              <<"license.spdx">>,
+                                              <<"qso1.fixture">>,
+                                              <<"redshift.z_residual">>,
+                                              <<"runner.suite">>] failed=[] unavailable=[]
+  rev scripted-rev-S2 latch=BLOCK passed=[] failed=[<<"qso1.fixture">>] unavailable=[]
+  stream verify.evidence.measurement last_seq=2
+  stream verify.evidence.repair last_seq=3
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=4
+  stream verify.signal.ingest last_seq=1
+  stream verify.signal.ledger last_seq=2
+  stream verify.signal.license last_seq=1
+  stream verify.signal.qso1 last_seq=2
+  stream verify.signal.redshift last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=17
+
+######## OFFLINE PURE FOLD over the whole VERIFY stream (STREAM.MSG.GET, no consumer)
+[fold-stream] messages=21 state_hash=5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+  rev 1ed57a4f5b94443c9c224fc9b751ec94a816c1bf latch=BLOCK passed=[] failed=[<<"redshift.z_residual">>] unavailable=[<<"redshift.sigma_residual">>]
+  rev scripted-rev-S1 latch=CANDIDATE passed=[<<"agda.kernel">>,
+                                              <<"futhark.diff">>,
+                                              <<"hamiltonian.suite">>,
+                                              <<"ingest.replay">>,
+                                              <<"ledger.abi">>,
+                                              <<"license.spdx">>,
+                                              <<"qso1.fixture">>,
+                                              <<"redshift.z_residual">>,
+                                              <<"runner.suite">>] failed=[] unavailable=[]
+  rev scripted-rev-S2 latch=BLOCK passed=[] failed=[<<"qso1.fixture">>] unavailable=[]
+  stream verify.evidence.measurement last_seq=2
+  stream verify.evidence.repair last_seq=3
+  stream verify.signal.agda last_seq=1
+  stream verify.signal.futhark last_seq=1
+  stream verify.signal.hamiltonian last_seq=4
+  stream verify.signal.ingest last_seq=1
+  stream verify.signal.ledger last_seq=2
+  stream verify.signal.license last_seq=1
+  stream verify.signal.qso1 last_seq=2
+  stream verify.signal.redshift last_seq=1
+  stream verify.signal.runner last_seq=1
+  events_seen=17
+
+######## HASH COMPARISON
+after phase1 (pre-kill)            bc12e26b3352acd98a98ada2aecafc1e7de5824779abc2a39331d3b0346abc56
+after phase2 (restart #1)          9a48cbb0bd1fde80c14a0a08badbbd2f48378166d05fa3d203402b8a4ed2cbed
+after phase3 (crash+redelivery)    5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+cold replay from empty state       5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+offline fold of stream             5c737a6cc4c297aedeb6041cc393297309777cf4a12debf6af8e80ca2984b95a
+RESULT: replay state IDENTICAL to live service state
+
+######## OUTPUT STREAM VERIFYOUT (decisions published by the Erlang latch)
+out#5 verify.latch.quarantine {"prev_latch":"PENDING","latch":"QUARANTINE","revision":"scripted-rev-S1","cause_event_id":"S1-ledger-unavail","note":"RELEASE_CANDIDATE is not final authorization"}
+out#9 verify.latch.blocked {"prev_latch":"PENDING","latch":"BLOCK","revision":"scripted-rev-S1","cause_event_id":"S1-ham-fail","note":"RELEASE_CANDIDATE is not final authorization"}
+out#18 verify.latch.blocked {"prev_latch":"PENDING","latch":"BLOCK","revision":"1ed57a4f5b94443c9c224fc9b751ec94a816c1bf","cause_event_id":"octave-redshift.z_residual-1ed57a4f5b94-qso1-fortran-t001-readme-2026-10","note":"RELEASE_CANDIDATE is not final authorization"}
+out#21 verify.latch.blocked {"prev_latch":"PENDING","latch":"BLOCK","revision":"scripted-rev-S2","cause_event_id":"S2-qso1-invalid","note":"RELEASE_CANDIDATE is not final authorization"}
+out#26 verify.latch.candidate {"prev_latch":"PENDING","latch":"RELEASE_CANDIDATE","revision":"scripted-rev-S1","cause_event_id":"S1-ham-pass-3","note":"RELEASE_CANDIDATE is not final authorization"}
+audit messages: 22  latch messages: 5
+
+######## KEY LEAK CHECK
+key not present in any log/output file
