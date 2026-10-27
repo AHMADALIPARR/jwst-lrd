@@ -92,6 +92,45 @@ for a in wavelength flux flux_error; do
 done
 [ $ok = 1 ] && pass lrd_arr_v1_arrays || fail lrd_arr_v1_arrays "$why"
 
+# 6b. Pixel/array counts declared for the c0b87857 fixture (BLOCKERS.md (d) criterion 1); each line prints
+#     expected=<n> got=<m> in PASS and FAIL. The fixture bytes are never modified (see fixtures_sha256_unchanged).
+if [ "$SHA" = c0b878576d7d7ec723c5ee526d29715fb672d81e45bc8ba4e02598ce8b9c5ee7 ]; then
+  cnt() { if [ "$3" = "$2" ]; then pass "$1 expected=$2 got=$3"; else fail "$1" "expected=$2 got=$3"; fi; }
+  cnt ingest_pixel_count 429 "$nr"
+  cnt ingest_array_f64_count 3 "$(ls "$D"/*.f64 | wc -l | tr -d ' ')"
+  for a in wavelength flux flux_error; do cnt "ingest_array_${a}_elements" 429 $(( $(wc -c < "$D/$a.f64" | tr -d ' ') / 8 )); done
+else
+  unav ingest_pixel_count "no declared expected counts for $SHA"
+fi
+
+# 6c. Observations preserved exactly: every file under fixtures/ (raw FITS, LRD-ARR arrays, manifests, reference
+#     outputs, state) hashes to the value in fixtures/FIXTURES.sha256, and no file is missing or unlisted.
+MF=fixtures/FIXTURES.sha256
+if [ ! -f "$MF" ]; then fail fixtures_sha256_unchanged "$MF missing"; else
+  grep -v '^#' "$MF" | sed 's/^[0-9a-f]*  //' | LC_ALL=C sort > "$T/mf.paths"
+  find fixtures -type f ! -path "$MF" | LC_ALL=C sort > "$T/fs.paths"
+  bad=""; n=0
+  while read -r h p; do
+    n=$((n+1)); g=$("$BIN/lrd_sha256" "$p" 2>/dev/null | cut -d' ' -f1)
+    [ "$g" = "$h" ] || bad="$bad $p"
+  done <<EOM
+$(grep -v '^#' "$MF")
+EOM
+  extra=$(comm -13 "$T/mf.paths" "$T/fs.paths" | tr '\n' ' '); missing=$(comm -23 "$T/mf.paths" "$T/fs.paths" | tr '\n' ' ')
+  if [ "$n" = 67 ] && [ -z "$bad" ] && [ -z "$extra" ] && [ -z "$missing" ]; then
+    pass "fixtures_sha256_unchanged expected=67 got=$n"
+  else
+    fail fixtures_sha256_unchanged "expected=67 got=$n changed:[$bad] unlisted:[$extra] missing:[$missing]"
+  fi
+fi
+
+# 6d. run_all.sh counts OPEN (and FAIL-EXPECTED/OPEN) separately from PASS/FAIL/UNAVAILABLE; OPEN never fails.
+mkdir -p "$T/rt/o1"
+printf '#!/bin/sh\necho "PASS SYNTHETIC_p"\necho "OPEN SYNTHETIC_o note"\necho "FAIL-EXPECTED/OPEN SYNTHETIC_s note"\nexit 0\n' > "$T/rt/o1/run.sh"; chmod +x "$T/rt/o1/run.sh"
+LRD_TESTS_DIR="$T/rt" LRD_TEST_LOGS="$T/rt.logs" sh tests/run_all.sh > "$T/rt.out" 2>&1; r=$?
+[ $r = 0 ] && grep -q '^== TOTAL: 1 PASS, 0 FAIL, 0 UNAVAILABLE, 2 OPEN$' "$T/rt.out" \
+  && pass runner_counts_open_separately || fail runner_counts_open_separately "exit $r: $(tail -1 "$T/rt.out")"
+
 # 7. LRD-REC-v1 serialization and commitment against a hand-derived vector.
 printf 'b=2\na=1\n' | "$BIN/lrd_rec" "$T/r.rec" > "$T/r.commit"
 printf 'LRD-REC-v1\n1:a1:1\n1:b1:2\n' > "$T/r.expect"
