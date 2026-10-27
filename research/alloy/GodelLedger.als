@@ -157,6 +157,13 @@ assert MalformedRejected { all c: Code | malformed[c] implies not verify[c] }
 assert VerifyCharacterisation {
   all c: Code | verify[c] iff (not malformed[c] and exps[c] in Symbol.sym)
 }
+-- GAP G2 closed (blocker (a) criterion 4): non-positive exponents and exponents that are not the code
+-- of any known symbol are rejected by verify. Bounded checks (scope below), not proofs. The C decoder
+-- mirrors this: exponent 0 -> E_GAP/E_ZEROEXP, outside 1..256 -> E_EXPRANGE, L <= 0 -> E_NOTPOS.
+assert NegativeExponentRejected { all c: Code | (some e: exps[c] | e < 0) implies not verify[c] }
+assert NonSymbolExponentRejected { all c: Code | (some e: exps[c] | e not in Symbol.sym) implies not verify[c] }
+-- BROKEN variant of the G2 property: without the exponent check a negative exponent CAN be accepted.
+assert NegativeExponentRejected_BROKEN { all c: Code | (some e: exps[c] | e < 0) implies not verifyBroken[c] }
 -- BROKEN variant: with the exponent check removed, malformed codes CAN be accepted.
 assert MalformedRejected_BROKEN { all c: Code | malformed[c] implies not verifyBroken[c] }
 
@@ -178,6 +185,10 @@ check MalformedRejected_s6 { all c: Code | malformed[c] implies not verify[c] }
   for 6 but 5 Int, 5 seq expect 0
 -- Broken variant: a counterexample is EXPECTED.
 check MalformedRejected_BROKEN for 5 but 5 Int, 4 seq expect 1
+-- G2 (blocker (a) criterion 4).
+check NegativeExponentRejected        for 5 but 5 Int, 4 seq expect 0
+check NonSymbolExponentRejected       for 5 but 5 Int, 4 seq expect 0
+check NegativeExponentRejected_BROKEN for 5 but 5 Int, 4 seq expect 1
 
 -- Vacuity: facts are satisfiable with non-empty key relations (ledgers with >= 2 entries,
 -- an append step, a prefix pair, at least one malformed and one valid non-empty code).

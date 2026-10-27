@@ -9,10 +9,11 @@ CFLAGS  ?= -std=c17 -Wall -Wextra -O2
 CFLAGS  += -Iinclude
 LDLIBS_GMP    = -lgmp
 LDLIBS_CRYPTO = -lcrypto
+LDLIBS_M      = -lm
 OUT     = out
 TESTS   = ../tests/ledger
 
-BINS = $(OUT)/test_godel $(OUT)/lrd-rec $(OUT)/test_env
+BINS = $(OUT)/test_godel $(OUT)/test_godel_pos $(OUT)/lrd-rec $(OUT)/test_env
 
 all: $(BINS)
 
@@ -30,6 +31,9 @@ $(OUT)/lrd_godel.o: src/lrd_godel.c include/lrd_godel.h include/lrd_rec.h | $(OU
 
 $(OUT)/test_godel: $(TESTS)/test_godel.c $(OUT)/lrd_godel.o $(OUT)/lrd_rec.o $(OUT)/lrd_env.o | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_GMP) $(LDLIBS_CRYPTO)
+
+$(OUT)/test_godel_pos: $(TESTS)/test_godel_pos.c $(OUT)/lrd_godel.o $(OUT)/lrd_rec.o $(OUT)/lrd_env.o | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_GMP) $(LDLIBS_CRYPTO) $(LDLIBS_M)
 
 $(OUT)/lrd-rec: src/lrd_rec_tool.c $(OUT)/lrd_rec.o $(OUT)/lrd_env.o | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS_CRYPTO)
