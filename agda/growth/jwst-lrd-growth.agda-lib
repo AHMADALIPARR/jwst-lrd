@@ -1,7 +1,6 @@
 -- SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
 -- Growth track library. Dependency: the installed Agda standard library
--- (this VM: stdlib 1.7.3 via -i /usr/share/agda-stdlib; the core library in
--- agda/ pins stdlib 2.1 -- see agda/growth/STATUS.md for the discrepancy).
+-- (stdlib 2.1: -i /usr/share/agda-stdlib/src; same version as the core library in agda/).
 name: jwst-lrd-growth
 include: .
 flags: --safe --without-K
