@@ -1,0 +1,39 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Check 05: the T=0 slice of Kruskal-Szekeres (Einstein-Rosen bridge).
+   On T=0:  U=-X, V=X, UV=-X^2, so  X^2 = -F(r) = (r/rs - 1) e^{r/rs}  with r >= rs, and
+   the induced metric is  dl^2 = A dX^2 + r^2 dOmega^2,  A = 4 rs^3 e^{-r/rs}/r. */
+batchload("common.mac")$
+assume(rs>0, r>rs)$
+A: 4*rs^3*exp(-r/rs)/r$
+Fr: (1 - r/rs)*exp(r/rs)$
+Fp: ratsimp(diff(Fr, r))$
+ok: 0$
+/* (a) implicit derivative on the slice:  -X^2 = F(r)  =>  dr/dX = -2X/F'(r) = 2 X rs^2 e^{-r/rs}/r */
+drdX: -2*X/Fp$
+if is(ratsimp(drdX - 2*X*rs^2*exp(-r/rs)/r)=0) then ok: ok+1$
+/* (b) radial proper length element equals Schwarzschild's: A (dX/dr)^2 = 1/(1-rs/r), with X^2=-F(r) */
+/* A/(dr/dX)^2 contains X^2 explicitly: substitute X^2 -> -F(r) */
+chk: radcan(ratsimp(ev(A/(drdX/1)^2, X^2 = -Fr) - 1/(1-rs/r)))$
+if is(chk=0) then ok: ok+1$
+/* (c) dr/dX vanishes only at X=0 (i.e. r=rs) and d^2r/dX^2 = 2 rs/e > 0 there => r_min = rs */
+/* d/dX of (2 X rs^2 e^{-r/rs}/r) with dr/dX substituted, then evaluate at X=0, r=rs */
+d2: diff(2*X*rs^2*exp(-r/rs)/r, X) + diff(2*X*rs^2*exp(-r/rs)/r, r)*(2*X*rs^2*exp(-r/rs)/r)$
+d2at: ratsimp(ev(d2, X=0, r=rs))$
+print("  d^2 r/dX^2 at throat =", d2at)$
+if is(ratsimp(d2at - 2*rs*exp(-1))=0) then ok: ok+1$
+/* the factor X in dr/dX has the only zero at X=0, since e^{-r/rs}/r > 0 */
+/* (d) proper radial distance l(r) = sqrt(r(r-rs)) + rs ln( sqrt(r/rs) + sqrt(r/rs - 1) ) */
+lr: sqrt(r*(r-rs)) + rs*log(sqrt(r/rs) + sqrt(r/rs - 1))$
+dl: ratsimp(radcan(diff(lr, r) - sqrt(r/(r-rs))))$
+if is(dl = 0) then ok: ok+1$
+/* (e) near throat l ~ 2 sqrt(rs (r-rs)); i.e. r - rs ~ l^2/(4 rs). Check the limit of l/(2 sqrt(rs (r-rs))) */
+lim: limit(ratsimp(subst(r=rs+eps, lr)/(2*sqrt(rs*eps))), eps, 0, plus)$
+print("  limit l/(2 sqrt(rs (r-rs))) as r->rs+ =", lim)$
+if is(lim = 1) then ok: ok+1$
+/* (f) minimal sphere area: 4 pi r^2 at r=rs */
+amin: 4*%pi*rs^2$
+print("  minimal throat area =", amin)$
+if is(amin = 4*%pi*ev(r^2, r=rs)) then ok: ok+1$
+/* (g) singularity at UV=1: F(0)=1, so T=+-1, X=0 is r=0; on T=0 slice r never reaches 0 */
+if is(ev(Fr, r=0) = 1) then ok: ok+1$
+report("05 Einstein-Rosen bridge slice T=0 (7 identities)", ok, 7)$

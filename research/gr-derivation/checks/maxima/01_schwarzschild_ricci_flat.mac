@@ -1,0 +1,29 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Check 01: Schwarzschild metric is Ricci-flat; Kretschmann scalar; negative control. */
+batchload("common.mac")$
+x: [t, r, th, ph]$
+schw(f) := matrix([-f,0,0,0],[0,1/f,0,0],[0,0,r^2,0],[0,0,0,r^2*sin(th)^2])$
+f0: 1 - rs/r$
+g: schw(f0)$
+G: christoffel(g, x)$
+R: riemann(G, x)$
+Ric: ricci(R, x)$
+nz: count_zero2(Ric)$
+report("01a Schwarzschild R_{mu nu}=0 (16 components; 10 independent)", nz, 16)$
+/* Ricci scalar */
+gi: invert(g)$
+Rs: simpf(sum(sum(gi[i,j]*Ric[i][j], j,1,4), i,1,4))$
+report("01b Ricci scalar R=0 (1 scalar)", if is(Rs=0) then 1 else 0, 1)$
+/* Kretschmann scalar K = R_{abcd}R^{abcd}; diagonal metric */
+K: 0$
+for i thru 4 do for j thru 4 do for k thru 4 do for l thru 4 do
+  K: K + g[i,i]*gi[j,j]*gi[k,k]*gi[l,l]*R[i][j][k][l]^2$
+K: simpf(K)$
+print("  Kretschmann K =", K)$
+report("01c Kretschmann = 12 rs^2/r^6", if is(simpf(K - 12*rs^2/r^6)=0) then 1 else 0, 1)$
+/* Negative control: f = 1 - rs/r + q/r^2 (Reissner-Nordstrom-like) must NOT be Ricci flat */
+gc: schw(1 - rs/r + q/r^2)$
+Rc: ricci(riemann(christoffel(gc,x),x),x)$
+nzc: count_zero2(Rc)$
+print("  negative control (q/r^2 term): vanishing Ricci components =", nzc, "of 16")$
+report("01d negative control detected (some R_{mu nu} != 0)", if nzc < 16 then 1 else 0, 1)$

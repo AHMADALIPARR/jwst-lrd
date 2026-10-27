@@ -1,0 +1,35 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* bc -l arbitrary-precision arithmetic. Inputs are ASSUMPTIONS, not measurements. */
+scale = 20
+c = 299792.458                      /* km/s, exact (SI definition) */
+gmsun = 132712440018000000000       /* m^3/s^2, IAU 2015 nominal GM_sun = 1.32712440018e20 */
+cm = 299792458                      /* m/s */
+rssun = 2 * gmsun / (cm * cm)       /* Schwarzschild radius of 1 Msun, metres */
+print "rs(1 Msun) [m]            = ", rssun, "\n"
+define zg(rho) { return (1 / sqrt(1 - 1/rho)) - 1; }
+define zw(rho) { return 1 / (2*rho); }
+for (i = 3; i <= 5; i++) {
+  rho = 10 ^ i
+  z = zg(rho)
+  print "rho=1e", i, "  z_exact = ", z, "\n"
+  print "          z_weak  = ", zw(rho), "\n"
+  print "          c*z_exact [km/s] = ", c * z, "\n"
+}
+/* physical scales for assumed masses */
+for (m = 7; m <= 8; m++) {
+  rs = rssun * (10 ^ m)
+  print "M=1e", m, " Msun: rs = ", rs, " m = ", rs/1000, " km ; rs/c = ", rs/cm, " s\n"
+  for (i = 3; i <= 5; i++) {
+    r = rs * (10 ^ i)
+    print "   r=1e", i, " rs = ", r, " m = ", r / 149597870700, " AU = ", r / cm / 86400, " light-days\n"
+  }
+}
+/* conditional characteristic radius */
+zc = 7.04221
+zo = 7.0451
+zgc = (1 + zo) / (1 + zc) - 1
+print "z_grav(cond)   = ", zgc, "\n"
+print "c*z_grav [km/s] = ", c * zgc, "\n"
+print "rho_weak = 1/(2z) = ", 1 / (2 * zgc), "\n"
+print "rho_exact = 1/(1-(1+z)^-2) = ", 1 / (1 - 1 / ((1 + zgc) ^ 2)), "\n"
+quit

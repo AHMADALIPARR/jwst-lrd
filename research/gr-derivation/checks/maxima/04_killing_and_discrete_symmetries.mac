@@ -1,0 +1,80 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Check 04: Killing vectors and discrete isometries of the Kruskal-Szekeres metric.
+   Continuous: boost/time translation xi_t = (1/2rs)(V d_V - U d_U) and the three rotations L_x,L_y,L_z.
+   Verified two independent ways:  (L_xi g)_{mu nu} = 0   and   nabla_mu xi_nu + nabla_nu xi_mu = 0.
+   Discrete: (U,V)->(V,U) [X->-X: exchange of the two exteriors], (U,V)->(-V,-U) [T->-T],
+             (U,V)->(-U,-V) [point reflection], and the continuous boost (lam U, V/lam). */
+batchload("common.mac")$
+assume(rs>0)$
+Fr: (1 - r/rs)*exp(r/rs)$
+rU: -rs^2*V*exp(-r/rs)/r$
+rV: -rs^2*U*exp(-r/rs)/r$
+dd(e, v) := diff(e, v) + diff(e, r) * (if v = U then rU elseif v = V then rV else 0)$
+simpf(e) := ratsimp(trigsimp(ratsimp(subst(Fr/U, V, e))))$
+
+x: [U, V, th, ph]$
+A: 4*rs^3*exp(-r/rs)/r$
+g: matrix([0,-A/2,0,0],[-A/2,0,0,0],[0,0,r^2,0],[0,0,0,r^2*sin(th)^2])$
+G: christoffel(g, x)$
+
+lie(xi) := makelist(makelist(simpf(sum(xi[p]*dd(g[m,n],x[p]) + g[p,n]*dd(xi[p],x[m]) + g[m,p]*dd(xi[p],x[n]), p,1,4)), n,1,4), m,1,4)$
+covkill(xi) := block([xl],
+  xl: makelist(sum(g[n,p]*xi[p],p,1,4), n,1,4),
+  makelist(makelist(simpf(
+     (dd(xl[n],x[m]) - sum(G[p][m][n]*xl[p],p,1,4)) + (dd(xl[m],x[n]) - sum(G[p][n][m]*xl[p],p,1,4))),
+     n,1,4), m,1,4))$
+nzero(M) := block([c:0], for i thru 4 do for j thru 4 do if is(M[i][j]=0) then c: c+1, c)$
+comm(X, Y) := makelist(simpf(sum(X[n]*dd(Y[m],x[n]) - Y[n]*dd(X[m],x[n]), n,1,4)), m,1,4)$
+
+xit: [-U/(2*rs), V/(2*rs), 0, 0]$
+Lz:  [0,0,0,1]$
+Lx:  [0,0,-sin(ph), -cos(th)/sin(th)*cos(ph)]$
+Ly:  [0,0, cos(ph), -cos(th)/sin(th)*sin(ph)]$
+names: ["xi_t (boost/time translation)", "L_z", "L_x", "L_y"]$
+fields: [xit, Lz, Lx, Ly]$
+for k thru 4 do block([a, b],
+  a: nzero(lie(fields[k])), b: nzero(covkill(fields[k])),
+  report(concat("04a Lie-derivative Killing eq: ", names[k]), a, 16),
+  report(concat("04b covariant Killing eq: ", names[k]), b, 16))$
+
+/* norm of xi_t equals -f = -(1 - rs/r)  (so it is timelike exterior, null on horizon, spacelike interior) */
+nrm: simpf(sum(sum(g[i,j]*xit[i]*xit[j], j,1,4), i,1,4))$
+report("04c g(xi_t,xi_t) = -(1-rs/r)", if is(simpf(nrm + (1 - rs/r))=0) then 1 else 0, 1)$
+
+/* Lie algebra: [xi_t, L_i] = 0 (3), [L_x,L_y]=-L_z, [L_y,L_z]=-L_x, [L_z,L_x]=-L_y (3; sign fixed by the chosen field signs) */
+cnt: 0$
+for k in [2,3,4] do if is(comm(xit, fields[k]) = [0,0,0,0]) then cnt: cnt+1$
+if is(map(simpf, comm(Lx,Ly) + Lz) = [0,0,0,0]) then cnt: cnt+1$
+if is(map(simpf, comm(Ly,Lz) + Lx) = [0,0,0,0]) then cnt: cnt+1$
+if is(map(simpf, comm(Lz,Lx) + Ly) = [0,0,0,0]) then cnt: cnt+1$
+report("04d commutators: R x so(3) algebra (6 brackets)", cnt, 6)$
+
+/* Negative controls: these must NOT be Killing: d_U, dilation U d_U + V d_V, d_theta */
+negs: [[1,0,0,0], [U,V,0,0], [0,0,1,0]]$
+cn: 0$
+for v in negs do if nzero(lie(v)) < 16 then cn: cn+1$
+report("04e negative controls are detected as non-Killing (d_U, dilation, d_theta)", cn, 3)$
+
+/* Schwarzschild chart: d_t Killing, d_phi Killing (Lie derivative) */
+block([xs: [t,r,th,ph], gs, k1, k2, n1, n2],
+  gs: matrix([-(1-rs/r),0,0,0],[0,1/(1-rs/r),0,0],[0,0,r^2,0],[0,0,0,r^2*sin(th)^2]),
+  n1: 0, n2: 0,
+  for m thru 4 do for n thru 4 do (
+    if is(ratsimp(sum([1,0,0,0][p]*diff(gs[m,n],xs[p]) + gs[p,n]*diff([1,0,0,0][p],xs[m]) + gs[m,p]*diff([1,0,0,0][p],xs[n]),p,1,4))=0) then n1: n1+1,
+    if is(ratsimp(sum([0,0,0,1][p]*diff(gs[m,n],xs[p]) + gs[p,n]*diff([0,0,0,1][p],xs[m]) + gs[m,p]*diff([0,0,0,1][p],xs[n]),p,1,4))=0) then n2: n2+1),
+  report("04f Schwarzschild chart: d_t Killing (Lie derivative)", n1, 16),
+  report("04g Schwarzschild chart: d_phi Killing (Lie derivative)", n2, 16))$
+
+/* Discrete isometries + boost, using an arbitrary function a(UV) for the conformal factor and
+   b(UV) for r^2: the metric is  -a(UV) dU dV + b(UV) dOmega^2. */
+ga(Up,Vp) := matrix([0,-a(Up*Vp)/2],[-a(Up*Vp)/2,0])$
+maps: [[V,U],[-V,-U],[-U,-V],[lam*U,V/lam]]$
+mapnames: ["X->-X : (U,V)->(V,U) (exchange of exteriors I<->III)", "T->-T : (U,V)->(-V,-U) (I->I, II<->IV)",
+           "(T,X)->(-T,-X): (U,V)->(-U,-V) (I<->III, II<->IV)", "boost: (U,V)->(lam U, V/lam)"]$
+for k thru 4 do block([Up, Vp, J, gp, c],
+  [Up, Vp]: maps[k],
+  J: matrix([diff(Up,U),diff(Up,V)],[diff(Vp,U),diff(Vp,V)]),
+  gp: ratsimp(transpose(J) . ga(Up,Vp) . J),
+  c: 0,
+  for i thru 2 do for j thru 2 do if is(ratsimp(gp[i,j] - ga(U,V)[i,j]) = 0) then c: c+1,
+  report(concat("04h pullback of metric invariant: ", mapnames[k]), c, 4))$

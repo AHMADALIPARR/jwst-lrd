@@ -1,0 +1,66 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Check 02: pull the Kruskal-Szekeres metric
+       ds^2 = -(4 rs^3/r) exp(-r/rs) dU dV + r^2 dOmega^2
+   back to Schwarzschild (t,r) in each of the four regions and compare with
+       ds^2 = -f dt^2 + dr^2/f + r^2 dOmega^2,  f = 1 - rs/r.
+   Convention:  U = sU*exp((r*-t)/(2rs)),  V = sV*exp((r*+t)/(2rs)),
+   r* = r + rs ln|r/rs - 1|, exterior: sU*sV=-1, interior: sU*sV=+1.
+   Regions: I (sU,sV)=(-,+), III (+,-), II (+,+), IV (-,-).  T=(U+V)/2, X=(V-U)/2. */
+batchload("common.mac")$
+assume(rs>0)$
+A: 4*rs^3*exp(-r/rs)/r$
+g2: matrix([0,-A/2],[-A/2,0])$
+f: 1 - rs/r$
+target: matrix([-f,0],[0,1/f])$
+total: 0$ npass: 0$ nrel: 0$ nrelpass: 0$
+regions: [["I",-1,1,true],["III",1,-1,true],["II",1,1,false],["IV",-1,-1,false]]$
+for reg in regions do block([nm, sU, sV, ext, rstar, Uf, Vf, J, gp, ok, e],
+  [nm, sU, sV, ext]: reg,
+  /* ext: r>rs (log(r/rs-1)); interior: 0<r<rs (log(1-r/rs)) */
+  rstar: if ext then r + rs*log(r/rs - 1) else r + rs*log(1 - r/rs),
+  Uf: sU*exp((rstar - t)/(2*rs)),
+  Vf: sV*exp((rstar + t)/(2*rs)),
+  J: matrix([diff(Uf,t),diff(Uf,r)],[diff(Vf,t),diff(Vf,r)]),
+  gp: transpose(J) . g2 . J,
+  for i thru 2 do for j thru 2 do (
+    e: radcan(ratsimp(gp[i,j] - target[i,j])),
+    total: total + 1,
+    if is(e = 0) then npass: npass + 1
+    else printf(true, "   region ~a: residual (~d,~d) = ~a~%", nm, i, j, e)
+  ),
+  /* UV = (1 - r/rs) exp(r/rs) */
+  e: radcan(ratsimp(Uf*Vf - (1 - r/rs)*exp(r/rs))),
+  nrel: nrel + 1, if is(e = 0) then nrelpass: nrelpass + 1,
+  /* T^2 - X^2 = UV */
+  e: ratsimp(((Uf+Vf)/2)^2 - ((Vf-Uf)/2)^2 - Uf*Vf),
+  nrel: nrel + 1, if is(e = 0) then nrelpass: nrelpass + 1,
+  /* Jacobian d(U,V)/d(t,r) is non-zero away from r = rs (and r=0) */
+  e: radcan(ratsimp(determinant(J))),
+  printf(true, "   region ~a: det d(U,V)/d(t,r) = ~a~%", nm, e),
+  nrel: nrel + 1, if not is(e = 0) then nrelpass: nrelpass + 1
+)$
+report("02a metric pullback = Schwarzschild, 4 regions x 4 components", npass, total)$
+report("02b UV=(1-r/rs)e^{r/rs}, T^2-X^2=UV, Jacobian != 0 (4 regions x 3)", nrelpass, nrel)$
+
+/* Pushforward of d/dt in exterior region I is the boost field (1/2rs)(V d_V - U d_U): */
+block([Uf, Vf, rstar, ok],
+  rstar: r + rs*log(r/rs - 1),
+  Uf: -exp((rstar - t)/(2*rs)), Vf: exp((rstar + t)/(2*rs)),
+  ok: 0,
+  if is(radcan(ratsimp(diff(Uf,t) - (-Uf/(2*rs))))=0) then ok: ok+1,
+  if is(radcan(ratsimp(diff(Vf,t) - ( Vf/(2*rs))))=0) then ok: ok+1,
+  /* t = rs ln(-V/U), i.e. V/U = -exp(t/rs) */
+  if is(radcan(ratsimp(Vf/Uf + exp(t/rs)))=0) then ok: ok+1,
+  /* T/X = tanh(t/(2 rs)) */
+  if is(radcan(ratsimp(((Uf+Vf)/(Vf-Uf)) - tanh(t/(2*rs)) )) = 0) or
+     is(radcan(ratsimp(exponentialize(((Uf+Vf)/(Vf-Uf)) - tanh(t/(2*rs))))) = 0) then ok: ok+1,
+  report("02c region I: dU/dt=-U/(2rs), dV/dt=V/(2rs), V/U=-e^{t/rs}, T/X=tanh(t/2rs)", ok, 4))$
+
+/* r(U,V) from UV = F(r) has dr/dU = V/F'(r) etc.; F'(r) = -(r/rs^2) e^{r/rs} != 0 for r>0 */
+Fr: (1 - r/rs)*exp(r/rs)$
+dF: ratsimp(diff(Fr, r))$
+report("02d F'(r) = -(r/rs^2) e^{r/rs}", if is(ratsimp(dF + r/rs^2*exp(r/rs))=0) then 1 else 0, 1)$
+/* regularity at r = rs: A(rs) = 4 rs^2/e finite, nonzero; det g_4 = -(A^2/4) r^4 sin^2(th) nonzero */
+Ars: ev(A, r=rs)$
+print("  A(r=rs) =", Ars)$
+report("02e conformal factor finite and nonzero at r=rs", if is(ratsimp(Ars - 4*rs^2*exp(-1))=0) then 1 else 0, 1)$

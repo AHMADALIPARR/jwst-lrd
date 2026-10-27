@@ -1,0 +1,54 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Check 03: the Kruskal-Szekeres metric, in coordinates (U,V,theta,phi),
+       ds^2 = -(4 rs^3/r) e^{-r/rs} dU dV + r^2 dOmega^2,   with  U V = (1 - r/rs) e^{r/rs},
+   is Ricci-flat, without ever dividing by (r - rs).  r = r(U,V) is defined implicitly; its
+   derivatives follow from implicit differentiation of UV = F(r), F'(r) = -(r/rs^2) e^{r/rs}:
+       r_U = V/F' = -rs^2 V e^{-r/rs}/r,    r_V = U/F' = -rs^2 U e^{-r/rs}/r.        */
+batchload("common.mac")$
+assume(rs>0)$
+Fr: (1 - r/rs)*exp(r/rs)$
+rU: -rs^2*V*exp(-r/rs)/r$
+rV: -rs^2*U*exp(-r/rs)/r$
+dd(e, v) := diff(e, v) + diff(e, r) * (if v = U then rU elseif v = V then rV else 0)$
+/* simplifier: use the constraint V = F(r)/U after each differentiation step */
+simpf(e) := ratsimp(subst(Fr/U, V, e))$
+
+/* integrability of the implicit-derivative rules (r_UV = r_VU) */
+cmix: simpf(dd(rU, V) - dd(rV, U))$
+report("03a mixed partials of r(U,V) commute (1 identity)", if is(cmix = 0) then 1 else 0, 1)$
+/* the rules reproduce the constraint: d(UV - F(r)) = 0 along U and V */
+cU: simpf(dd(U*V - Fr, U))$
+cV: simpf(dd(U*V - Fr, V))$
+report("03b d_U(UV-F(r))=0 and d_V(UV-F(r))=0 (2 identities)", (if is(cU=0) then 1 else 0) + (if is(cV=0) then 1 else 0), 2)$
+
+x: [U, V, th, ph]$
+A: 4*rs^3*exp(-r/rs)/r$
+g: matrix([0,-A/2,0,0],[-A/2,0,0,0],[0,0,r^2,0],[0,0,0,r^2*sin(th)^2])$
+detg: simpf(determinant(g))$
+print("  det g =", detg)$
+report("03c det g = -(A^2/4) r^4 sin^2(th): nonzero & finite at r=rs", if is(simpf(detg + A^2/4*r^4*sin(th)^2)=0) then 1 else 0, 1)$
+G: christoffel(g, x)$
+R: riemann(G, x)$
+Ric: ricci(R, x)$
+nz: count_zero2(Ric)$
+report("03d Kruskal metric R_{mu nu}=0 (16 components; 10 independent)", nz, 16)$
+gi: invert(g)$
+Rs: simpf(sum(sum(gi[i,j]*Ric[i][j], j,1,4), i,1,4))$
+report("03e Ricci scalar = 0 (1 scalar)", if is(Rs=0) then 1 else 0, 1)$
+/* Kretschmann in a non-diagonal metric: K = g_{im} g^{jn} g^{kp} g^{lq} R^i_{jkl} R^m_{npq} */
+K: 0$
+for i thru 4 do for m thru 4 do if g[i,m] # 0 then
+ for j thru 4 do for n thru 4 do if gi[j,n] # 0 then
+  for k thru 4 do for p thru 4 do if gi[k,p] # 0 then
+   for l thru 4 do for q thru 4 do if gi[l,q] # 0 then
+     K: K + g[i,m]*gi[j,n]*gi[k,p]*gi[l,q]*R[i][j][k][l]*R[m][n][p][q]$
+K: simpf(K)$
+Kexp: simpf(12*rs^2/r^6)$
+report("03f Kretschmann (Kruskal chart) = 12 rs^2/r^6, finite at r=rs", if is(simpf(K - Kexp)=0) then 1 else 0, 1)$
+/* Negative control: change the conformal factor (e^{-r/rs} -> e^{-2r/rs}); not a solution. */
+Ac: 4*rs^3*exp(-2*r/rs)/r$
+gc: matrix([0,-Ac/2,0,0],[-Ac/2,0,0,0],[0,0,r^2,0],[0,0,0,r^2*sin(th)^2])$
+Rc: ricci(riemann(christoffel(gc,x),x),x)$
+nzc: count_zero2(Rc)$
+print("  negative control: vanishing Ricci components =", nzc, "of 16")$
+report("03g negative control detected (some R_{mu nu} != 0)", if nzc < 16 then 1 else 0, 1)$

@@ -1,0 +1,273 @@
+== GR derivation checks: 2026-10-26T19:54:36-07:00 ==
+Scope: mathematical derivation of a model - not empirical evidence about QSO1 and not an explanation of the z=7.04221 vs 7.0451 discrepancy.
+tool maxima : /home/box/tools/maxroot/usr/bin/maxima Maxima 5.47.0
+tool octave : GNU Octave, version 9.4.0
+tool gfortran: GNU Fortran (Debian 14.2.0-19) 14.2.0
+tool bc     : available
+tool awk    : mawk 1.3.4 20250131
+tool lean/agda/coq: NOT USED (no formal proof attempted or claimed)
+tool sympy/python: NOT USED (forbidden)
+
+-- maxima 01_schwarzschild_ricci_flat.mac
+PASS  01a Schwarzschild R_{mu nu}=0 (16 components; 10 independent) : 16/16
+PASS  01b Ricci scalar R=0 (1 scalar) : 1/1
+    (for j thru 4 do
+         (for k thru 4 do
+              (for l thru 4 do
+                   K:K+g[i,i]*gi[j,j]*gi[k,k]*gi[l,l]*R[i][j][k][l]^2)))
+                       2
+                  12 rs
+  Kretschmann K = ------ 
+                     6
+                    r
+       if is(simpf(K-(12*rs^2)/r^6) = 0) then 1 else 0,1)
+PASS  01c Kretschmann = 12 rs^2/r^6 : 1/1
+      "of 16")
+  negative control (q/r^2 term): vanishing Ricci components = 12 of 16 
+       if nzc < 16 then 1 else 0,1)
+PASS  01d negative control detected (some R_{mu nu} != 0) : 1/1
+-- maxima 02_kruskal_transformation.mac
+         ["IV",-1,-1,false]]
+    block([nm,sU,sV,ext,rstar,Uf,Vf,J,gp,ok,e],[nm,sU,sV,ext]:reg,
+          rstar:if ext then r+rs*log(r/rs-1) else r+rs*log(1-r/rs),
+          Uf:sU*exp((rstar-t)/(2*rs)),Vf:sV*exp((rstar+t)/(2*rs)),
+          J:matrix([diff(Uf,t),diff(Uf,r)],[diff(Vf,t),diff(Vf,r)]),
+          gp:transpose(J) . g2 . J,
+          for i thru 2 do
+              (for j thru 2 do
+                   (e:radcan(ratsimp(gp[i,j]-target[i,j])),total:total+1,
+                    if is(e = 0) then npass:npass+1
+                        else printf(true,
+                                    "   region ~a: residual (~d,~d) = ~a~%",
+                                    nm,i,j,e))),
+          e:radcan(ratsimp(Uf*Vf-(1-r/rs)*exp(r/rs))),nrel:nrel+1,
+          if is(e = 0) then nrelpass:nrelpass+1,
+          e:ratsimp(((Uf+Vf)/2)^2-((Vf-Uf)/2)^2+(-Uf)*Vf),nrel:nrel+1,
+          if is(e = 0) then nrelpass:nrelpass+1,
+          e:radcan(ratsimp(determinant(J))),
+          printf(true,"   region ~a: det d(U,V)/d(t,r) = ~a~%",nm,e),
+          nrel:nrel+1,if not is(e = 0) then nrelpass:nrelpass+1)
+   region I: det d(U,V)/d(t,r) = (r*%e^(r/rs))/(2*rs^3)
+   region III: det d(U,V)/d(t,r) = (r*%e^(r/rs))/(2*rs^3)
+   region II: det d(U,V)/d(t,r) = (r*%e^(r/rs))/(2*rs^3)
+   region IV: det d(U,V)/d(t,r) = (r*%e^(r/rs))/(2*rs^3)
+       total)
+PASS  02a metric pullback = Schwarzschild, 4 regions x 4 components : 16/16
+       nrelpass,nrel)
+PASS  02b UV=(1-r/rs)e^{r/rs}, T^2-X^2=UV, Jacobian != 0 (4 regions x 3) : 12/12
+      Vf:exp((rstar+t)/(2*rs)),ok:0,
+      if is(radcan(ratsimp(diff(Uf,t)-(-Uf)/(2*rs))) = 0) then ok:ok+1,
+      if is(radcan(ratsimp(diff(Vf,t)-Vf/(2*rs))) = 0) then ok:ok+1,
+      if is(radcan(ratsimp(Vf/Uf+exp(t/rs))) = 0) then ok:ok+1,
+      if is(radcan(ratsimp((Uf+Vf)/(Vf-Uf)-tanh(t/(2*rs)))) = 0)
+           or is(radcan(ratsimp(exponentialize(
+                                 (Uf+Vf)/(Vf-Uf)-tanh(t/(2*rs)))))
+                   = 0) then ok:ok+1,
+      report("02c region I: dU/dt=-U/(2rs), dV/dt=V/(2rs), V/U=-e^{t/rs}, T/X=tanh(t/2rs)",
+             ok,4))
+PASS  02c region I: dU/dt=-U/(2rs), dV/dt=V/(2rs), V/U=-e^{t/rs}, T/X=tanh(t/2rs) : 4/4
+       if is(ratsimp(dF+(r/rs^2)*exp(r/rs)) = 0) then 1 else 0,1)
+PASS  02d F'(r) = -(r/rs^2) e^{r/rs} : 1/1
+                - 1   2
+  A(r=rs) = 4 %e    rs  
+       if is(ratsimp(Ars-4*rs^2*exp(-1)) = 0) then 1 else 0,1)
+PASS  02e conformal factor finite and nonzero at r=rs : 1/1
+-- maxima 03_kruskal_ricci_flat.mac
+       if is(cmix = 0) then 1 else 0,1)
+PASS  03a mixed partials of r(U,V) commute (1 identity) : 1/1
+       (if is(cU = 0) then 1 else 0)+(if is(cV = 0) then 1 else 0),2)
+PASS  03b d_U(UV-F(r))=0 and d_V(UV-F(r))=0 (2 identities) : 2/2
+                         2 r
+                       - ---
+               2   6     rs     2
+  det g = - 4 r  rs  %e      sin (th) 
+       if is(simpf(detg+(A^2/4)*r^4*sin(th)^2) = 0) then 1 else 0,1)
+PASS  03c det g = -(A^2/4) r^4 sin^2(th): nonzero & finite at r=rs : 1/1
+PASS  03d Kruskal metric R_{mu nu}=0 (16 components; 10 independent) : 16/16
+PASS  03e Ricci scalar = 0 (1 scalar) : 1/1
+    (for m thru 4 do
+         if g[i,m] # 0
+             then (for j thru 4 do
+                       (for n thru 4 do
+                            if gi[j,n] # 0
+                                then (for k thru 4 do
+                                          (for p thru 4 do
+                                               if gi[k,p] # 0
+                                                   then (for l thru 4 do
+                                                             (for q thru 4 do
+                                                                  if 
+                                                                  gi[l,q] # 0
+                                                                   then K
+                                                                   :K
+                                                                    +g[i,m]
+                                                                     *gi[j,n]
+                                                                     *gi[k,p]
+                                                                     *gi[l,q]
+                                                                     *R[i][j][
+                                                                      k][
+                                                                      l]
+                                                                     *R[m][n][
+                                                                      p][
+                                                                      q])))))))
+       if is(simpf(K-Kexp) = 0) then 1 else 0,1)
+PASS  03f Kretschmann (Kruskal chart) = 12 rs^2/r^6, finite at r=rs : 1/1
+  negative control: vanishing Ricci components = 10 of 16 
+       if nzc < 16 then 1 else 0,1)
+PASS  03g negative control detected (some R_{mu nu} != 0) : 1/1
+-- maxima 04_killing_and_discrete_symmetries.mac
+    makelist(simpf(sum(xi[p]*dd(g[m,n],x[p])+g[p,n]*dd(xi[p],x[m])
+                                            +g[m,p]*dd(xi[p],x[n]),p,1,4)),n,
+             1,4),m,1,4)
+        makelist(makelist(simpf((dd(xl[n],x[m])-sum(G[p][m][n]*xl[p],p,1,4))
+                                 +(dd(xl[m],x[n])
+                                  -sum(G[p][n][m]*xl[p],p,1,4))),n,1,4),m,1,
+                 4))
+      for i thru 4 do (for j thru 4 do if is(M[i][j] = 0) then c:c+1),c)
+     1,4)
+    block([a,b],a:nzero(lie(fields[k])),b:nzero(covkill(fields[k])),
+          report(concat("04a Lie-derivative Killing eq: ",names[k]),a,16),
+          report(concat("04b covariant Killing eq: ",names[k]),b,16))
+PASS  04a Lie-derivative Killing eq: xi_t (boost/time translation) : 16/16
+PASS  04b covariant Killing eq: xi_t (boost/time translation) : 16/16
+PASS  04a Lie-derivative Killing eq: L_z : 16/16
+PASS  04b covariant Killing eq: L_z : 16/16
+PASS  04a Lie-derivative Killing eq: L_x : 16/16
+PASS  04b covariant Killing eq: L_x : 16/16
+PASS  04a Lie-derivative Killing eq: L_y : 16/16
+PASS  04b covariant Killing eq: L_y : 16/16
+       if is(simpf(nrm+(1-rs/r)) = 0) then 1 else 0,1)
+PASS  04c g(xi_t,xi_t) = -(1-rs/r) : 1/1
+PASS  04d commutators: R x so(3) algebra (6 brackets) : 6/6
+       cn,3)
+PASS  04e negative controls are detected as non-Killing (d_U, dilation, d_theta) : 3/3
+      gs:matrix([-(1-rs/r),0,0,0],[0,1/(1-rs/r),0,0],[0,0,r^2,0],
+                [0,0,0,r^2*sin(th)^2]),n1:0,n2:0,
+      for m thru 4 do
+          (for n thru 4 do
+               (if is(ratsimp(sum([1,0,0,0][p]*diff(gs[m,n],xs[p])
+                                   +gs[p,n]*diff([1,0,0,0][p],xs[m])
+                                   +gs[m,p]*diff([1,0,0,0][p],xs[n]),p,1,4))
+                        = 0) then n1:n1+1,
+                if is(ratsimp(sum([0,0,0,1][p]*diff(gs[m,n],xs[p])
+                                   +gs[p,n]*diff([0,0,0,1][p],xs[m])
+                                   +gs[m,p]*diff([0,0,0,1][p],xs[n]),p,1,4))
+                        = 0) then n2:n2+1)),
+      report("04f Schwarzschild chart: d_t Killing (Lie derivative)",n1,16),
+      report("04g Schwarzschild chart: d_phi Killing (Lie derivative)",n2,16))
+PASS  04f Schwarzschild chart: d_t Killing (Lie derivative) : 16/16
+PASS  04g Schwarzschild chart: d_phi Killing (Lie derivative) : 16/16
+          "T->-T : (U,V)->(-V,-U) (I->I, II<->IV)",
+          "(T,X)->(-T,-X): (U,V)->(-U,-V) (I<->III, II<->IV)",
+          "boost: (U,V)->(lam U, V/lam)"]
+    block([Up,Vp,J,gp,c],[Up,Vp]:maps[k],
+          J:matrix([diff(Up,U),diff(Up,V)],[diff(Vp,U),diff(Vp,V)]),
+          gp:ratsimp(transpose(J) . ga(Up,Vp) . J),c:0,
+          for i thru 2 do
+              (for j thru 2 do
+                   if is(ratsimp(gp[i,j]-ga(U,V)[i,j]) = 0) then c:c+1),
+          report(concat("04h pullback of metric invariant: ",mapnames[k]),c,
+                 4))
+PASS  04h pullback of metric invariant: X->-X : (U,V)->(V,U) (exchange of exteriors I<->III) : 4/4
+PASS  04h pullback of metric invariant: T->-T : (U,V)->(-V,-U) (I->I, II<->IV) : 4/4
+PASS  04h pullback of metric invariant: (T,X)->(-T,-X): (U,V)->(-U,-V) (I<->III, II<->IV) : 4/4
+PASS  04h pullback of metric invariant: boost: (U,V)->(lam U, V/lam) : 4/4
+-- maxima 05_einstein_rosen_bridge.mac
+                                   *((2*X*rs^2*exp(-r/rs))/r)
+                             - 1
+  d^2 r/dX^2 at throat = 2 %e    rs 
+  limit l/(2 sqrt(rs (r-rs))) as r->rs+ = 1 
+                                2
+  minimal throat area = 4 %pi rs  
+PASS  05 Einstein-Rosen bridge slice T=0 (7 identities) : 7/7
+-- maxima 06_gravitational_redshift.mac
+                                           2        3         4
+                                eps   3 eps    5 eps    35 eps
+  series of (1-eps)^(-1/2): 1 + --- + ------ + ------ + ------- + . . . 
+                                 2      8        16       128
+    then (ok:ok+1,print("   item",n,"ok")) else print("   item",n,"FAILED")
+   item 1 ok 
+                                 (ro - re) rs
+  d(1+z)/d rs at rs=0, times rs: ------------ 
+                                   2 re ro
+    else print("   item",n,"FAILED")
+   item 2 ok 
+    then (ok:ok+1,print("   item",n,"ok")) else print("   item",n,"FAILED")
+   item 3 ok 
+    then (ok:ok+1,print("   item",n,"ok")) else print("   item",n,"FAILED")
+   item 4 ok 
+    else print("   item",n,"FAILED")
+   item 5 ok 
+                                  2
+    then (ok:ok+1,print("   item",n,"ok")) else print("   item",n,"FAILED")
+   item 6 ok 
+    then (ok:ok+1,print("   item",n,"ok")) else print("   item",n,"FAILED")
+   item 7 ok 
+PASS  06 gravitational-redshift algebra (7 identities) : 7/7
+-- octave numeric_kruskal.m
+PASS  oct-01 Newton inversion: UV=(1-r)e^r, r>0 (rs=1) : 120/120
+PASS  oct-02 r>rs iff UV<0 (exterior regions I,III); r<rs iff UV>0 (II,IV) : 120/120
+PASS  oct-03 Kruskal R_{mu nu}=0 by FD (tol 1e-6*max(1,r^-3); worst ratio 0.37), points : 120/120
+PASS  oct-04 negative control (e^{-2r}) detected: |Ric|max > 1e-3, points : 120/120
+PASS  oct-05 Killing eq (L_xi g)=0 numeric: xi_t, points : 120/120
+PASS  oct-05 Killing eq (L_xi g)=0 numeric: L_z, points : 120/120
+PASS  oct-05 Killing eq (L_xi g)=0 numeric: L_x, points : 120/120
+PASS  oct-05 Killing eq (L_xi g)=0 numeric: L_y, points : 120/120
+PASS  oct-06 non-Killing controls (d_U, dilation, d_theta) detected at all points (3 fields) : 3/3
+PASS  oct-07 g(xi_t,xi_t) = -(1-rs/r), points : 120/120
+PASS  oct-08 pullback of Kruskal metric = Schwarzschild (FD), 4 regions x 20 points : 80/80
+PASS  oct-09 ER throat: min area 4 pi rs^2 at X=0, r>=rs, Z2-symmetric, monotone (4 conditions) : 4/4
+-- fortran redshift_er.f90
+   rho= 1.000E+03  z_exact= 5.0037531E-04  z_weak=1/(2rho)= 5.0000000E-04  c*z= 150.0087 km/s
+   rho= 1.000E+04  z_exact= 5.0003750E-05  z_weak=1/(2rho)= 5.0000000E-05  c*z=  14.9907 km/s
+   rho= 1.000E+05  z_exact= 5.0000375E-06  z_weak=1/(2rho)= 5.0000000E-06  c*z=   1.4990 km/s
+PASS  f90-01 exact vs weak-field redshift at rho=1e3,1e4,1e5 (relative gap = 3/(4 rho) to O(rho^-2)) : 3/3
+   z_grav(cond)= 3.593540E-04  c*z= 107.7316 km/s  rho_weak=  1391.386  rho_exact=  1392.136
+PASS  f90-02 composition, round trip, ~108 km/s, rho~1391 (CONDITIONAL characteristic radius) : 5/5
+PASS  f90-03 ER slice: r>=rs and Z2 symmetry X<->-X on 8001 grid points : 8001/8001
+   min area= 1.256637061435917E+01  at X=  0.0000  4*pi= 1.256637061435917E+01
+PASS  f90-04 ER throat minimum area = 4 pi rs^2 attained at X=0 (2 conditions) : 2/2
+PASS  f90-05 proper length: l ~ 2 sqrt(rs(r-rs)) near throat (5 scales) + closed form vs Simpson (1) : 6/6
+   causal curves I->III: 0 of 200000;  I->II (infall, allowed): 200000
+   spacelike control I->III: 200000 of 200000
+PASS  f90-06 MC illustration: 0 causal I->III crossings out of 200000 : 1/1
+PASS  f90-07 MC control: spacelike steps do reach III (detector works) : 1/1
+-- bc redshift_table.bc (informational values, arbitrary precision)
+rs(1 Msun) [m]            = 2953.25007650080347943526
+rho=1e3  z_exact = .00050037531277368382
+          z_weak  = .00050000000000000000
+          c*z_exact [km/s] = 150.00874493894147011262
+rho=1e4  z_exact = .00005000375031252734
+          z_weak  = .00005000000000000000
+          c*z_exact [km/s] = 14.99074721541083945080
+rho=1e5  z_exact = .00000500003750031251
+          z_weak  = .00000500000000000000
+          c*z_exact [km/s] = 1.49897353231086314104
+M=1e7 Msun: rs = 29532500765.00803479435260000000 m = 29532500.76500803479435260000 km ; rs/c = 98.50981896618638349585 s
+   r=1e3 rs = 29532500765008.03479435260000000000 m = 197.41257430215572442872 AU = 1.14015994173826832749 light-days
+   r=1e4 rs = 295325007650080.34794352600000000000 m = 1974.12574302155724428720 AU = 11.40159941738268327498 light-days
+   r=1e5 rs = 2953250076500803.47943526000000000000 m = 19741.25743021557244287207 AU = 114.01599417382683274983 light-days
+M=1e8 Msun: rs = 295325007650.08034794352600000000 m = 295325007.65008034794352600000 km ; rs/c = 985.09818966186383495853 s
+   r=1e3 rs = 295325007650080.34794352600000000000 m = 1974.12574302155724428720 AU = 11.40159941738268327498 light-days
+   r=1e4 rs = 2953250076500803.47943526000000000000 m = 19741.25743021557244287207 AU = 114.01599417382683274983 light-days
+   r=1e5 rs = 29532500765008034.79435260000000000000 m = 197412.57430215572442872076 AU = 1140.15994173826832749830 light-days
+z_grav(cond)   = .00035935395867553819
+c*z_grav [km/s] = 107.73160656337001845297
+rho_weak = 1/(2z) = 1391.38581314878893359451
+rho_exact = 1/(1-(1+z)^-2) = 1392.13585805996424774139
+-- awk redshift_check.awk
+   rs(1 Msun) [m]                                 got=2953.2500765 want=2953.2500765 ok
+   z_exact(rho=1e3)                               got=0.000500375312774 want=0.000500375312774 ok
+   c z_exact(1e3) [km/s]                          got=150.008744939 want=150.008744939 ok
+   c z_exact(1e4) [km/s]                          got=14.9907472154 want=14.9907472154 ok
+   c z_exact(1e5) [km/s]                          got=1.49897353229 want=1.49897353231 ok
+   rs/c for 1e7 Msun [s]                          got=98.5098189662 want=98.5098189662 ok
+   rs/c for 1e8 Msun [s]                          got=985.098189662 want=985.098189662 ok
+   r=1e3 rs, M=1e7 [light-days]                   got=1.14015994174 want=1.14015994174 ok
+   r=1e5 rs, M=1e8 [light-days]                   got=1140.15994174 want=1140.15994174 ok
+   z_grav(cond)                                   got=0.000359353958675 want=0.000359353958676 ok
+   c z_grav(cond) [km/s]                          got=107.731606563 want=107.731606563 ok
+   rho_weak = 1/(2z)                              got=1391.38581315 want=1391.38581315 ok
+   rho_exact                                      got=1392.13585806 want=1392.13585806 ok
+PASS  awk-01 double-precision redshift arithmetic vs bc reference values : 13/13
+
+SUMMARY: 55 PASS lines, 0 FAIL lines; individual checks passed: 9475 of 9475

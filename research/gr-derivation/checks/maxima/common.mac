@@ -1,0 +1,36 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Small tensor toolkit (no ctensor dependency). Index placement:
+   chr[i][j][k] = Gamma^i_{jk};  riem[i][j][k][l] = R^i_{jkl}; ric[j][l] = R_{jl}.
+   Global `simpf` is the simplifier applied to every component. */
+simpf(e) := ratsimp(e)$
+/* dd(e,v): total derivative w.r.t. coordinate v; redefine when some symbol (e.g. r) depends implicitly on coordinates */
+dd(e, v) := diff(e, v)$
+
+christoffel(g, x) := block([n: length(x), gi, G],
+  gi: simpf(invert(g)),
+  G: makelist(makelist(makelist(0,k,1,n),j,1,n),i,1,n),
+  for i thru n do for j thru n do for k thru n do
+    G[i][j][k]: simpf(sum(gi[i,l]*(dd(g[l,j],x[k])+dd(g[l,k],x[j])-dd(g[j,k],x[l])),l,1,n)/2),
+  G)$
+
+riemann(G, x) := block([n: length(x), R],
+  R: makelist(makelist(makelist(makelist(0,l,1,n),k,1,n),j,1,n),i,1,n),
+  for i thru n do for j thru n do for k thru n do for l thru n do
+    R[i][j][k][l]: simpf(dd(G[i][j][l],x[k]) - dd(G[i][j][k],x[l])
+        + sum(G[i][k][m]*G[m][j][l] - G[i][l][m]*G[m][j][k], m,1,n)),
+  R)$
+
+ricci(R, x) := block([n: length(x), Ric],
+  Ric: makelist(makelist(0,l,1,n),j,1,n),
+  for j thru n do for l thru n do
+    Ric[j][l]: simpf(sum(R[i][j][i][l], i,1,n)),
+  Ric)$
+
+/* count entries of a 4x4 nested list that simplify (via simpf) to zero */
+count_zero2(M) := block([c: 0, n: length(M)],
+  for i thru n do for j thru n do if is(simpf(M[i][j]) = 0) then c: c+1,
+  c)$
+
+report(name, passed, total) := block([],
+  if passed = total then printf(true, "PASS  ~a : ~d/~d~%", name, passed, total)
+  else printf(true, "FAIL  ~a : ~d/~d~%", name, passed, total))$
