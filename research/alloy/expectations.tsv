@@ -14,6 +14,9 @@ GodelLedger	VerifyCharacterisation	check	0
 GodelLedger	EncodingInjective_s6	check	0
 GodelLedger	MalformedRejected_s6	check	0
 GodelLedger	MalformedRejected_BROKEN	check	1
+GodelLedger	NegativeExponentRejected	check	0
+GodelLedger	NonSymbolExponentRejected	check	0
+GodelLedger	NegativeExponentRejected_BROKEN	check	1
 GodelLedger	vacuity_GodelLedger	run	1
 CapabilityAddressing	NoForgedOrRolledBackAccepted	check	0
 CapabilityAddressing	ReplayedNonceRejected	check	0

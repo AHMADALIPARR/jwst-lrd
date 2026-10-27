@@ -128,6 +128,7 @@ Every assumption is also stated as a commented fact or predicate in the `.als` f
 - GAP G2: it is not specified whether negative exponents, or exponents that are not a known symbol
   code, count as "malformed". They are outside `malformed`, but `verify` rejects them (checked by
   `VerifyCharacterisation`).
+  Blocker (a) follow-up (2026-10-27): added `NegativeExponentRejected` and `NonSymbolExponentRejected` (expect 0) and `NegativeExponentRejected_BROKEN` (expect 1). These three commands were run individually (glucose, `for 5 but 5 Int, 4 seq`) and gave UNSAT, UNSAT and SAT as expected; logs are in `logs/stdout/GodelLedger/`. The full `check.sh` sweep was NOT re-run to completion after this edit (an attempt was killed after 5 commands, all `ok`), so the "36 commands" totals and `logs/alloy-check.txt` above still describe the earlier full run. The model abstracts arithmetic and does not model the byte stream or framing.
 
 ### CapabilityAddressing.als (TASK 010)
 - Arithmetic: seqIds and the counter are only compared, never incremented, so there is no overflow.
