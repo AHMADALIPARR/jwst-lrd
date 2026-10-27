@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: AGPL-3.0-only
-# Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+# SPDX-License-Identifier: AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque
+# Copyright (C) 2026 Bel Esprit D'Accord Irrevocable Trust / SnapKitty Collective Limited. Dual-licensed: AGPL-3.0-only plus SnapKitty Opaque License.
 #
 # Test runner for the causal track (TASK 006), research/CONTRACTS.md test convention.
 # Prints one line per check:
