@@ -151,6 +151,15 @@ lobby _AddSlots: (| lrdReader = (|
       s: s, chunk].
     f close.
     s).
+  readHead: path Max: n = ( | f. s |
+    "first n bytes only (the catalog only needs the magic line; never read a whole file to classify it)"
+    f: os_file openForReading: path IfFail: [^ ''].
+    s: f readCount: (f size min: n) IfFail: [|:e| f close. ^ ''].
+    f close.
+    s).
+  fileSize: path = ( | f. n |
+    f: os_file openForReading: path IfFail: [^ -1].
+    n: f size. f close. n).
   fileExists: path = ( | f |
     f: os_file openForReading: path IfFail: [^ false].
     f close. true).

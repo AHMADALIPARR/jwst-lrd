@@ -22,6 +22,7 @@ lobby _AddSlots: (| lrdObservatory = (|
   world <- nil. page <- 'obs'. panels <- nil. obsList <- nil. selObs <- 0. cursor <- 0.
   fieldPage <- 0. lineSel <- 0. state <- nil. signature <- ''. lastChange <- ''. changeLog <- nil.
   selfDir <- ''. loadedExt <- nil. poller <- nil. pollMs <- 60000.
+  shaCache <- nil. recCache <- nil.
   topoReady <- false. causalNote <- ''.
 
   "---------- data ----------"
@@ -67,6 +68,7 @@ lobby _AddSlots: (| lrdObservatory = (|
   st: k = ( state isNil ifTrue: [state: dictionary copyRemoveAll]. state at: k IfAbsent: [| v | v: vector copySize: 2 FillingWith: 0. state at: k Put: v. v] ).
 
   refresh = ( | sig |
+    shaCache: nil. recCache: nil.
     lrdCatalog scan.
     buildObservations.
     sig: ''.
@@ -87,10 +89,14 @@ lobby _AddSlots: (| lrdObservatory = (|
     preferences desktop initialBounds: (0 @ 0) ## (1912 @ 1172).
     desktop open.
     world: desktop w.
-    world safelyDo: [world removeAllMorphs].
+    clearWorld.
     rebuild.
     startPolling.
     self).
+  clearWorld = (
+    "worldMorph removeAllMorphs re-subscribes every hand to itself as a cursor client; the hand then receives its own leftMouseDown and grabs itself (an owner cycle that spins forever in globalPosition). Undo that subscription."
+    world safelyDo: [world removeAllMorphs. world hands do: [|:h| h unsubscribeCursor: h]].
+    self ).
   rebuild = ( world safelyDo: [buildPage]. self ).
   removePanels = ( panels isNil ifFalse: [panels do: [|:p| p delete]]. panels: list copyRemoveAll. self ).
   addPanel: k Title: t X: x Y: y W: w H: h = ( | p |
@@ -131,7 +137,7 @@ lobby _AddSlots: (| lrdObservatory = (|
   pollLoop = (
     [true] whileTrue: [
       times delay: pollMs.
-      world isNil ifFalse: [world safelyDo: [refresh. refillAll]]].
+      world isNil ifFalse: [| old | old: signature. refresh. "full refill only when the catalog changed; the monitor panel always shows the new scan number" signature = old ifTrue: [refill: 'monitor'] False: [refillAll]]].
     self).
 
   "---------- actions ----------"
@@ -268,11 +274,17 @@ lobby _AddSlots: (| lrdObservatory = (|
       k: keys at: i. t add: k, ' = ', (o rec at: k)].
     self).
 
-  "power of ten used to scale a series for plotting: decimal exponent of its largest magnitude"
-  scaleOf: a = ( | best. bm |
-    a values do: [|:v| v isFinite && [v kind != 'zero'] ifTrue: [| e | e: v decimalExponent.
-      (bm isNil) || [e > bm] ifTrue: [bm: e. best: v]]].
-    bm isNil ifTrue: [0] False: [bm] ).
+  "power of ten used to scale a series for plotting: decimal exponent of its largest magnitude.
+   The largest magnitude is found by comparing (biased exponent, fraction), which orders finite
+   binary64 values exactly; only that one value then needs the exact bigInt decimal expansion."
+  scaleOf: a = ( | best. be <- 0. bf <- 0 |
+    a values do: [|:v|
+      v isFinite ifTrue: [
+        ((v biasedExp != 0) || [v fraction != 0]) ifTrue: [
+          best isNil ifTrue: [best: v. be: v biasedExp. bf: v fraction] False: [
+            ((v biasedExp > be) || [(v biasedExp = be) && [v fraction > bf]]) ifTrue: [
+              best: v. be: v biasedExp. bf: v fraction]]]]].
+    best isNil ifTrue: [0] False: [best decimalExponent] ).
   floats: a Scale: p = ( | out | out: vector copySize: a values size.
     0 upTo: a values size Do: [|:i| out at: i Put: ((a values at: i) scaledFloat: p)]. out ).
 
@@ -375,6 +387,16 @@ lobby _AddSlots: (| lrdObservatory = (|
     self).
 
   "---------- generic LRD file panels ----------"
+  "parsed records (with their commitment, a Self SHA-256 over the whole record, which costs seconds for a
+   500 kB record) are cached per path and size; the cache is dropped on every rescan."
+  recsOf: path = ( | k. r |
+    recCache isNil ifTrue: [recCache: dictionary copyRemoveAll].
+    k: path, ' ', (lrdReader fileSize: path) printString.
+    r: recCache at: k IfAbsent: nil.
+    r isNil ifFalse: [^ r].
+    r: lrdReader readRecs: path.
+    recCache at: k Put: r.
+    r).
   describe: e On: t Selected: sel State: s = ( | recs. r. per <- 9 |
     t add: (sel ifTrue: ['> '] False: ['  ']), (e isSynthetic ifTrue: ['[SYNTHETIC] '] False: ['']), e rel, '  [', e rootName, ']'
       Color: (e isSynthetic ifTrue: [lrdUI synthColor] False: [sel ifTrue: [lrdUI titleColor] False: [lrdUI ink: 'black']]).
@@ -386,7 +408,7 @@ lobby _AddSlots: (| lrdObservatory = (|
       a length > 0 ifTrue: [t addMono: '    [0] ', ((a values at: 0) decimal: 7), '  [', (a length - 1) printString, '] ', ((a values at: a length - 1) decimal: 7) Color: (lrdUI ink: 'black')].
       a hdrKeys do: [|:k| (k = 'synthetic') ifTrue: [t add: '    ', k, '=', (a hdr at: k) Color: lrdUI synthColor]].
       ^ self].
-    recs: lrdReader readRecs: e path.
+    recs: recsOf: e path.
     recs isEmpty ifTrue: [^ t add: '    empty' Color: lrdUI warnColor].
     s at: 1 Put: (s at: 1) % recs size.
     r: recs at: s at: 1.
@@ -454,9 +476,9 @@ lobby _AddSlots: (| lrdObservatory = (|
     m setWidth: p baseBounds width - 180 Height: p baseBounds height - 54.
     p place: m At: 176 @ 50.
     self).
-  fillCausal: p = ( | t. srcs. es. s. e. g. v |
+  fillCausal: p = ( | t. srcs. es. s. e. g |
     buttons: (bar: '< graph|filePrev|graph >|fileNext') In: p Y: 24.
-    t: text: p X: 4 Y: 50 W: 200 H: p baseBounds height - 54.
+    t: text: p X: 4 Y: 50 W: p baseBounds width - 8 H: p baseBounds height - 54.
     srcs: lrdCatalog filesMatching: 'self/causal/causalGraph.self'.
     srcs isEmpty ifTrue: [t addBold: 'Self causal panel: not yet available' Color: lrdUI badColor.
                           t add: 'expected: <worktree>/self/causal/causalGraph.self (HCALC Alloy)' Color: lrdUI dimColor].
@@ -479,12 +501,27 @@ lobby _AddSlots: (| lrdObservatory = (|
     g isNil ifTrue: [^ t add: 'causalGraph rejected the record' Color: lrdUI badColor].
     t add: 'topological order: ', (g joinIds: g topoOrder).
     t add: 'closure size: ', g closureSize printString.
-    v: g morphicView.
-    p place: v At: 210 @ 50.
+    "the module's columnMorph view is as large as the whole graph and the desktop does not clip, so it is listed in this panel's own clipped text widget (same events and edges the view lists)"
+    t add: 'events:' Color: lrdUI titleColor.
+    g events do: [|:x| t addMono: x printString Color: (lrdUI ink: 'black')].
+    t add: 'edges:' Color: lrdUI titleColor.
+    g edges do: [|:x| t addMono: x printString Color: (lrdUI ink: 'black')].
     self).
 
   "---------- mission QSO1-DCBH-001 ----------"
-  fileSha: path = ( | s | s: lrdReader readFile: path IfFail: nil. s isNil ifTrue: [nil] False: [lrdSha256 digestOfString: s] ).
+  "Self SHA-256 of a file.  The digest is cached per (path, size, mtime-free) so a panel refill does not
+   re-hash unchanged multi-kB arrays each time; the cache is dropped on every rescan, so a changed file
+   (different size or a rescan) is always re-hashed."
+  fileSha: path = ( | s. k. d |
+    shaCache isNil ifTrue: [shaCache: dictionary copyRemoveAll].
+    k: path, ' ', (lrdReader fileSize: path) printString.
+    d: shaCache at: k IfAbsent: nil.
+    d isNil ifFalse: [^ d].
+    s: lrdReader readFile: path IfFail: nil.
+    s isNil ifTrue: [^ nil].
+    d: lrdSha256 digestOfString: s.
+    shaCache at: k Put: d.
+    d ).
   check: ok Label: l On: t = ( t add: (ok ifTrue: ['  OK   '] False: ['  FAIL ']), l Color: (ok ifTrue: [lrdUI okColor] False: [lrdUI badColor]). self ).
   fillProvenance: p = ( | t. o. r. ref. rr. raw |
     t: text: p X: 4 Y: 26 W: p baseBounds width - 8 H: p baseBounds height - 30.

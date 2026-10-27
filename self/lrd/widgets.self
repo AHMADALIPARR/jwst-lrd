@@ -136,7 +136,7 @@ lrdPanel _AddSlots: (|
     m color: lrdUI panelColor. m ).
   lrdAction: a = ( observatory panel: self Action: a. self ).
   pickX: x = ( observatory panel: self PickX: x. self ).
-  place: m At: p = ( m position: p. addMorph: m. m ).
+  place: m At: p = ( addMorph: m. m position: p. m ).
   baseDrawOn: cv = ( | b |
     b: baseBounds.
     cv fillRectangle: b Color: color.

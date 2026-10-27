@@ -71,5 +71,24 @@ EOT
   n=$(grep -c '^OBS ' "$T/q.out"); [ "$n" -ge 4 ] && pass "self_lists_at_least_4_observations (n=$n)" || fail self_lists_at_least_4_observations "n=$n"
   grep -qi 'SYNTHETIC' "$T/q.out" && fail no_synthetic_in_catalogue "SYNTHETIC entry in observation list" || pass no_synthetic_in_catalogue
 fi
+
+# catalogue scan must skip binary files that merely contain the magic string (a 2 MB libair.a once
+# made the observatory die with outOfMemoryError when the catalogue read it whole)
+if [ -x "$SELF_VM" ] && [ -f "$SELF_WORLD" ]; then
+  mkdir -p "$T/binroot/.git" "$T/binroot/d"
+  printf 'LRD-REC-v1\n' > "$T/binroot/d/text.rec"
+  { head -c 3000000 /dev/zero; printf '\nLRD-REC-v1\n'; head -c 100 /dev/zero; } > "$T/binroot/d/libfake.a"
+  cat > "$T/c.self" <<'EOS2'
+((os environmentAt: 'LRD_SELF_DIR' IfFail: '.'), '/load.self') runScript.
+lrdCatalog scan.
+lrdCatalog entries do: [|:e| ('ENTRY ', e path) printLine].
+'END' printLine.
+EOS2
+  LRD_SELF_DIR="$ROOT/self" LRD_ROOTS="$T/binroot" timeout 120 "$SELF_VM" -s "$SELF_WORLD" -f "$T/c.self" </dev/null > "$T/c.out" 2>&1
+  if ! grep -q '^END' "$T/c.out"; then fail catalogue_skips_binary_files "scan did not finish; tail: $(tail -1 "$T/c.out")"
+  elif grep -q 'ENTRY .*libfake.a' "$T/c.out"; then fail catalogue_skips_binary_files "binary file was catalogued"
+  elif grep -q "ENTRY $T/binroot/d/text.rec" "$T/c.out"; then pass catalogue_skips_binary_files
+  else fail catalogue_skips_binary_files "text record not catalogued"; fi
+fi
 echo "== self done"
 [ "$FAILS" -eq 0 ]

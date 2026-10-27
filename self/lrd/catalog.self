@@ -43,14 +43,14 @@ lobby _AddSlots: (| lrdCatalog = (|
     rs isEmpty ifTrue: [^ self].
     cmd: 'find'.
     rs do: [|:r| cmd: cmd, ' ', r].
-    cmd: cmd, ' \\( -name .git -o -path \'*/tests/self\' -o -path \'*/tests/ui-self\' -o -path \'*/self/placeholders\' -o -name _build -o -name target -o -name node_modules \\) -prune -o -type f -size -8192k -print 2>/dev/null | xargs -r grep -l -s -m1 -x -e format=LRD-ARR-v1 -e LRD-REC-v1 2>/dev/null | sort'.
+    cmd: cmd, ' \\( -name .git -o -path \'*/tests/self\' -o -path \'*/tests/ui-self\' -o -path \'*/self/placeholders\' -o -name _build -o -name target -o -name node_modules \\) -prune -o -type f -size -8192k -print 2>/dev/null | xargs -r grep -I -l -s -m1 -x -e format=LRD-ARR-v1 -e LRD-REC-v1 2>/dev/null | sort'.
     found: lines: (run: cmd).
     found do: [|:p. e. r. head|
       r: ''.
       rs do: [|:x| (lrdReader string: p StartsWith: x, '/') ifTrue: [r: x]].
       e: lrdEntry clone. e path: p. e root: r.
       (lrdReader string: p EndsWith: '.hdr') ifTrue: [e format: 'LRD-ARR-v1'. entries addLast: e] False: [
-        head: lrdReader readFile: p IfFail: ''.
+        head: lrdReader readHead: p Max: 64.
         (lrdReader isRecText: head) ifTrue: [e format: 'LRD-REC-v1'. entries addLast: e]]].
     scanCount: scanCount + 1.
     lastScanTime: (run: 'date \'+%Y-%m-%d %H:%M:%S %Z\'') shrinkwrapped.
