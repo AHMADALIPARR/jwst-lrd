@@ -46,6 +46,13 @@
 !     and apply_transform treats them as exact.  Each term of S is as large as `scale`
 !     while s2 can be near zero, so an entry error of a few units in the last place
 !     (epsilon(1.0_dp) = 2.2e-16) leaves an error in s2 of a few epsilon times `scale`.
+!   * The return from c*t to t in transform_coord multiplies by the inexact double
+!     1.0_dp / C_LIGHT.  iv_scale encloses the product with THAT double, and the code then
+!     widens each bound by one more ulp (NEAREST).  By hand: fl(1/c) has relative error at most
+!     2^-53 against the exact 1/c, so using it moves t by at most 2^-53 |t|, which is less than
+!     one ulp of t; the extra ulp therefore covers it.  This is an argument, not a tested
+!     property: no test pins this widening.  If the argument were wrong, the residual would be
+!     about one ulp of t (epsilon(1.0_dp) relative), far inside the margin below.
 !   * Measured: tests/causal/test_boost.f90 compares s2 in two inertial frames for 200
 !     deterministic pseudo-random pairs; the worst |s2_L - s2_B| / scale it printed was
 !     2.6064e-15.  rel_tol = 1e-12 is about 380 times that, and about 4500 epsilon.

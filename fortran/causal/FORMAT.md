@@ -66,9 +66,27 @@ commitment = lowercase hex ( SHA-256( "LRD-COMMIT-v1" 0x00 serialization ) )    
 * `<path>`: the record;
 * `<path>.commit`: the 64-character commitment followed by one LF (65 bytes).
 
-`graph_load` computes the commitment from the bytes it read and returns it; it does not read
-`<path>.commit` and does not compare against it. A caller that wants verification must
-compare the returned commitment with the sidecar itself.
+`graph_load(path, g, ok, err, commit)` reads `<path>`, recomputes the commitment from the
+bytes it read, and **verifies it against `<path>.commit` before it interprets the record**.
+The sidecar must be exactly 64 lowercase hex characters, optionally followed by one LF
+(`graph_save` writes the LF; a file without it is accepted). Refusals set `ok = .false.` and
+return one of these `err` strings (the `commit` output is the recomputed commitment in every
+case where `<path>` could be read):
+
+| `err` | when |
+|---|---|
+| `read_failed` | `<path>` cannot be read |
+| `commit_sidecar_missing` | `<path>.commit` cannot be read (absent or unreadable) |
+| `commit_sidecar_malformed` | not 64 lowercase hex characters plus an optional single LF (short, empty, upper-case or other non-hex, CRLF, longer) |
+| `commit_sidecar_zero` | 64 `0` characters |
+| `commit_mismatch` | a well-formed sidecar that differs from the recomputed commitment (a different digest, or the record was changed after the sidecar was written) |
+
+Only when the sidecar matches does `graph_load` go on to `graph_parse` (section 5), whose
+errors are separate. The sidecar protects against accidental or unannounced change of the
+record; it is stored next to the record, so it is not authentication: whoever can rewrite the
+record can also rewrite the sidecar. This verification is new in the follow-up to review item
+L2; before it `graph_load` did not read the sidecar. The check is in `graph_load` only; `graph_parse` takes a
+buffer and does not see a sidecar.
 
 SHA-256 is FIPS 180-4 over bytes (one byte per Fortran character), in `causal_sha256.f90`.
 
@@ -170,6 +188,8 @@ For the SYNTHETIC fixture (11 events, 6 edges, 10 rejections) the topological or
 `topo` is `1,2,3,5,6,4,7,8,9,10,11`.
 
 ## 5. Reading and validating (`graph_parse`, `graph_load`)
+
+`graph_load` first checks the sidecar (section 2). The steps below are `graph_parse`, which works on a byte buffer.
 
 `graph_parse` is stricter than "parse the record":
 

@@ -107,5 +107,36 @@ program test_units_interval
   s = iv_sqr(iv_point(1.0_dp + epsilon(1.0_dp)))
   call check('iv_sqr_upper_bound_widened', eq_bits(s%lo, 1.0_dp + 2.0_dp * epsilon(1.0_dp)) .and. &
              eq_bits(s%hi, 1.0_dp + 3.0_dp * epsilon(1.0_dp)))
+  ! ---- two_prod extreme-range fallback (review mutants X6, X7, X8) -------------------------
+  ! two_prod is not an error-free transformation when |a| or |b| > 1e290 (the Veltkamp split
+  ! overflows and the error term is NaN) or |p| < 1e-280 (the split products underflow), so in
+  ! those ranges mul_dn / mul_up widen ONE ulp on BOTH sides unconditionally, even when the
+  ! product is exact.  All products below are exact, so an unwidened bound can only come from
+  ! the error-free path, and a bound widened inside the guard range can only come from the
+  ! fallback.  The 2**k operands sit just inside / just outside each threshold.
+  !   2**963 = 8.7e289 < 1e290 < 2**964 = 1.7e290;   2**-930 = 1.07e-280 > 1e-280.
+  s = iv_scale(iv_point(1.5e300_dp), 0.5_dp)            ! a > 1e290; p = 7.5e299 exactly
+  call check('two_prod_fallback_large_a_widens_both_sides', &
+             eq_bits(s%lo, nearest(7.5e299_dp, -1.0_dp)) .and. eq_bits(s%hi, nearest(7.5e299_dp, 1.0_dp)))
+  s = iv_scale(iv_point(0.5_dp), 1.5e300_dp)            ! b > 1e290 (scale factor)
+  call check('two_prod_fallback_large_b_widens_both_sides', &
+             eq_bits(s%lo, nearest(7.5e299_dp, -1.0_dp)) .and. eq_bits(s%hi, nearest(7.5e299_dp, 1.0_dp)))
+  s = iv_scale(iv_point(2.0_dp**964), 0.5_dp)           ! just above the 1e290 guard
+  call check('two_prod_fallback_2pow964_widens_both_sides', &
+             eq_bits(s%lo, nearest(2.0_dp**963, -1.0_dp)) .and. eq_bits(s%hi, nearest(2.0_dp**963, 1.0_dp)))
+  s = iv_scale(iv_point(2.0_dp**963), 0.5_dp)           ! just below the guard: exact, not widened
+  call check('two_prod_exact_2pow963_not_widened', &
+             eq_bits(s%lo, 2.0_dp**962) .and. eq_bits(s%hi, 2.0_dp**962))
+  s = iv_scale(iv_point(1.0e-290_dp), 1.0_dp)           ! |p| = 1e-290 < 1e-280
+  call check('two_prod_fallback_tiny_1e-290_widens_both_sides', &
+             eq_bits(s%lo, nearest(1.0e-290_dp, -1.0_dp)) .and. eq_bits(s%hi, nearest(1.0e-290_dp, 1.0_dp)))
+  s = iv_scale(iv_point(2.0_dp**(-480)), 2.0_dp**(-480))  ! p = 2**-960 = 1e-289 exactly
+  call check('two_prod_fallback_tiny_2pow-960_widens_both_sides', &
+             eq_bits(s%lo, nearest(2.0_dp**(-960), -1.0_dp)) .and. eq_bits(s%hi, nearest(2.0_dp**(-960), 1.0_dp)))
+  s = iv_scale(iv_point(2.0_dp**(-465)), 2.0_dp**(-465))  ! p = 2**-930 = 1.07e-280: exact, not widened
+  call check('two_prod_exact_2pow-930_not_widened', &
+             eq_bits(s%lo, 2.0_dp**(-930)) .and. eq_bits(s%hi, 2.0_dp**(-930)))
+  s = iv_mul(iv_point(2.0_dp**(-480)), iv_point(2.0_dp**(-480)))   ! same through iv_mul
+  call check('iv_mul_tiny_product_encloses_exact', s%lo < 2.0_dp**(-960) .and. s%hi > 2.0_dp**(-960))
   call finish('test_units_interval')
 end program test_units_interval

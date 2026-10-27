@@ -405,13 +405,25 @@ contains
     g%rcode(g%n_rej) = code
   end subroutine append_rejection
 
+  ! graph_load: reads <path>, verifies it against the sidecar <path>.commit, then parses.
+  ! The sidecar is checked BEFORE the record is interpreted.  A sidecar must be 64 lowercase
+  ! hex characters, optionally followed by exactly one LF (graph_save writes the LF).  Errors
+  ! (all with ok = .false.; err text is the contract):
+  !   read_failed             <path> cannot be read
+  !   commit_sidecar_missing  <path>.commit cannot be opened/read
+  !   commit_sidecar_malformed  not 64 lowercase hex characters (+ optional LF)
+  !   commit_sidecar_zero     64 x '0' (a placeholder, never a SHA-256 of a record)
+  !   commit_mismatch         well-formed sidecar differs from the recomputed commitment
+  ! `commit` always returns the commitment recomputed from the bytes of <path> (blank only
+  ! when <path> itself could not be read).  Any other err comes from graph_parse.
   subroutine graph_load(path, g, ok, err, commit)
     character(len=*), intent(in) :: path
     type(causal_graph_t), intent(out) :: g
     logical, intent(out) :: ok
     character(len=:), allocatable, intent(out) :: err
     character(len=64), intent(out) :: commit
-    character(len=:), allocatable :: buf
+    character(len=:), allocatable :: buf, side
+    logical :: sok
     commit = ''
     call read_bytes(path, buf, ok)
     if (.not. ok) then
@@ -419,6 +431,36 @@ contains
       return
     end if
     commit = rec_commitment(buf)
+    call read_bytes(path // '.commit', side, sok)
+    if (.not. sok) then
+      ok = .false.
+      err = 'commit_sidecar_missing'
+      return
+    end if
+    if (len(side) == 65) then
+      if (side(65:65) /= achar(10)) side = ''
+    end if
+    if (len(side) == 65) side = side(1:64)
+    if (len(side) /= 64) then
+      ok = .false.
+      err = 'commit_sidecar_malformed'
+      return
+    end if
+    if (verify(side, '0123456789abcdef') /= 0) then
+      ok = .false.
+      err = 'commit_sidecar_malformed'
+      return
+    end if
+    if (verify(side, '0') == 0) then
+      ok = .false.
+      err = 'commit_sidecar_zero'
+      return
+    end if
+    if (side /= commit) then
+      ok = .false.
+      err = 'commit_mismatch'
+      return
+    end if
     call graph_parse(buf, g, ok, err)
   end subroutine graph_load
 
