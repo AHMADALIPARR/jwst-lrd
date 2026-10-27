@@ -514,3 +514,258 @@ fn out_of_scope_key_read_allows_mac_forgery() {
     assert!(other.mac_ok(&key));
     println!("OUT_OF_SCOPE demonstrated: attacker holding authority.key computes valid MACs");
 }
+
+// ======================================================================================
+// BLOCKERS.md (c): `persist_failed` fault-injection tests. Faults are REAL I/O failures against
+// the unmodified production binary (no cfg(test) branches, no skipped I/O):
+//   * consume / admin sites: a DIRECTORY is created at `authority.state.tmp`, so the temp-file
+//     open inside `write_atomic` fails with EISDIR (works for root and non-root; removable live
+//     with rmdir, so recovery is exercised in the SAME authority process);
+//   * accept site: the first persist (consume) must succeed and the second (accept) must fail,
+//     so the authority is started under `prlimit --fsize=<bytes>` with SIGXFSZ ignored: the
+//     write of the larger state file fails with EFBIG (real short write), the rename never runs.
+// ======================================================================================
+fn sha_hex(p: &Path) -> String {
+    lrd_capability::sha256::sha256(&fs::read(p).unwrap()).iter().map(|b| format!("{:02x}", b)).collect()
+}
+fn field_u64(r: &Rec, k: &str) -> u64 {
+    r.get(k).unwrap_or_else(|| panic!("missing {} in {:?}", k, r)).parse().unwrap()
+}
+
+impl Env {
+    fn state_file(&self) -> PathBuf {
+        self.adir.join("authority.state")
+    }
+    fn tmp_fault_path(&self) -> PathBuf {
+        self.adir.join("authority.state.tmp")
+    }
+    fn fault_on(&self) {
+        fs::create_dir(self.tmp_fault_path()).unwrap();
+    }
+    fn fault_off(&self) {
+        fs::remove_dir(self.tmp_fault_path()).unwrap();
+    }
+    /// Restart the authority under a file-size limit (bytes) with SIGXFSZ ignored. stderr is a
+    /// pipe (never a size-limited file) and is drained by `stop_limited`.
+    fn start_limited(&mut self, fsize: u64) {
+        self.stop();
+        let _ = fs::remove_file(&self.sock);
+        let c = Command::new("prlimit")
+            .arg(format!("--fsize={}", fsize))
+            .args(["--", "sh", "-c", "trap '' XFSZ; exec \"$@\"", "sh", AUTH, "serve", "--dir"])
+            .arg(&self.adir)
+            .arg("--sock")
+            .arg(&self.sock)
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        self.child = Some(c);
+        let t = Instant::now();
+        while !(self.sock.exists() && call(&self.admin, &Rec::new().with("op", "STATUS")).is_ok()) {
+            assert!(t.elapsed() < Duration::from_secs(20), "limited authority did not start");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+    }
+    /// Kill the limited authority (our own child) and return what it logged on stderr.
+    fn stop_limited(&mut self) -> String {
+        let mut c = self.child.take().expect("child");
+        let _ = c.kill();
+        let o = c.wait_with_output().unwrap();
+        String::from_utf8_lossy(&o.stderr).to_string()
+    }
+}
+
+/// Env with seq=1 accepted, worker synced, and one fresh transition capability issued (all
+/// BEFORE any fault). Returns (env, capability file).
+fn faultable(name: &str) -> (Env, PathBuf) {
+    let mut e = Env::new(name);
+    e.sync();
+    let (ok, r, err) = e.transition("h1", "none");
+    assert!(ok, "{:?} {}", r, err);
+    e.sync();
+    let cap = e.issue("transition", 60);
+    (e, cap)
+}
+
+/// After a rejected persist the authority must be exactly as before: same counters, same file bytes.
+fn assert_unadvanced(e: &Env, r: &Rec, sha0: &str, st0: &Rec) {
+    assert_eq!(r.get("decision"), Some("REJECT"), "{:?}", r);
+    assert_eq!(reason(r), "persist_failed", "{:?}", r);
+    assert!(r.get("new_commit").is_none(), "REJECT must not carry new_commit: {:?}", r);
+    assert_eq!(r.get("head_seq"), st0.get("seq"), "head_seq in the REJECT must be unchanged");
+    let st = e.status();
+    assert_eq!(st.get("seq"), st0.get("seq"), "authority seq advanced");
+    assert_eq!(st.get("head"), st0.get("head"), "authority head advanced");
+    assert_eq!(st.get("persisted_seq"), st0.get("persisted_seq"), "persisted_seq advanced");
+    assert_eq!(sha_hex(&e.state_file()), sha0, "on-disk state file changed by a failed persist");
+}
+
+/// Recovery: fault removed (by the caller), a FRESH capability is ACCEPTed, persisted_seq == seq.
+fn assert_recovers(e: &mut Env, seq_before: u64) {
+    e.sync();
+    let (ok, r, err) = e.transition("recovered", "none");
+    assert!(ok, "post-fault transition rejected: {:?} {}", r, err);
+    assert_eq!(r.get("decision"), Some("ACCEPT"), "{:?}", r);
+    assert_eq!(field_u64(&r, "seq"), seq_before + 1);
+    let st = e.status();
+    assert_eq!(field_u64(&st, "seq"), seq_before + 1);
+    assert_eq!(st.get("persisted_seq"), st.get("seq"), "persisted_seq != seq after recovery");
+    let disk = fs::read_to_string(e.state_file()).unwrap();
+    assert_eq!(field_u64(&Rec::from_line(disk.lines().next().unwrap()).unwrap(), "seq"), seq_before + 1, "disk header seq");
+}
+
+#[test]
+fn persist_failed_consume_site() {
+    let (mut e, cap) = faultable("pf-consume");
+    let sha0 = sha_hex(&e.state_file());
+    let st0 = e.status();
+    let seq0 = field_u64(&st0, "seq");
+    e.fault_on();
+    let (ok, r, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "will-not-persist"]);
+    assert!(!ok);
+    assert_unadvanced(&e, &r, &sha0, &st0);
+    // the failure is the real I/O error from write_atomic, logged by the authority
+    let log = e.log();
+    assert!(log.contains("REJECT reason=persist_failed"), "{}", excerpt(&log, 5));
+    assert!(log.contains("Is a directory"), "expected real EISDIR in log: {}", excerpt(&log, 5));
+    // consume-site: the failed persist did not reach disk, so disk still records the cap as issued
+    let disk = fs::read_to_string(e.state_file()).unwrap();
+    let capid = Rec::from_line(&fs::read_to_string(&cap).unwrap()).unwrap().get("cap_id").unwrap().to_string();
+    let line = disk.lines().find(|l| l.contains(&format!("cap_id={} ", capid)) && l.contains("t=cap")).expect("cap on disk");
+    assert!(line.contains("status=issued"), "{}", line);
+    // fault removed (same process): byte-identical file, then the authority recovers
+    e.fault_off();
+    assert_eq!(sha_hex(&e.state_file()), sha0);
+    assert_recovers(&mut e, seq0);
+    println!("persist_failed consume-site: REJECT persist_failed head_seq={} sha256={}", seq0, sha0);
+}
+
+#[test]
+fn persist_failed_consume_site_restart_is_single_acceptance() {
+    // Known inconsistency (recorded, not fixed): after a consume-site persist failure the cap is
+    // `consumed` in memory (replay) but still `issued` on disk, so after an authority restart it is
+    // usable again. Invariant asserted here: it is accepted AT MOST ONCE in total.
+    let (mut e, cap) = faultable("pf-consume-restart");
+    e.fault_on();
+    let (_, r, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "x"]);
+    assert_eq!(reason(&r), "persist_failed");
+    let (_, r, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "x"]);
+    assert_eq!(reason(&r), "replay", "in-memory the cap is consumed: {:?}", r);
+    e.fault_off();
+    e.restart();
+    e.sync();
+    let (ok, r, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "x2"]);
+    println!("OPEN persist_failed_consume_site_cap_usable_after_restart: first use after restart ok={} reason={}", ok, reason(&r));
+    e.restart();
+    e.sync();
+    let (ok2, r2, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "x3"]);
+    assert!(!ok2, "capability accepted twice: {:?}", r2);
+    assert!(matches!(reason(&r2), "replay" | "retired"), "{:?}", r2);
+}
+
+#[test]
+fn persist_failed_accept_site() {
+    let (mut e, cap) = faultable("pf-accept");
+    let sha0 = sha_hex(&e.state_file());
+    let size0 = fs::metadata(e.state_file()).unwrap().len();
+    let st0 = e.status();
+    let seq0 = field_u64(&st0, "seq");
+    // consume persist adds ~55 bytes (retired line + status word); accept persist adds a state line
+    // of >190 bytes. Limit = size0 + 152 lets the first persist succeed and makes the second fail.
+    e.start_limited(size0 + 152);
+    assert_eq!(sha_hex(&e.state_file()), sha0, "restart must not change the file");
+    let (ok, r, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "will-not-accept"]);
+    assert!(!ok);
+    assert_eq!(r.get("decision"), Some("REJECT"), "{:?}", r);
+    assert_eq!(reason(&r), "persist_failed", "{:?}", r);
+    assert!(r.get("new_commit").is_none(), "{:?}", r);
+    assert_eq!(r.get("head_seq"), st0.get("seq"));
+    // in-memory chain rolled back
+    let st = e.status();
+    assert_eq!(st.get("seq"), st0.get("seq"), "in-memory chain not rolled back");
+    assert_eq!(st.get("head"), st0.get("head"));
+    assert_eq!(st.get("persisted_seq"), st0.get("persisted_seq"));
+    // the CONSUME persist did succeed (so this really is the accept site): disk file changed, cap consumed on disk
+    assert_ne!(sha_hex(&e.state_file()), sha0, "consume persist should have reached disk");
+    let disk = fs::read_to_string(e.state_file()).unwrap();
+    assert_eq!(field_u64(&Rec::from_line(disk.lines().next().unwrap()).unwrap(), "seq"), seq0, "disk must not be ahead");
+    let capid = Rec::from_line(&fs::read_to_string(&cap).unwrap()).unwrap().get("cap_id").unwrap().to_string();
+    let line = disk.lines().find(|l| l.contains(&format!("cap_id={} ", capid)) && l.contains("t=cap")).expect("cap on disk");
+    assert!(line.contains("status=consumed"), "{}", line);
+    // capability stays consumed (still faulted): replay, not ok
+    let (ok, r2, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "again"]);
+    assert!(!ok);
+    assert!(matches!(reason(&r2), "replay" | "retired"), "{:?}", r2);
+    assert!(r2.get("new_commit").is_none());
+    let sha_mid = sha_hex(&e.state_file());
+    let log = e.stop_limited();
+    assert!(log.contains("REJECT reason=persist_failed"), "{}", excerpt(&log, 5));
+    assert!(log.contains("File too large"), "expected real EFBIG in log: {}", excerpt(&log, 5));
+    // fault removed (authority restarted WITHOUT the limit): state file untouched by the removal,
+    // the consumed cap is still not reusable (disk consistent), and a fresh cap is ACCEPTed.
+    e.start();
+    assert_eq!(sha_hex(&e.state_file()), sha_mid);
+    let (ok, r3, _) = e.worker(&["transition", "--cap", cap.to_str().unwrap(), "--payload", "after-restart"]);
+    assert!(!ok);
+    assert!(matches!(reason(&r3), "replay" | "retired"), "consumed cap reusable after restart: {:?}", r3);
+    assert_eq!(e.seq(), seq0.to_string());
+    assert_recovers(&mut e, seq0);
+    println!("persist_failed accept-site: REJECT persist_failed head_seq={} sha256_before_fault={}", seq0, sha0);
+}
+
+#[test]
+fn persist_failed_admin_site() {
+    let (mut e, cap) = faultable("pf-admin");
+    let sha0 = sha_hex(&e.state_file());
+    let st0 = e.status();
+    let seq0 = field_u64(&st0, "seq");
+    let capid = Rec::from_line(&fs::read_to_string(&cap).unwrap()).unwrap().get("cap_id").unwrap().to_string();
+    e.fault_on();
+    let r = call(&e.admin, &Rec::new().with("op", "REVOKE").with("cap_id", capid.clone())).unwrap();
+    assert_eq!(r.get("result"), Some("persist_failed"), "{:?}", r);
+    let d = r.get("detail").expect("persist_failed must carry detail=");
+    assert!(d.contains("Is_a_directory"), "detail should carry the real I/O error: {}", d);
+    assert!(r.get("status").is_none());
+    let st = e.status();
+    assert_eq!(st.get("seq"), st0.get("seq"));
+    assert_eq!(st.get("persisted_seq"), st0.get("persisted_seq"));
+    assert_eq!(sha_hex(&e.state_file()), sha0, "on-disk state changed by failed REVOKE persist");
+    // the failure does not make the authority advance its chain; ISSUE under the same fault fails too (Err, not a result)
+    assert!(call(&e.admin, &Rec::new().with("op", "ISSUE").with("scope", "read").with("ttl", "60")).map(|r| r.get("result") != Some("ok")).unwrap_or(true));
+    e.fault_off();
+    assert_eq!(sha_hex(&e.state_file()), sha0);
+    assert_recovers(&mut e, seq0);
+    println!("persist_failed admin-site: result=persist_failed detail={} sha256={}", d, sha0);
+}
+
+#[test]
+fn persist_failed_token_in_protocol_matches_code() {
+    // every `reject(&tag, "<tok>"` in authority.rs, plus the admin-site `"result", "persist_failed"`,
+    // must appear in PROTOCOL.md's token list; and persist_failed must be produced at >= 3 return sites.
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let code = fs::read_to_string(root.join("src/authority.rs")).unwrap();
+    let proto = fs::read_to_string(root.join("PROTOCOL.md")).unwrap();
+    let mut toks: Vec<String> = Vec::new();
+    // two token-producing forms: `reject(&tag, "<tok>"` and `Err("<tok>")` (check_cap); only snake_case tokens
+    for pat in ["reject(&tag, \"", "Err(\""] {
+        let mut rest = code.as_str();
+        while let Some(i) = rest.find(pat) {
+            let s = &rest[i + pat.len()..];
+            let tok = &s[..s.find('"').unwrap()];
+            if !tok.is_empty() && tok.chars().all(|c| c.is_ascii_lowercase() || c == '_') && !toks.contains(&tok.to_string()) {
+                toks.push(tok.to_string());
+            }
+            rest = s;
+        }
+    }
+    if code.contains("ok_or(\"unknown_cap\")") {
+        toks.push("unknown_cap".to_string());
+    }
+    assert!(toks.len() >= 5, "grep found too few tokens: {:?}", toks);
+    let missing: Vec<&String> = toks.iter().filter(|t| !proto.contains(&format!("`{}`", t))).collect();
+    assert!(missing.is_empty(), "tokens in authority.rs but not in PROTOCOL.md: {:?}", missing);
+    assert!(toks.contains(&"persist_failed".to_string()));
+    let sites = code.matches("\"persist_failed\"").count();
+    assert_eq!(sites, 3, "expected exactly 3 persist_failed return sites in authority.rs, found {}", sites);
+    println!("PROTOCOL token check: {} reject tokens all documented: {:?}", toks.len(), toks);
+}

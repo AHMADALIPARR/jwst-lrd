@@ -32,6 +32,8 @@ while read -r l; do
   case "$l" in *"... ok") emit "PASS rust_$name";; *"... FAILED") emit "FAIL rust_$name see capability/evidence/cargo_test.log";;
                *"... ignored") emit "UNAVAILABLE rust_$name ignored";; esac
 done < <(grep -E '^test [^ ]+ \.\.\. (ok|FAILED|ignored)$' "$EV/cargo_test.log")
+# OPEN lines printed by tests (known, unfixed inconsistencies; not counted as FAIL)
+grep -E "^OPEN " "$EV/cargo_test.log" | while read -r l; do emit "$l"; done
 grep -q '^test result: ' "$EV/cargo_test.log" || emit "FAIL cargo_test no test result (exit $crc)"
 [ $crc -eq 0 ] || grep -q 'FAILED$' "$EV/cargo_test.log" || emit "FAIL cargo_test exit $crc"
 
