@@ -1,0 +1,99 @@
+== T1 pre-registration
+PASS  PREREG.md matches PREREG.sha256
+== T2 fixture and pixel counts
+PASS  fixture sha256 c0b87857... verified in run.log
+PASS  429 pixels, 408 valid, 21 masked (got n=429 valid=408)
+== T3 engine validation (Octave vs awk-sp reference numbers; PREREG s8: 2e-5; runmed 1e-6)
+PASS  awk-sp window z, RM12: Octave 7.040280 vs reference 7.040280
+PASS  awk-sp window z, P1: Octave 7.041836 vs reference 7.041836
+PASS  awk-sp window z, P2: Octave 7.042200 vs reference 7.042200
+PASS  running median Octave vs continuum.awk max|diff|=5.000e-11 (< 1e-6)
+== T4 independent Fortran 2018 cross-check vs Octave (polynomial, 1C, joint z)
+PASS  P0 D0 Fortran 7.040445 vs Octave 7.040445
+PASS  P1 D0 Fortran 7.040487 vs Octave 7.040487
+PASS  P2 D0 Fortran 7.041442 vs Octave 7.041442
+PASS  P3 D0 Fortran 7.041922 vs Octave 7.041922
+PASS  P0 D1 Fortran 7.040737 vs Octave 7.040737
+PASS  P1 D1 Fortran 7.040199 vs Octave 7.040199
+PASS  P2 D1 Fortran 7.039781 vs Octave 7.039781
+PASS  P3 D1 Fortran 7.040057 vs Octave 7.040057
+INFO  P0 D2 Fortran 7.040441 vs Octave 7.040441 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P1 D2 Fortran 7.040026 vs Octave 7.040026 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P2 D2 Fortran 7.038958 vs Octave 7.038958 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P3 D2 Fortran 7.040635 vs Octave 7.040635 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P0 D3 Fortran 7.043472 vs Octave 7.043472 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P1 D3 Fortran 7.042017 vs Octave 7.042017 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P2 D3 Fortran 7.040639 vs Octave 7.040639 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P3 D3 Fortran 7.035841 vs Octave 7.035841 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P0 D4 Fortran 7.043832 vs Octave 7.043832 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P1 D4 Fortran 7.041990 vs Octave 7.041990 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P2 D4 Fortran 7.040740 vs Octave 7.040740 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+INFO  P3 D4 Fortran 7.037793 vs Octave 7.037793 diff=0.00e+00 (not asserted: PREREG s8 asserts D0,D1 only)
+== T5 Octave unit tests (cc_unit)
+UT PASS template_unit_area_sig0 integral=1.000000000000
+UT PASS template_unit_area_sig500 integral=1.000000000000
+UT PASS template_unit_area_sig2000 integral=1.000000000000
+UT PASS vectorised_vs_bruteforce_chi2 30 cases, max|diff|=1.48e-07
+UT PASS finite_on_valid_pixels valid=408
+UT PASS export_has_no_nan_inf n=429
+UT PASS pixel_counts_429_408_21 n=429 valid=408 masked=21
+UT PASS drop_last_pixels D1/D3 counts
+UT PASS spline_contains_linear resid=6.0e-15
+UT PASS beta_grid_contains_zero 
+UT PASS amplitude_nonnegative_constraint A_unconstrained=-48.11 A_constrained=0 chi2_con=9.4783 chi2_unc=1.6956
+unit tests: PASS=11 FAIL=0
+== T6 SYNTHETIC noise-free injection-recovery, z_true=7.0451 (SYNTHETIC; NOT data). Asserted only where the generating family is contained (PREREG s8, tol 3e-5)
+PASS  SYNTHETIC noise-free recovery P1/1C bias=-3.189e-10
+PASS  SYNTHETIC noise-free recovery P1/2C bias=+1.765e-06
+PASS  SYNTHETIC noise-free recovery P2/1C bias=-4.208e-10
+PASS  SYNTHETIC noise-free recovery P2/2C bias=+1.392e-06
+PASS  SYNTHETIC noise-free recovery P3/1C bias=+1.069e-09
+PASS  SYNTHETIC noise-free recovery P3/2C bias=+2.240e-06
+PASS  SYNTHETIC noise-free recovery SPL/1C bias=+1.001e-09
+PASS  SYNTHETIC noise-free recovery SPL/2C bias=-1.272e-06
+PASS  SYNTHETIC noise-free recovery PLLIN/1C bias=-1.028e-08
+PASS  SYNTHETIC noise-free recovery PLLIN/2C bias=+1.748e-06
+INFO  SYNTHETIC noise-free RM6/1C (family not contained; not asserted) bias=-3.108e-03
+INFO  SYNTHETIC noise-free RM6/2C (family not contained; not asserted) bias=-3.108e-03
+INFO  SYNTHETIC noise-free RM12/1C (family not contained; not asserted) bias=-1.584e-05
+INFO  SYNTHETIC noise-free RM12/2C (family not contained; not asserted) bias=-1.584e-05
+INFO  SYNTHETIC noise-free RM20/1C (family not contained; not asserted) bias=+2.646e-06
+INFO  SYNTHETIC noise-free RM20/2C (family not contained; not asserted) bias=+2.646e-06
+INFO  SYNTHETIC noise-free P0/1C (family not contained; not asserted) bias=-3.848e-05
+INFO  SYNTHETIC noise-free P0/2C (family not contained; not asserted) bias=-3.848e-05
+INFO  SYNTHETIC noise-free PL/1C (family not contained; not asserted) bias=-3.037e-06
+INFO  SYNTHETIC noise-free PL/2C (family not contained; not asserted) bias=+5.763e-07
+INFO  SYNTHETIC kind=edge model=P0 comp=1C z_true=7.04510 zJ=7.044586 bias=-5.142e-04 hwJ=0.000269 chi2=58.6663 zHb=7.045652 zHa=7.044571
+INFO  SYNTHETIC kind=edge model=P0 comp=2C z_true=7.04510 zJ=7.044586 bias=-5.142e-04 hwJ=0.000285 chi2=58.6663 zHb=7.045652 zHa=7.044571
+INFO  SYNTHETIC kind=edge model=P1 comp=1C z_true=7.04510 zJ=7.044847 bias=-2.532e-04 hwJ=0.000267 chi2=35.7022 zHb=7.045100 zHa=7.044843
+INFO  SYNTHETIC kind=edge model=P1 comp=2C z_true=7.04510 zJ=7.046179 bias=+1.079e-03 hwJ=0.000397 chi2=10.4513 zHb=7.045100 zHa=7.047453
+INFO  SYNTHETIC kind=edge model=P2 comp=1C z_true=7.04510 zJ=7.046790 bias=+1.690e-03 hwJ=0.000339 chi2=6.6807 zHb=7.045100 zHa=7.046824
+INFO  SYNTHETIC kind=edge model=P2 comp=2C z_true=7.04510 zJ=7.047140 bias=+2.040e-03 hwJ=0.000431 chi2=4.8547 zHb=7.045100 zHa=7.047208
+INFO  SYNTHETIC kind=edge model=P3 comp=1C z_true=7.04510 zJ=7.047110 bias=+2.010e-03 hwJ=0.000418 chi2=4.8212 zHb=7.045100 zHa=7.047173
+INFO  SYNTHETIC kind=edge model=P3 comp=2C z_true=7.04510 zJ=7.047110 bias=+2.010e-03 hwJ=0.000625 chi2=4.8212 zHb=7.045100 zHa=7.047173
+INFO  SYNTHETIC kind=edge model=PLLIN comp=1C z_true=7.04510 zJ=7.044847 bias=-2.532e-04 hwJ=0.000267 chi2=35.7015 zHb=7.045100 zHa=7.044843
+INFO  SYNTHETIC kind=edge model=PLLIN comp=2C z_true=7.04510 zJ=7.046179 bias=+1.079e-03 hwJ=0.000397 chi2=10.4511 zHb=7.045100 zHa=7.047457
+INFO  SYNTHETIC kind=edge model=PL comp=1C z_true=7.04510 zJ=7.044659 bias=-4.407e-04 hwJ=0.000267 chi2=45.7316 zHb=7.045088 zHa=7.044653
+INFO  SYNTHETIC kind=edge model=PL comp=2C z_true=7.04510 zJ=7.044659 bias=-4.407e-04 hwJ=0.000267 chi2=45.7316 zHb=7.045088 zHa=7.044653
+INFO  SYNTHETIC kind=edge model=RM12 comp=1C z_true=7.04510 zJ=7.044629 bias=-4.708e-04 hwJ=0.000271 chi2=60.4627 zHb=7.044737 zHa=7.044628
+INFO  SYNTHETIC kind=edge model=RM12 comp=2C z_true=7.04510 zJ=7.044665 bias=-4.351e-04 hwJ=0.000265 chi2=57.9246 zHb=7.044737 zHa=7.044664
+INFO  SYNTHETIC kind=edge model=RM20 comp=1C z_true=7.04510 zJ=7.044643 bias=-4.570e-04 hwJ=0.000271 chi2=64.9329 zHb=7.044737 zHa=7.044642
+INFO  SYNTHETIC kind=edge model=RM20 comp=2C z_true=7.04510 zJ=7.044672 bias=-4.282e-04 hwJ=0.000264 chi2=60.5970 zHb=7.044737 zHa=7.044671
+INFO  SYNTHETIC kind=edge model=RM6 comp=1C z_true=7.04510 zJ=7.042095 bias=-3.005e-03 hwJ=0.000232 chi2=859.0418 zHb=7.044737 zHa=7.042069
+INFO  SYNTHETIC kind=edge model=RM6 comp=2C z_true=7.04510 zJ=7.042095 bias=-3.005e-03 hwJ=0.000232 chi2=859.0418 zHb=7.044737 zHa=7.042069
+INFO  SYNTHETIC kind=edge model=SPL comp=1C z_true=7.04510 zJ=7.047155 bias=+2.055e-03 hwJ=0.000477 chi2=4.7877 zHb=7.045100 zHa=7.047238
+INFO  SYNTHETIC kind=edge model=SPL comp=2C z_true=7.04510 zJ=7.045879 bias=+7.788e-04 hwJ=0.000627 chi2=3.3986 zHb=7.045100 zHa=7.045924
+INFO  SYNTHETIC SUMMARY kind=noisy model=P1 comp=1C N=30 z_true=7.04510 mean_bias=+3.786e-05 sd=3.334e-04 mean_hw=2.787e-04 coverage_1sigma=14/30
+INFO  SYNTHETIC SUMMARY kind=noisy model=P2 comp=1C N=30 z_true=7.04510 mean_bias=+7.147e-05 sd=4.116e-04 mean_hw=3.394e-04 coverage_1sigma=19/30
+INFO  SYNTHETIC SUMMARY kind=noisy model=RM12 comp=1C N=30 z_true=7.04510 mean_bias=+2.886e-05 sd=2.299e-04 mean_hw=2.759e-04 coverage_1sigma=23/30
+INFO  SYNTHETIC SUMMARY kind=noisy model=SPL comp=1C N=30 z_true=7.04510 mean_bias=+6.059e-06 sd=3.651e-04 mean_hw=4.456e-04 coverage_1sigma=24/30
+== T7 job completion and report parsing
+PASS  244 job outputs present (got 244)
+PASS  no failed jobs (exit!=0): 0
+PASS  180 FIT records (10 models x 2 comps x 9 scenarios; got 180)
+PASS  cc_report parsed 180 records
+== T8 housekeeping
+PASS  AGPL-3.0-only SPDX header in every source file 
+PASS  no .py/.js/.ts files (0 found)
+
+TOTAL PASS=42 FAIL=0
