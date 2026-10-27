@@ -20,6 +20,7 @@ program test_fixture
   character(len=*), parameter :: path = 'out/SYNTHETIC_causal_fixture.lrdrec'
 
   call set_suite('fortran.fixture_file')
+  call ensure_dir('out')
   call build_fixture(g, codes, ok)
   call check('built', ok .and. all(codes == EXPECTED_CODES))
   call graph_save(g, path, c1, ok)

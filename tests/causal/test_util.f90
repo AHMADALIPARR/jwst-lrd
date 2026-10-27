@@ -11,7 +11,7 @@ module test_util
   private
   integer, public :: n_pass = 0, n_fail = 0
   character(len=64), public :: suite = 'fortran'
-  public :: check, finish, set_suite, eq_bits
+  public :: check, finish, set_suite, eq_bits, ensure_dir
 contains
   ! Exact equality via bit patterns (intentional exactness checks; avoids
   ! -Wcompare-reals noise while stating the intent).
@@ -41,6 +41,17 @@ contains
       end if
     end if
   end subroutine check
+
+  ! Creates a directory (mkdir -p) so a test never depends on an untracked out/ directory.
+  ! Silent on success; on failure it emits FAIL <suite>.out_dir_unavailable with the reason.
+  subroutine ensure_dir(dir)
+    character(len=*), intent(in) :: dir
+    integer :: es, cs
+    es = 0
+    cs = 0
+    call execute_command_line('mkdir -p ' // dir, wait=.true., exitstat=es, cmdstat=cs)
+    if (cs /= 0 .or. es /= 0) call check('out_dir_unavailable', .false., 'out_dir_missing_and_mkdir_failed:' // dir)
+  end subroutine ensure_dir
 
   subroutine finish(prog)
     character(len=*), intent(in) :: prog
