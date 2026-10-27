@@ -9,13 +9,15 @@
 # without a shebang falls back to sh.
 # A suite that prints no PASS/FAIL/UNAVAILABLE line, or exits nonzero without a FAIL line,
 # is reported as FAIL <suite>/run.sh.
+# OPEN lines ("OPEN <name> ..." and "FAIL-EXPECTED/OPEN <name> ...") mark known-unresolved items: they are counted
+# separately in the TOTAL line and neither count as PASS nor make the run fail.
 # LRD_TESTS_DIR overrides the tests directory (used by tests/runner to test this runner).
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 2
 TD=${LRD_TESTS_DIR:-$ROOT/tests}
 LOGD=${LRD_TEST_LOGS:-$ROOT/build/out}
 mkdir -p "$LOGD"
-pass=0; fail=0; unav=0
+pass=0; fail=0; unav=0; open=0
 for t in "$TD"/*/run.sh; do
   [ -f "$t" ] || continue
   mod=$(basename "$(dirname "$t")")
@@ -35,7 +37,8 @@ for t in "$TD"/*/run.sh; do
   p=$(printf '%s\n' "$out" | grep -c '^PASS ')
   f=$(printf '%s\n' "$out" | grep -c '^FAIL ')
   u=$(printf '%s\n' "$out" | grep -c '^UNAVAILABLE ')
-  pass=$((pass+p)); fail=$((fail+f)); unav=$((unav+u))
+  o=$(printf '%s\n' "$out" | grep -c '^OPEN \|^FAIL-EXPECTED/OPEN ')
+  pass=$((pass+p)); fail=$((fail+f)); unav=$((unav+u)); open=$((open+o))
   if [ $((p+f+u)) -eq 0 ]; then
     echo "FAIL $mod/run.sh printed no PASS/FAIL/UNAVAILABLE line (exit $r; see $LOGD/test-$mod.stderr)"
     fail=$((fail+1))
@@ -44,5 +47,5 @@ for t in "$TD"/*/run.sh; do
     fail=$((fail+1))
   fi
 done
-echo "== TOTAL: $pass PASS, $fail FAIL, $unav UNAVAILABLE"
+echo "== TOTAL: $pass PASS, $fail FAIL, $unav UNAVAILABLE, $open OPEN"
 [ $fail -eq 0 ]
