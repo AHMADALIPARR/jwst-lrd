@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Also subject to SNAPKITTY_OPAQUE_LICENSE.md (dual license, see repository root).
+#
+# Mutant swap_8_9 (JWST-LRD blocker (b)): in ham_decide's step path, exchange
+# check row 8 (epoch_exhausted) and row 9 (infeasible), i.e. the order the
+# CONTRACTS.md v1.1 amendment declares normative is reversed.
+# Apply from the repository root with: patch -p1 < hamiltonian/mutants/swap_8_9.patch
+# Never apply it to the working tree; hamiltonian/mutants/run.sh applies it to a temp copy.
+--- a/hamiltonian/src/ham_engine.c	2026-10-27 13:14:01.154577582 -0700
++++ b/hamiltonian/src/ham_engine.c	2026-10-27 13:14:01.158577582 -0700
+@@ -269,8 +269,6 @@
+     if (is_step) {
+         /* 7 */
+         if (ep64 != cur->epoch) { reason = "bad_epoch"; goto decide; }
+-        /* 8 */
+-        if (cur->steps_used >= cfg->budget) { reason = "epoch_exhausted"; goto decide; }
+         /* 9 */
+         vidx = malloc((m->nh ? m->nh : 1) * sizeof *vidx);
+         if (!vidx) { st = HAM_ERR_NOMEM; goto out; }
+@@ -288,6 +286,8 @@
+             TRY(ham_rec_addf(&d, "violated_count", "%zu", nv));
+             reason = LRD_REASON_INFEASIBLE; goto decide;
+         }
++        /* 8 */
++        if (cur->steps_used >= cfg->budget) { reason = "epoch_exhausted"; goto decide; }
+         /* 10: exact comparison, no floating point */
+         TRY(ham_energy(m, a, ecand));
+         have_cand = 1;
