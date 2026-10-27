@@ -60,7 +60,10 @@ contains
     end do
   end function cg_index
 
-  ! ok=.false. for non-positive/duplicate id, invalid kind, or over-long label.
+  ! ok=.false. for a non-positive or duplicate id, or an event kind outside
+  ! EV_EMISSION..EV_ARCHIVE_PUBLICATION.  A longer label is truncated
+  ! when the event is built (event%label is a fixed 64-character field); this routine
+  ! has no label check.
   subroutine cg_add_event(g, e, ok)
     type(causal_graph_t), intent(inout) :: g
     type(event), intent(in) :: e

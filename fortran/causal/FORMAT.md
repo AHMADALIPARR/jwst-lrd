@@ -127,7 +127,7 @@ Transforms, `NNNNNN` = 1..n_transforms, prefix `transform.NNNNNN.`:
 |---|---|
 | `from`, `to` | integer frame ids |
 | `type` | the literal `lorentz_boost_plus_offset` (written; the reader does not read it, see section 5) |
-| `beta1`, `beta2`, `beta3` | hex-float: velocity of frame `to` relative to frame `from`, in units of c (`|beta| < 1`) |
+| `beta1`, `beta2`, `beta3` | hex-float: velocity of frame `to` relative to frame `from`, in units of c (beta·beta < 1) |
 | `offset0_m` .. `offset3_m` | hex-float, in metres, in frame `to`: (c·t0, x0, y0, z0). The transform is X_to = Λ(beta) X_from + offset with X = (c·t, x, y, z) (`causal_frames.f90`) |
 
 Events, `NNNNNN` = 1..n_events, prefix `event.NNNNNN.`:
