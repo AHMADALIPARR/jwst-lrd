@@ -443,6 +443,72 @@ static int t_epoch_exhausted(void) {
     return ok;
 }
 
+/* Blocker (b): CONTRACTS.md v1.1 makes the step check order normative:
+ * epoch_exhausted, then infeasible, then energy. Every other exhaustion test uses a
+ * feasible candidate and every infeasible test a non-exhausted state, so only this
+ * test pins rows 8/9 (mutant hamiltonian/mutants/swap_8_9.patch). */
+static int exhausted_infeasible_case(const ham_model *m, const ham_epoch_cfg *cfg, const int *g, int gx0, int gx1,
+                                     const char *energy_prev_want) {
+    ham_state s0, s1, nx;
+    if (ham_state_genesis(m, cfg, g, &s0, NULL, NULL) != HAM_OK) { snprintf(g_why, sizeof g_why, "genesis failed"); return 0; }
+    dec d = {0};
+    if (!step(m, cfg, &s0, gx0, gx1, &d, &s1) || !d.acc) {
+        snprintf(g_why, sizeof g_why, "setup step to (%d,%d) not accepted", gx0, gx1);
+        dec_free(&d); ham_state_free(&s0); return 0;
+    }
+    dec_free(&d);
+    ham_state_free(&s0);
+    int ok = 1;
+    char *e = ham_q_str(s1.energy);
+    if (s1.steps_used != cfg->budget || strcmp(e, energy_prev_want) != 0) {
+        snprintf(g_why, sizeof g_why, "setup: steps_used=%u budget=%u energy=%s", (unsigned)s1.steps_used,
+                 (unsigned)cfg->budget, e);
+        ok = 0;
+    }
+    free(e);
+    if (ok) {
+        memset(&nx, 0x5A, sizeof nx);
+        unsigned char snap[sizeof nx]; memcpy(snap, &nx, sizeof nx);
+        uint64_t c0 = ham_states_constructed();
+        ok = step(m, cfg, &s1, 2, 2, &d, &nx);         /* (2,2) violates hard no_22; H(2,2)=11/2 */
+        if (!ok) snprintf(g_why, sizeof g_why, "ham_decide failed");
+        ok = ok && expect_reject(d.b, d.n, d.acc, "epoch_exhausted") &&
+             field_is(d.b, d.n, "decision", "REJECT") && field_is(d.b, d.n, "epoch_steps_used", "1") &&
+             field_absent(d.b, d.n, "violated") && field_absent(d.b, d.n, "violated_count");
+        if (ok && memcmp(&nx, snap, sizeof nx) != 0) { snprintf(g_why, sizeof g_why, "*next written on reject"); ok = 0; }
+        if (ok && ham_states_constructed() != c0) { snprintf(g_why, sizeof g_why, "state constructed on reject"); ok = 0; }
+        dec_free(&d);
+    }
+    ham_state_free(&s1);
+    return ok;
+}
+
+static int t_exhausted_beats_infeasible(void) {
+    ham_model m; model_a(&m);
+    ham_epoch_cfg cfg = {1, 2};
+    /* (1) exhausted + infeasible candidate; energy check would PASS: state at (1,2), H=6 > H(2,2)=11/2 */
+    int g1[2] = {0, 2};                                  /* H=7 -> step to (1,2), H=6, budget 1 used */
+    if (!exhausted_infeasible_case(&m, &cfg, g1, 1, 2, "6/1")) { ham_model_free(&m); return 0; }
+    /* (1) exhausted + infeasible candidate; energy check would FAIL: state at (2,0), H=0 < H(2,2)=11/2 */
+    int g2[2] = {1, 2};                                  /* H=6 -> step to (2,0), H=0, budget 1 used */
+    if (!exhausted_infeasible_case(&m, &cfg, g2, 2, 0, "0/1")) { ham_model_free(&m); return 0; }
+    /* (2) mirror: same infeasible candidate, NON-exhausted state: reason infeasible, violated_count >= 1 */
+    ham_state s0, nx; int g3[2] = {1, 2};
+    REQ(ham_state_genesis(&m, &cfg, g3, &s0, NULL, NULL) == HAM_OK);
+    REQ(s0.steps_used < cfg.budget);
+    memset(&nx, 0x5A, sizeof nx);
+    unsigned char snap[sizeof nx]; memcpy(snap, &nx, sizeof nx);
+    uint64_t c0 = ham_states_constructed();
+    dec d = {0};
+    REQ(step(&m, &cfg, &s0, 2, 2, &d, &nx));
+    char *vc = field(d.b, d.n, "violated_count");
+    int ok = expect_reject(d.b, d.n, d.acc, "infeasible") && field_is(d.b, d.n, "violated", "no_22") &&
+             vc && atoi(vc) >= 1 && memcmp(&nx, snap, sizeof nx) == 0 && ham_states_constructed() == c0;
+    if (!ok && g_why[0] == 0) snprintf(g_why, sizeof g_why, "mirror case: violated_count=%s", vc ? vc : "(absent)");
+    free(vc); dec_free(&d); ham_state_free(&s0); ham_model_free(&m);
+    return ok;
+}
+
 static int t_epoch_transition_explicit(void) {
     ham_model m; model_a(&m);
     ham_epoch_cfg cfg = {1, 2};
@@ -905,6 +971,7 @@ int main(int argc, char **argv) {
     run("infeasible_transition_rejected", t_infeasible_transition_rejected);
     run("epoch_exhausted", t_epoch_exhausted);
     run("epoch_transition_explicit", t_epoch_transition_explicit);
+    run("exhausted_beats_infeasible", t_exhausted_beats_infeasible);
     run("envelope_rejects", t_envelope_rejects);
     run("replay_rejected", t_replay_rejected);
     run("reject_never_constructs_state", t_reject_never_constructs_state);
