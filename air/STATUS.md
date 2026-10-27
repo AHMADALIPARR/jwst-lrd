@@ -90,7 +90,7 @@ The real JWST x1d fixture from Foundry J Spec has not landed (there's no `fixtur
 ## Build (exact commands, as run by tests/air/run.sh)
 
 ```
-make -C air BUILD=build                       # cc (gcc 14.2.0): -O2 -std=c17 -Wall -Wextra -Werror -Iinclude -Iabi_mirror, -lcrypto -lm
+make -C air BUILD=build                       # cc (gcc 14.2.0): -O2 -std=c17 -Wall -Wextra -Werror -Iinclude -I../ledger/abi, -lcrypto -lm
 make -C air BUILD=build-clang CC=clang        # clang 19.1.7, same flags
 make -C air BUILD=build-san CFLAGS="-O1 -g -fno-omit-frame-pointer" \
      SAN="-fsanitize=address,undefined -fno-sanitize-recover=all"
@@ -130,7 +130,7 @@ PASS cli_prove_verify_accept
 PASS cli_modified_proof_rejected
 PASS cli_other_observation_rejected
 PASS asan_ubsan_test_air
-PASS lrd_state_mirror_matches_t004_ledger
+PASS air_uses_canonical_ledger_abi_header
 UNAVAILABLE real_input no real (non-SYNTHETIC) LRD-ARR-v1 JWST x1d fixture under fixtures/ (Foundry J Spec fixture not landed)
 PASS no_python_typescript_javascript
 PASS license_headers
@@ -170,9 +170,7 @@ Diagnostic lines from `air/build/logs/test_air.log`, verbatim (`new_commit` chan
 
 ## Blockers / assumptions
 
-1. **`ledger/abi/lrd_state.h` is not on main.** `air/abi_mirror/lrd_state.h` is a byte-identical copy of `ledger/abi/lrd_state.h` from branch `t004-ledger` at commit `627fda7` (ledger track), preceded by a 9-line TODO header. `run.sh` checks that it matches (`lrd_state_mirror_matches_t004_ledger`).
-   **TODO:** once t004-ledger is merged, delete `air/abi_mirror/` and change `-Iabi_mirror` to `-I../ledger/abi` in `air/Makefile`. No source changes are needed.
-   The mirror's own SPDX line was `AGPL-3.0-only AND LicenseRef-SnapKitty-Opaque` after the 2026-10-26 licence normalization (earlier `-or-later`); air/ files use `AGPL-3.0-only` plus the SnapKitty Opaque License line, as instructed.
+1. **Resolved 2026-10-26: `ledger/abi/lrd_state.h` is on main.** The former `air/abi_mirror/lrd_state.h` (which had drifted: `-or-later` vs `-only`) was deleted. `air/Makefile` now compiles with `-I../ledger/abi` and `air/include/air/state.h` includes the canonical header. `tests/air/run.sh` test 7 (`air_uses_canonical_ledger_abi_header`) checks that no local copy exists and that the compile line uses `-I../ledger/abi`. Last run: 29 PASS, 0 FAIL, 1 UNAVAILABLE (`real_input`).
 2. **`new_commit` derivation** is an assumption (see above). It needs confirmation from the ledger track and Hilbert.
 3. **`air_transition` signature:** it takes the public record, the inputs and the proof bytes explicitly, so it doesn't match the bare `lrd_transition_fn` typedef. It needs a context mechanism from the ledger track to plug in.
 4. **No real JWST fixture:** `real_input` is UNAVAILABLE. Choosing a fixed-point scale for the real flux unit is still open.
