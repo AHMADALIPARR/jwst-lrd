@@ -8,8 +8,14 @@
 #   make fixtures   re-fetch (if missing) and verify sha256 of every raw FITS fixture
 #   make clean      remove build/out (never touches fixtures/ or build/tools)
 #   make rebuild    clean + build
-CC      ?= gcc
-FC      ?= gfortran
+# GNU make predefines CC=cc and FC=f77, so a plain "?=" never takes effect; override
+# only the built-in default (an environment or command-line value still wins).
+ifeq ($(origin CC),default)
+CC := gcc
+endif
+ifeq ($(origin FC),default)
+FC := gfortran
+endif
 CFLAGS  ?= -O2 -Wall -Wextra
 FFLAGS  ?= -O2 -Wall -std=f2018 -fimplicit-none
 OUT     := build/out
