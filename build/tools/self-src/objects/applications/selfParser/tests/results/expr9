@@ -1,7 +1,0 @@
-
-expressionSeries
-  keywordSend: foo:
-    binarySend: +
-      3
-      4
-    3

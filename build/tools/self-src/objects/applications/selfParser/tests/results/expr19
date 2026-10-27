@@ -1,9 +1,0 @@
-
-expressionSeries
-  binarySend: +
-    unarySend: b
-      unarySend: a
-        <implicitSelf>
-    unarySend: d
-      unarySend: c
-        <implicitSelf>

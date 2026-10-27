@@ -4,3 +4,16 @@ build/out/
 *.o
 *.agdai
 _build/
+
+# build artifacts (never tracked; see research/BLOCKERS.md (e))
+build/*
+!build/TOOLCHAIN.lock
+!build/toolchain.sh
+!build/install-curry-self.sh
+.curry/
+theorems/coq/*.vo
+theorems/coq/*.vos
+theorems/coq/*.vok
+theorems/coq/*.glob
+theorems/coq/.*.aux
+theorems/coq/.*.cache

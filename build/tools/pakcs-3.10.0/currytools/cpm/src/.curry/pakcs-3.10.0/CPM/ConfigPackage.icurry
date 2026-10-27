@@ -1,6 +1,0 @@
-interface CPM.ConfigPackage where {
-import Prelude;
-packagePath 0 :: [Prelude.Char];
-packageVersion 0 :: [Prelude.Char];
-hiding data Prelude.Char
-}
