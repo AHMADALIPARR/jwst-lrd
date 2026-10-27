@@ -1,0 +1,12 @@
+DETECTED C-MODELS-AGREE: row 3 lam=0.5 eps=0.05 z_form=12 duty=0.5 simple=8.40344291E+005 saturated=9.99999999E+009
+DETECTED C-MODELS-AGREE: row 39 lam=0.5 eps=0.1 z_form=20 duty=0.75 simple=1.00000000E-009 saturated=6.67834302E+005
+DETECTED C-MONO-ZFORM-Simple: rows 39->44 (lam=0.5 eps=0.1 z_form=20 duty=0.75 -> lam=0.5 eps=0.1 z_form=25 duty=0.75) seed 1.0e-9 -> 462339.268
+DETECTED C-MONO-LAM-Simple: rows 39->189 (lam=0.5 eps=0.1 z_form=20 duty=0.75 -> lam=0.75 eps=0.1 z_form=20 duty=0.75) seed 1.0e-9 -> 77182.3648
+DETECTED C-MONO-DUTY-Simple: rows 39->40 (lam=0.5 eps=0.1 z_form=20 duty=0.75 -> lam=0.5 eps=0.1 z_form=20 duty=1) seed 1.0e-9 -> 158453.424
+DETECTED C-MONO-EPS-Simple: rows 14->39 (lam=0.5 eps=0.05 z_form=20 duty=0.75 -> lam=0.5 eps=0.1 z_form=20 duty=0.75) seed 5522.19504 -> 1.0e-9
+DETECTED C-MONO-DUTY-Saturated: rows 2->3 (lam=0.5 eps=0.05 z_form=12 duty=0.25 -> lam=0.5 eps=0.05 z_form=12 duty=0.5) seed 6482068.7 -> 9999999990.0
+DETECTED C-MONO-EPS-Saturated: rows 3->28 (lam=0.5 eps=0.05 z_form=12 duty=0.5 -> lam=0.5 eps=0.1 z_form=12 duty=0.5) seed 9999999990.0 -> 7217907.85
+DETECTED_MODELS_AGREE 2
+DETECTED_MONOTONE 6
+RESULT PASS contradiction_detector_fires_on_synthetic
+GROWTH_SEARCH_SYNTHETIC_DONE

@@ -1,0 +1,41 @@
+PASS cg.solver_reproduces_csv
+PASS cg.solver_reproduces_rec
+PASS cg.csv_1200_rows_plus_header
+PASS cg.missing_evidence_claims_match_repo
+PASS cg.scope_only_own_dirs
+PASS cg.curry_causal_untouched
+PASS cg.licence_wording
+PASS cg.no_python_ts_js
+PASS curry_growth.row_count_1200
+PASS curry_growth.light_benchmark_rejected
+PASS curry_growth.light_viable_exactly_lam1_zform30
+PASS curry_growth.heavy_rejected_only_lam05_zform12
+PASS curry_growth.heavy_fid_14_viable_of_15
+PASS curry_growth.supereddington_simple_hand_value
+PASS curry_growth.supereddington_saturated_hand_value
+PASS curry_growth.pbh_all_unavailable
+PASS curry_growth.composite_all_unavailable
+PASS curry_growth.no_family_confirmed
+PASS curry_growth.every_rejection_has_reason
+PASS curry_growth.nondet_search_equals_deterministic
+PASS curry_growth.contradiction_detector_silent_on_real_data
+PASS curry_growth.bounded_search_honours_bound
+PASS curry_growth.search_exhaustive
+UNAVAILABLE curry_growth.family.PrimordialBH PO-PBH-1 missing: PBH mass/abundance source (primary paper) not retrieved; no abundance in repo
+UNAVAILABLE curry_growth.family.Composite PO-COMP-1 missing: time-varying growth history; solver only sweeps constant (lam, eps, duty)
+UNAVAILABLE curry_growth.evidence.t018-dynmass-independent-mass independent dynamical-mass reproduction (role 02): branch t018-dynmass has no commits beyond main; M_target = 5e7 Msun is the published value (Juodzbalis+ 2026), not reproduced here
+UNAVAILABLE curry_growth.evidence.t019-formation-window cosmological clock and seed-formation window (role 03): t019-clock has no clock output of its own; z_form is a swept grid value (12..30), not a derived window
+UNAVAILABLE curry_growth.evidence.t021-dcbh-scenario-models direct-collapse scenario models (role 05): branch t021-dcbh has no commits beyond main; no formation conditions, mass range, gas supply or metallicity model is in the repo
+UNAVAILABLE curry_growth.evidence.t022-hamiltonian-feasibility Foundry J Verify Hamiltonian growth feasibility (role 06): no branch t022-growth-hamiltonian exists locally or on origin; /workspace/foundry-j/verify holds the J property harness (no growth results); hamiltonian/ (t008) is a generic engine with no growth model
+UNAVAILABLE curry_growth.evidence.dcbh-baryon-cap arXiv:2508.21748v2 states DCBH growth is limited by the baryon fraction in an atomically cooling halo, upper limit M_BH/M_dyn ~ 0.1, more than 1 dex below its inferred lower limit (refs 33,34 there). That is a published claim, NOT reproduced here: it needs t018 (independent M_dyn) and t021 (halo model)
+UNAVAILABLE curry_growth.evidence.m-target-uncertainty no published uncertainty on M_target = 5e7 Msun is available to the repo (research/CITATIONS.md); solver gives 'minimum seed to reach >= target' only, so overshoot of the observed mass cannot be tested
+UNAVAILABLE curry_growth.evidence.current-eddington-ratio-link observed current L/L_Edd (about 0.03 in arXiv:2508.21748v2, about 0.3 in arXiv:2308.05735v2, 10x apart, no uncertainties) cannot be tied to the solver's constant-lam history without a duty-cycle/episode model; no verdict
+UNAVAILABLE curry_growth.evidence.pbh-abundance-mass PBH mass function and abundance source: none in the repo (open proof obligation PO-PBH-1)
+UNAVAILABLE curry_growth.evidence.composite-time-varying time-varying growth histories (open proof obligation PO-COMP-1)
+UNAVAILABLE curry_growth.evidence.saturation-prescription-citation paper for the lam_eff = 1 + ln(lam) saturation prescription (open proof obligation PO-SAT-1)
+UNAVAILABLE curry_growth.evidence.parameter-priors literature priors for eps and duty cycle (AFid/AGrid are declared uncited assumptions; adversary/PLAN.md cites 1911.05791 for them but that paper is not retrieved in this repo)
+PASS curry_growth.report_deterministic
+PASS curry_growth.contradiction_detector_synthetic
+PASS curry_growth.bounded_run
+PASS curry_growth.every_rejection_has_reason_full_dump
+exit=0

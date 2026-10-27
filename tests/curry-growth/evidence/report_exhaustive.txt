@@ -1,0 +1,266 @@
+GROWTH-SEARCH v1 (Mission QSO1-DCBH-001 role 08, t024-curry-growth)
+input=/workspace/jwst-lrd-t024/fixtures/growth/feasible_grid.csv
+rows=1200 candidates_total=4960 bound=100000 evaluated=4960 exhaustive=yes
+
+SECTION RULES
+RULE R-LIGHT-1: viable(LightSeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with light seed 150 Msun
+  PROV CITED arXiv:2308.05735v2 (Furtak+ 2024, Nature 628, 57) Discussion: DELPHI model assumes a seed mass of 150 Msun from metal-free stars (a model assumption of that paper, used here only as the reference light-seed mass)
+  PROV DEFINITION light seed = the single cited reference mass 150 Msun; no range is invented
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1 (lam is L/L_Edd, fortran/growth/STATUS.md)
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv; constant (lam, eps, duty) from z_form to z_obs = 7.04221; M_target = 5e7 Msun (Juodzbalis+ 2026)
+RULE R-HEAVY-1: viable(HeavySeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with heavy seed upper end 1e6 Msun
+  PROV CITED arXiv:2308.05735v2 Discussion: hydrodynamic simulations 'typically starting with heavier seeds (10^(4-6) Msun)'; upper end 1e6 Msun used. Direct collapse is named in arXiv:2508.21748v2 as 'direct collapse of massive pristine clouds' without a mass range
+  PROV DEFINITION heavy seed = any seed up to 1e6 Msun; reach test uses the upper end, so 'viable' means some seed in range suffices
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1
+  PROV OPEN-PROOF-OBLIGATION PO-DCBH-1: DCBH-specific formation conditions, mass range, gas supply, metallicity (role 05, t021-dcbh) are not in the repo; this family is 'heavy seed', DCBH is one possible origin
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv
+RULE R-SEDD-1: viable(SuperEddington, Tuple) :- lam > 1, reach M_target with light seed 150 Msun with lam > 1
+  PROV CITED arXiv:2508.21748v2 main text: QSO1 'may still have experienced previous super-Eddington bursts' (qualitative; no rate or duration given)
+  PROV DEFINITION super-Eddington: lam > 1
+  PROV DEFINITION light reference seed 150 Msun rescued by lam > 1 growth
+  PROV OPEN-PROOF-OBLIGATION PO-SAT-1: the saturated model lam_eff = 1 + ln(lam) is a prescription with no paper cited in fortran/growth (STATUS.md OPEN 2); the simple model (growth linear in lam) is an upper bound by construction
+  PROV SOLVER min seed under the candidate's model from fixtures/growth/feasible_grid.csv
+RULE R-PBH-1: viable(PrimordialBH, Tuple) :- evidence for PO-PBH-1
+  PROV OPEN-PROOF-OBLIGATION PO-PBH-1: no PBH abundance or mass-function source in the repo; the only PBH mass statement found (preferred ~1e6 Msun scale, ref 35 = Carr & Kuhnel 2020, quoted in arXiv:2508.21748v2) is a secondary citation, the primary paper was not retrieved
+  PROV DEFINITION the classifier in curry/growth/GrowthClassify.curry labels PrimordialBH by (seed >= 1e4 and z_form >= 25); that threshold has no cited source and is NOT used here
+RULE R-COMP-1: viable(Composite, Tuple) :- evidence for PO-COMP-1
+  PROV OPEN-PROOF-OBLIGATION PO-COMP-1: a composite history (e.g. heavy seed plus super-Eddington episodes) needs time-varying (lam, eps, duty); the solver sweeps constants only (fortran/growth/STATUS.md OPEN 3)
+ASET ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+ASET ASSUMPTION(uncited) AGrid: the solver's whole swept grid (eps 0.05..0.30, duty 0.1..1); the ranges are the solver's, not literature priors
+
+SECTION FAMILY VERDICTS (status VIABLE_UNDER_ASSUMPTIONS never means confirmed)
+GROUP aset=AFid family=LightSeed      model=Simple    candidates=15    viable=1     rejected=14    unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AFid family=HeavySeed      model=Simple    candidates=15    viable=14    rejected=1     unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AFid family=SuperEddington model=Simple    candidates=25    viable=24    rejected=1     unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AFid family=SuperEddington model=Saturated candidates=25    viable=24    rejected=1     unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AFid family=PrimordialBH   model=Simple    candidates=40    viable=0     rejected=0     unavailable=40    status=UNAVAILABLE
+GROUP aset=AFid family=Composite      model=Simple    candidates=40    viable=0     rejected=0     unavailable=40    status=UNAVAILABLE
+GROUP aset=AGrid family=LightSeed      model=Simple    candidates=450   viable=21    rejected=429   unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AGrid family=HeavySeed      model=Simple    candidates=450   viable=117   rejected=333   unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AGrid family=SuperEddington model=Simple    candidates=750   viable=220   rejected=530   unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AGrid family=SuperEddington model=Saturated candidates=750   viable=150   rejected=600   unavailable=0     status=VIABLE_UNDER_ASSUMPTIONS
+GROUP aset=AGrid family=PrimordialBH   model=Simple    candidates=1200  viable=0     rejected=0     unavailable=1200  status=UNAVAILABLE
+GROUP aset=AGrid family=Composite      model=Simple    candidates=1200  viable=0     rejected=0     unavailable=1200  status=UNAVAILABLE
+
+SECTION VIABLE UNDER ASSUMPTIONS (aset=AFid, every viable candidate)
+LightSeed       Simple    #14    lam=1 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.6876 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #16    lam=0.5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.3901 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #17    lam=0.5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.1585 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #18    lam=0.5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0970 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #19    lam=0.5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0718 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #20    lam=0.75 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.1504 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #21    lam=0.75 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0345 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #22    lam=0.75 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0089 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #23    lam=0.75 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0043 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #24    lam=0.75 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0027 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #25    lam=1 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0217 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #26    lam=1 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0030 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #27    lam=1 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0005 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #28    lam=1 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0002 | viable under assumptions (AFid); not confirmed
+HeavySeed       Simple    #29    lam=1 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0001 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #31    lam=1.5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.1583 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #32    lam=1.5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0106 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #33    lam=1.5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0024 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #34    lam=1.5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0010 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #35    lam=2 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0629 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #36    lam=2 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0012 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #37    lam=2 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #38    lam=2 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #39    lam=2 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #40    lam=2.5 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0013 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #41    lam=2.5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #42    lam=2.5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #43    lam=2.5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #44    lam=2.5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #45    lam=3 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #46    lam=3 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #47    lam=3 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #48    lam=3 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #49    lam=3 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #50    lam=5 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #51    lam=5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #52    lam=5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #53    lam=5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Simple    #54    lam=5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #56    lam=1.5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.3962 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #57    lam=1.5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0315 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #58    lam=1.5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0079 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #59    lam=1.5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0034 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #60    lam=2 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.6763 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #61    lam=2 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0243 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #62    lam=2 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0011 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #63    lam=2 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0002 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #64    lam=2 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0001 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #65    lam=2.5 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.1202 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #66    lam=2.5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0028 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #67    lam=2.5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0001 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #68    lam=2.5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #69    lam=2.5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #70    lam=3 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0293 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #71    lam=3 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0005 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #72    lam=3 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #73    lam=3 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #74    lam=3 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #75    lam=5 eps=0.1 z_form=12 duty=1 | viable, seed ratio 0.0006 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #76    lam=5 eps=0.1 z_form=15 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #77    lam=5 eps=0.1 z_form=20 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #78    lam=5 eps=0.1 z_form=25 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+SuperEddington  Saturated #79    lam=5 eps=0.1 z_form=30 duty=1 | viable, seed ratio 0.0000 | viable under assumptions (AFid); not confirmed
+
+SECTION REJECTED CANDIDATES (aset=AFid, every rejected candidate with its reason)
+LightSeed       Simple    #0     lam=0.5 eps=0.1 z_form=12 duty=1 | min_seed_simple=1.04196387E+006 Msun > light seed 150 Msun [ratio 6946]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=12 duty=1), model Simple
+LightSeed       Simple    #1     lam=0.5 eps=0.1 z_form=15 duty=1 | min_seed_simple=3.90056968E+005 Msun > light seed 150 Msun [ratio 2600]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=15 duty=1), model Simple
+LightSeed       Simple    #2     lam=0.5 eps=0.1 z_form=20 duty=1 | min_seed_simple=1.58453424E+005 Msun > light seed 150 Msun [ratio 1056]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=20 duty=1), model Simple
+LightSeed       Simple    #3     lam=0.5 eps=0.1 z_form=25 duty=1 | min_seed_simple=9.70415460E+004 Msun > light seed 150 Msun [ratio 647]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=25 duty=1), model Simple
+LightSeed       Simple    #4     lam=0.5 eps=0.1 z_form=30 duty=1 | min_seed_simple=7.18097137E+004 Msun > light seed 150 Msun [ratio 479]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=30 duty=1), model Simple
+LightSeed       Simple    #5     lam=0.75 eps=0.1 z_form=12 duty=1 | min_seed_simple=1.50415985E+005 Msun > light seed 150 Msun [ratio 1003]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.75 eps=0.1 z_form=12 duty=1), model Simple
+LightSeed       Simple    #6     lam=0.75 eps=0.1 z_form=15 duty=1 | min_seed_simple=3.44514146E+004 Msun > light seed 150 Msun [ratio 230]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.75 eps=0.1 z_form=15 duty=1), model Simple
+LightSeed       Simple    #7     lam=0.75 eps=0.1 z_form=20 duty=1 | min_seed_simple=8.92005310E+003 Msun > light seed 150 Msun [ratio 59.4670]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.75 eps=0.1 z_form=20 duty=1), model Simple
+LightSeed       Simple    #8     lam=0.75 eps=0.1 z_form=25 duty=1 | min_seed_simple=4.27515198E+003 Msun > light seed 150 Msun [ratio 28.5010]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.75 eps=0.1 z_form=25 duty=1), model Simple
+LightSeed       Simple    #9     lam=0.75 eps=0.1 z_form=30 duty=1 | min_seed_simple=2.72138377E+003 Msun > light seed 150 Msun [ratio 18.1426]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.75 eps=0.1 z_form=30 duty=1), model Simple
+LightSeed       Simple    #10    lam=1 eps=0.1 z_form=12 duty=1 | min_seed_simple=2.17137743E+004 Msun > light seed 150 Msun [ratio 145]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=12 duty=1), model Simple
+LightSeed       Simple    #11    lam=1 eps=0.1 z_form=15 duty=1 | min_seed_simple=3.04288877E+003 Msun > light seed 150 Msun [ratio 20.2859]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=15 duty=1), model Simple
+LightSeed       Simple    #12    lam=1 eps=0.1 z_form=20 duty=1 | min_seed_simple=5.02149751E+002 Msun > light seed 150 Msun [ratio 3.3477]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=20 duty=1), model Simple
+LightSeed       Simple    #13    lam=1 eps=0.1 z_form=25 duty=1 | min_seed_simple=1.88341233E+002 Msun > light seed 150 Msun [ratio 1.2556]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=25 duty=1), model Simple
+HeavySeed       Simple    #15    lam=0.5 eps=0.1 z_form=12 duty=1 | min_seed_simple=1.04196387E+006 Msun > heavy seed upper end 1e6 Msun [ratio 1.0420]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=12 duty=1), model Simple
+SuperEddington  Simple    #30    lam=1.5 eps=0.1 z_form=12 duty=1 | min_seed_simple=4.52499369E+002 Msun > light seed 150 Msun with lam > 1 [ratio 3.0167]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Simple
+SuperEddington  Saturated #55    lam=1.5 eps=0.1 z_form=12 duty=1 | min_seed_saturated=9.40733197E+002 Msun > light seed 150 Msun with lam > 1 [ratio 6.2716]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Saturated
+
+SECTION REJECTED CANDIDATES (aset=AGrid): closest miss per family/model, then count
+CLOSEST_MISS LightSeed       Simple    #504   lam=1 eps=0.1 z_form=25 duty=1 | min_seed_simple=1.88341233E+002 Msun > light seed 150 Msun [ratio 1.2556]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=25 duty=1), model Simple
+  rejected_in_group=429
+CLOSEST_MISS HeavySeed       Simple    #639   lam=0.5 eps=0.1 z_form=12 duty=1 | min_seed_simple=1.04196387E+006 Msun > heavy seed upper end 1e6 Msun [ratio 1.0420]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=12 duty=1), model Simple
+  rejected_in_group=333
+CLOSEST_MISS SuperEddington  Simple    #1794  lam=5 eps=0.3 z_form=15 duty=1 | min_seed_simple=1.71472525E+002 Msun > light seed 150 Msun with lam > 1 [ratio 1.1432]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=5 eps=0.3 z_form=15 duty=1), model Simple
+  rejected_in_group=530
+CLOSEST_MISS SuperEddington  Saturated #2442  lam=5 eps=0.1 z_form=15 duty=0.5 | min_seed_saturated=1.58010982E+002 Msun > light seed 150 Msun with lam > 1 [ratio 1.0534]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=5 eps=0.1 z_form=15 duty=0.5), model Saturated
+  rejected_in_group=600
+
+SECTION UNAVAILABLE (rule bodies blocked by missing evidence)
+UNAVAILABLE_FAMILY aset=AFid family=PrimordialBH candidates=40 | PO-PBH-1 missing: PBH mass/abundance source (primary paper) not retrieved; no abundance in repo
+UNAVAILABLE_FAMILY aset=AFid family=Composite candidates=40 | PO-COMP-1 missing: time-varying growth history; solver only sweeps constant (lam, eps, duty)
+UNAVAILABLE_FAMILY aset=AGrid family=PrimordialBH candidates=1200 | PO-PBH-1 missing: PBH mass/abundance source (primary paper) not retrieved; no abundance in repo
+UNAVAILABLE_FAMILY aset=AGrid family=Composite candidates=1200 | PO-COMP-1 missing: time-varying growth history; solver only sweeps constant (lam, eps, duty)
+UNAVAILABLE_EVIDENCE evidence.t018-dynmass-independent-mass | independent dynamical-mass reproduction (role 02): branch t018-dynmass has no commits beyond main; M_target = 5e7 Msun is the published value (Juodzbalis+ 2026), not reproduced here
+UNAVAILABLE_EVIDENCE evidence.t019-formation-window | cosmological clock and seed-formation window (role 03): t019-clock has no clock output of its own; z_form is a swept grid value (12..30), not a derived window
+UNAVAILABLE_EVIDENCE evidence.t021-dcbh-scenario-models | direct-collapse scenario models (role 05): branch t021-dcbh has no commits beyond main; no formation conditions, mass range, gas supply or metallicity model is in the repo
+UNAVAILABLE_EVIDENCE evidence.t022-hamiltonian-feasibility | Foundry J Verify Hamiltonian growth feasibility (role 06): no branch t022-growth-hamiltonian exists locally or on origin; /workspace/foundry-j/verify holds the J property harness (no growth results); hamiltonian/ (t008) is a generic engine with no growth model
+UNAVAILABLE_EVIDENCE evidence.dcbh-baryon-cap | arXiv:2508.21748v2 states DCBH growth is limited by the baryon fraction in an atomically cooling halo, upper limit M_BH/M_dyn ~ 0.1, more than 1 dex below its inferred lower limit (refs 33,34 there). That is a published claim, NOT reproduced here: it needs t018 (independent M_dyn) and t021 (halo model)
+UNAVAILABLE_EVIDENCE evidence.m-target-uncertainty | no published uncertainty on M_target = 5e7 Msun is available to the repo (research/CITATIONS.md); solver gives 'minimum seed to reach >= target' only, so overshoot of the observed mass cannot be tested
+UNAVAILABLE_EVIDENCE evidence.current-eddington-ratio-link | observed current L/L_Edd (about 0.03 in arXiv:2508.21748v2, about 0.3 in arXiv:2308.05735v2, 10x apart, no uncertainties) cannot be tied to the solver's constant-lam history without a duty-cycle/episode model; no verdict
+UNAVAILABLE_EVIDENCE evidence.pbh-abundance-mass | PBH mass function and abundance source: none in the repo (open proof obligation PO-PBH-1)
+UNAVAILABLE_EVIDENCE evidence.composite-time-varying | time-varying growth histories (open proof obligation PO-COMP-1)
+UNAVAILABLE_EVIDENCE evidence.saturation-prescription-citation | paper for the lam_eff = 1 + ln(lam) saturation prescription (open proof obligation PO-SAT-1)
+UNAVAILABLE_EVIDENCE evidence.parameter-priors | literature priors for eps and duty cycle (AFid/AGrid are declared uncited assumptions; adversary/PLAN.md cites 1911.05791 for them but that paper is not retrieved in this repo)
+
+SECTION CONTRADICTION DETECTION (internal consistency of the evidence)
+NO_CONTRADICTION in the evaluated evidence (models agree at lam<=1; min seed monotone in z_form, lam, duty, eps for both models; flags = (seed<=1e5); status counts 464/382)
+CONTRADICTION_COUNT 0
+
+SECTION INFERENCE TRACES (selected candidates, verbatim from the evaluated set)
+TRACE light seed, benchmark tuple (expected: rejected)
+CANDIDATE #12 family=LightSeed aset=AFid model=Simple row=340 lam=1 eps=0.1 z_form=20 duty=1
+  RULE R-LIGHT-1: viable(LightSeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with light seed 150 Msun
+  PROV CITED arXiv:2308.05735v2 (Furtak+ 2024, Nature 628, 57) Discussion: DELPHI model assumes a seed mass of 150 Msun from metal-free stars (a model assumption of that paper, used here only as the reference light-seed mass)
+  PROV DEFINITION light seed = the single cited reference mass 150 Msun; no range is invented
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1 (lam is L/L_Edd, fortran/growth/STATUS.md)
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv; constant (lam, eps, duty) from z_form to z_obs = 7.04221; M_target = 5e7 Msun (Juodzbalis+ 2026)
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam <= 1 => HOLDS: lam=1 <= 1
+  GOAL simple and saturated min seeds agree (solver: identical for lam <= 1) => HOLDS: min_seed_simple=5.02149751E+002 equals min_seed_saturated=5.02149751E+002
+  GOAL reach M_target with light seed 150 Msun => FAILS: min_seed_simple=5.02149751E+002 Msun > light seed 150 Msun [ratio 3.3477]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=20 duty=1), model Simple
+  => REJECTED (counterexample): min_seed_simple=5.02149751E+002 Msun > light seed 150 Msun [ratio 3.3477]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1 eps=0.1 z_form=20 duty=1), model Simple
+TRACE light seed, z_form 30 (expected: viable under assumptions)
+CANDIDATE #14 family=LightSeed aset=AFid model=Simple row=350 lam=1 eps=0.1 z_form=30 duty=1
+  RULE R-LIGHT-1: viable(LightSeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with light seed 150 Msun
+  PROV CITED arXiv:2308.05735v2 (Furtak+ 2024, Nature 628, 57) Discussion: DELPHI model assumes a seed mass of 150 Msun from metal-free stars (a model assumption of that paper, used here only as the reference light-seed mass)
+  PROV DEFINITION light seed = the single cited reference mass 150 Msun; no range is invented
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1 (lam is L/L_Edd, fortran/growth/STATUS.md)
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv; constant (lam, eps, duty) from z_form to z_obs = 7.04221; M_target = 5e7 Msun (Juodzbalis+ 2026)
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam <= 1 => HOLDS: lam=1 <= 1
+  GOAL simple and saturated min seeds agree (solver: identical for lam <= 1) => HOLDS: min_seed_simple=1.03132700E+002 equals min_seed_saturated=1.03132700E+002
+  GOAL reach M_target with light seed 150 Msun => HOLDS: min_seed_simple=1.03132700E+002 Msun <= light seed 150 Msun [ratio 0.6876]
+  => VIABLE UNDER ASSUMPTIONS (AFid) [seed ratio 0.6876]; not confirmed
+TRACE heavy seed, lam 0.5 z_form 12 (expected: rejected)
+CANDIDATE #15 family=HeavySeed aset=AFid model=Simple row=30 lam=0.5 eps=0.1 z_form=12 duty=1
+  RULE R-HEAVY-1: viable(HeavySeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with heavy seed upper end 1e6 Msun
+  PROV CITED arXiv:2308.05735v2 Discussion: hydrodynamic simulations 'typically starting with heavier seeds (10^(4-6) Msun)'; upper end 1e6 Msun used. Direct collapse is named in arXiv:2508.21748v2 as 'direct collapse of massive pristine clouds' without a mass range
+  PROV DEFINITION heavy seed = any seed up to 1e6 Msun; reach test uses the upper end, so 'viable' means some seed in range suffices
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1
+  PROV OPEN-PROOF-OBLIGATION PO-DCBH-1: DCBH-specific formation conditions, mass range, gas supply, metallicity (role 05, t021-dcbh) are not in the repo; this family is 'heavy seed', DCBH is one possible origin
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam <= 1 => HOLDS: lam=0.5 <= 1
+  GOAL simple and saturated min seeds agree (solver: identical for lam <= 1) => HOLDS: min_seed_simple=1.04196387E+006 equals min_seed_saturated=1.04196387E+006
+  GOAL reach M_target with heavy seed upper end 1e6 Msun => FAILS: min_seed_simple=1.04196387E+006 Msun > heavy seed upper end 1e6 Msun [ratio 1.0420]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=12 duty=1), model Simple
+  => REJECTED (counterexample): min_seed_simple=1.04196387E+006 Msun > heavy seed upper end 1e6 Msun [ratio 1.0420]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=0.5 eps=0.1 z_form=12 duty=1), model Simple
+TRACE heavy seed, benchmark tuple (expected: viable under assumptions)
+CANDIDATE #27 family=HeavySeed aset=AFid model=Simple row=340 lam=1 eps=0.1 z_form=20 duty=1
+  RULE R-HEAVY-1: viable(HeavySeed, Tuple) :- lam <= 1, simple and saturated min seeds agree (solver: identical for lam <= 1), reach M_target with heavy seed upper end 1e6 Msun
+  PROV CITED arXiv:2308.05735v2 Discussion: hydrodynamic simulations 'typically starting with heavier seeds (10^(4-6) Msun)'; upper end 1e6 Msun used. Direct collapse is named in arXiv:2508.21748v2 as 'direct collapse of massive pristine clouds' without a mass range
+  PROV DEFINITION heavy seed = any seed up to 1e6 Msun; reach test uses the upper end, so 'viable' means some seed in range suffices
+  PROV DEFINITION at or below Eddington luminosity: lam <= 1
+  PROV OPEN-PROOF-OBLIGATION PO-DCBH-1: DCBH-specific formation conditions, mass range, gas supply, metallicity (role 05, t021-dcbh) are not in the repo; this family is 'heavy seed', DCBH is one possible origin
+  PROV SOLVER min seed from fixtures/growth/feasible_grid.csv
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam <= 1 => HOLDS: lam=1 <= 1
+  GOAL simple and saturated min seeds agree (solver: identical for lam <= 1) => HOLDS: min_seed_simple=5.02149751E+002 equals min_seed_saturated=5.02149751E+002
+  GOAL reach M_target with heavy seed upper end 1e6 Msun => HOLDS: min_seed_simple=5.02149751E+002 Msun <= heavy seed upper end 1e6 Msun [ratio 0.0005]
+  => VIABLE UNDER ASSUMPTIONS (AFid) [seed ratio 0.0005]; not confirmed
+TRACE super-Eddington, simple model, lam 1.5 z_form 12
+CANDIDATE #30 family=SuperEddington aset=AFid model=Simple row=480 lam=1.5 eps=0.1 z_form=12 duty=1
+  RULE R-SEDD-1: viable(SuperEddington, Tuple) :- lam > 1, reach M_target with light seed 150 Msun with lam > 1
+  PROV CITED arXiv:2508.21748v2 main text: QSO1 'may still have experienced previous super-Eddington bursts' (qualitative; no rate or duration given)
+  PROV DEFINITION super-Eddington: lam > 1
+  PROV DEFINITION light reference seed 150 Msun rescued by lam > 1 growth
+  PROV OPEN-PROOF-OBLIGATION PO-SAT-1: the saturated model lam_eff = 1 + ln(lam) is a prescription with no paper cited in fortran/growth (STATUS.md OPEN 2); the simple model (growth linear in lam) is an upper bound by construction
+  PROV SOLVER min seed under the candidate's model from fixtures/growth/feasible_grid.csv
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam > 1 => HOLDS: lam=1.5 > 1
+  GOAL reach M_target with light seed 150 Msun with lam > 1 => FAILS: min_seed_simple=4.52499369E+002 Msun > light seed 150 Msun with lam > 1 [ratio 3.0167]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Simple
+  => REJECTED (counterexample): min_seed_simple=4.52499369E+002 Msun > light seed 150 Msun with lam > 1 [ratio 3.0167]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Simple
+TRACE super-Eddington, saturated model, lam 1.5 z_form 12
+CANDIDATE #55 family=SuperEddington aset=AFid model=Saturated row=480 lam=1.5 eps=0.1 z_form=12 duty=1
+  RULE R-SEDD-1: viable(SuperEddington, Tuple) :- lam > 1, reach M_target with light seed 150 Msun with lam > 1
+  PROV CITED arXiv:2508.21748v2 main text: QSO1 'may still have experienced previous super-Eddington bursts' (qualitative; no rate or duration given)
+  PROV DEFINITION super-Eddington: lam > 1
+  PROV DEFINITION light reference seed 150 Msun rescued by lam > 1 growth
+  PROV OPEN-PROOF-OBLIGATION PO-SAT-1: the saturated model lam_eff = 1 + ln(lam) is a prescription with no paper cited in fortran/growth (STATUS.md OPEN 2); the simple model (growth linear in lam) is an upper bound by construction
+  PROV SOLVER min seed under the candidate's model from fixtures/growth/feasible_grid.csv
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL lam > 1 => HOLDS: lam=1.5 > 1
+  GOAL reach M_target with light seed 150 Msun with lam > 1 => FAILS: min_seed_saturated=9.40733197E+002 Msun > light seed 150 Msun with lam > 1 [ratio 6.2716]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Saturated
+  => REJECTED (counterexample): min_seed_saturated=9.40733197E+002 Msun > light seed 150 Msun with lam > 1 [ratio 6.2716]: the seed cannot reach M_target=5e7 Msun by z_obs under constant (lam=1.5 eps=0.1 z_form=12 duty=1), model Saturated
+TRACE primordial black hole, benchmark tuple (expected: unavailable)
+CANDIDATE #92 family=PrimordialBH aset=AFid model=Simple row=340 lam=1 eps=0.1 z_form=20 duty=1
+  RULE R-PBH-1: viable(PrimordialBH, Tuple) :- evidence for PO-PBH-1
+  PROV OPEN-PROOF-OBLIGATION PO-PBH-1: no PBH abundance or mass-function source in the repo; the only PBH mass statement found (preferred ~1e6 Msun scale, ref 35 = Carr & Kuhnel 2020, quoted in arXiv:2508.21748v2) is a secondary citation, the primary paper was not retrieved
+  PROV DEFINITION the classifier in curry/growth/GrowthClassify.curry labels PrimordialBH by (seed >= 1e4 and z_form >= 25); that threshold has no cited source and is NOT used here
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL evidence for PO-PBH-1 => UNAVAILABLE: PO-PBH-1 missing: PBH mass/abundance source (primary paper) not retrieved; no abundance in repo
+  => UNAVAILABLE PO-PBH-1: PBH mass/abundance source (primary paper) not retrieved; no abundance in repo
+TRACE composite, benchmark tuple (expected: unavailable)
+CANDIDATE #132 family=Composite aset=AFid model=Simple row=340 lam=1 eps=0.1 z_form=20 duty=1
+  RULE R-COMP-1: viable(Composite, Tuple) :- evidence for PO-COMP-1
+  PROV OPEN-PROOF-OBLIGATION PO-COMP-1: a composite history (e.g. heavy seed plus super-Eddington episodes) needs time-varying (lam, eps, duty); the solver sweeps constants only (fortran/growth/STATUS.md OPEN 3)
+  PROV ASSUMPTION(uncited) AFid: eps = 0.1 and duty = 1 (benchmark values of fortran/growth/STATUS.md; no paper cited for them)
+  GOAL evidence for PO-COMP-1 => UNAVAILABLE: PO-COMP-1 missing: time-varying growth history; solver only sweeps constant (lam, eps, duty)
+  => UNAVAILABLE PO-COMP-1: time-varying growth history; solver only sweeps constant (lam, eps, duty)
+
+SECTION SELF-CHECKS (expectations derived by hand from the solver ODE, not copied from solver output)
+RESULT PASS row_count_1200
+RESULT PASS light_benchmark_rejected
+RESULT PASS light_viable_exactly_lam1_zform30
+RESULT PASS heavy_rejected_only_lam05_zform12
+RESULT PASS heavy_fid_14_viable_of_15
+RESULT PASS supereddington_simple_hand_value
+RESULT PASS supereddington_saturated_hand_value
+RESULT PASS pbh_all_unavailable
+RESULT PASS composite_all_unavailable
+RESULT PASS no_family_confirmed
+RESULT PASS every_rejection_has_reason
+RESULT PASS nondet_search_equals_deterministic
+RESULT PASS contradiction_detector_silent_on_real_data
+RESULT PASS bounded_search_honours_bound
+GROWTH_SEARCH_DONE
