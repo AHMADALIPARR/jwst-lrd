@@ -80,5 +80,32 @@ program test_units_interval
   s = iv_scale(iv_point(0.1_dp), 3.0_dp)
   call check('inexact_product_widened_one_side', s%lo < s%hi .and. (eq_bits(s%lo, 0.1_dp * 3.0_dp) .or. &
              eq_bits(s%hi, 0.1_dp * 3.0_dp)))
+  ! ---- upper-bound outward rounding (review mutants 11, 11a, 11b) --------------------------
+  ! All operands below are exactly representable; the exact result is not, so it lies strictly
+  ! between two doubles.  eps = 2**-52 = ulp(1).  The enclosure must reach the double above
+  ! the exact value (hi) and must not be widened on the side where the rounded result is
+  ! already outside (lo / tight side).  A one-ulp over-widening is therefore also detected.
+  s = iv_point(1.0_dp) + iv_point(2.0_dp**(-60))        ! exact 1 + 2**-60 > fl = 1
+  call check('add_up_widens_when_exact_above_rounded', eq_bits(s%hi, 1.0_dp + epsilon(1.0_dp)) .and. &
+             eq_bits(s%lo, 1.0_dp))
+  s = iv_point(-1.0_dp) + iv_point(-(2.0_dp**(-60)))    ! exact -1 - 2**-60 < fl = -1
+  call check('add_up_not_widened_when_exact_below_rounded', eq_bits(s%hi, -1.0_dp) .and. &
+             eq_bits(s%lo, -1.0_dp - epsilon(1.0_dp)))
+  s = iv_point(2.0_dp**(-60)) - iv_point(-1.0_dp)       ! exact 1 + 2**-60 through iv_sub
+  call check('sub_up_widens_when_exact_above_rounded', eq_bits(s%hi, 1.0_dp + epsilon(1.0_dp)) .and. &
+             eq_bits(s%lo, 1.0_dp))
+  ! (1 + eps)**2 = 1 + 2*eps + eps**2: fl = 1 + 2*eps, rounding error +eps**2 > 0
+  s = iv_scale(iv_point(1.0_dp + epsilon(1.0_dp)), 1.0_dp + epsilon(1.0_dp))
+  call check('mul_up_widens_when_exact_above_rounded', eq_bits(s%lo, 1.0_dp + 2.0_dp * epsilon(1.0_dp)) .and. &
+             eq_bits(s%hi, 1.0_dp + 3.0_dp * epsilon(1.0_dp)))
+  s = iv_scale(iv_point(-(1.0_dp + epsilon(1.0_dp))), 1.0_dp + epsilon(1.0_dp))
+  call check('mul_up_not_widened_when_exact_below_rounded', eq_bits(s%hi, -(1.0_dp + 2.0_dp * epsilon(1.0_dp))) .and. &
+             eq_bits(s%lo, -(1.0_dp + 3.0_dp * epsilon(1.0_dp))))
+  s = iv_mul(iv_point(1.0_dp + epsilon(1.0_dp)), iv_point(1.0_dp + epsilon(1.0_dp)))
+  call check('iv_mul_upper_bound_widened', eq_bits(s%lo, 1.0_dp + 2.0_dp * epsilon(1.0_dp)) .and. &
+             eq_bits(s%hi, 1.0_dp + 3.0_dp * epsilon(1.0_dp)))
+  s = iv_sqr(iv_point(1.0_dp + epsilon(1.0_dp)))
+  call check('iv_sqr_upper_bound_widened', eq_bits(s%lo, 1.0_dp + 2.0_dp * epsilon(1.0_dp)) .and. &
+             eq_bits(s%hi, 1.0_dp + 3.0_dp * epsilon(1.0_dp)))
   call finish('test_units_interval')
 end program test_units_interval

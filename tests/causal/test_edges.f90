@@ -17,7 +17,7 @@ program test_edges
   type(frame_registry) :: reg
   type(classify_opts) :: opts
   type(classification) :: cls
-  type(causal_graph_t) :: g
+  type(causal_graph_t) :: g, g2
   type(event) :: a, b
   integer :: st, code, ka, kb, n_allowed
   logical :: ok, all_match
@@ -93,6 +93,23 @@ program test_edges
   call cg_add_event(g, ev(3, EV_DETECTION, 1, 10.0_dp, 10.0_dp * c), ok)
   call cg_add_event(g, ev(1, EV_DETECTION, 1, 0.0_dp, 0.0_dp), ok)
   call check('duplicate_event_id_refused', .not. ok .and. g%n_ev == 3)
+  ! invalid event kinds must be refused by cg_add_event itself (review mutant 17: removing the
+  ! kind test at causal_graph.f90 let every one of these in); kinds just outside 1..4 and far outside
+  call cg_add_event(g, ev(4, EV_INVALID, 1, 20.0_dp, 0.0_dp), ok)
+  call check('invalid_kind_0_refused', .not. ok .and. g%n_ev == 3)
+  call cg_add_event(g, ev(4, EV_ARCHIVE_PUBLICATION + 1, 1, 20.0_dp, 0.0_dp), ok)
+  call check('invalid_kind_5_refused', .not. ok .and. g%n_ev == 3)
+  call cg_add_event(g, ev(4, -1, 1, 20.0_dp, 0.0_dp), ok)
+  call check('invalid_kind_negative_refused', .not. ok .and. g%n_ev == 3)
+  call cg_add_event(g, ev(4, huge(0), 1, 20.0_dp, 0.0_dp), ok)
+  call check('invalid_kind_huge_refused', .not. ok .and. g%n_ev == 3)
+  ! and the two end kinds (1 and 4) are still accepted, so the kind test is not over-tight
+  call cg_init(g2, 'SYNTHETIC-kind-bounds', .true.)
+  call reg_add_frame(g2%reg, 1, FK_INERTIAL, 'SYNTHETIC-local-inertial-L', st)
+  call cg_add_event(g2, ev(4, EV_EMISSION, 1, 0.0_dp, 0.0_dp), ok)
+  call check('kind_1_accepted_lower_bound', ok .and. g2%n_ev == 1)
+  call cg_add_event(g2, ev(5, EV_ARCHIVE_PUBLICATION, 1, 20.0_dp, 0.0_dp), ok)
+  call check('kind_4_accepted_upper_bound', ok .and. g2%n_ev == 2)
   code = cg_add_edge(g, 1, 2)
   call check('graph_spacelike_edge_rejected_and_logged', code == EDGE_REJ_SPACELIKE .and. &
              cg_n_edges(g) == 0 .and. g%n_rej == 1 .and. .not. cg_causal_before(g, 1, 2))
