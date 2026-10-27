@@ -9,7 +9,7 @@ tmp="$(mktemp -d /tmp/lrdcap-mut.XXXXXX)"; trap 'rm -rf "$tmp"' EXIT
 fails=0
 mut() { # name perl-substitution
   local name="$1" expr="$2" d="$tmp/$1"
-  mkdir -p "$d"; cp -r "$SRC/Cargo.toml" "$SRC/build.rs" "$SRC/src" "$SRC/tests" "$SRC/abi" "$SRC/fixtures" "$d/"
+  mkdir -p "$d"; cp -r "$SRC/Cargo.toml" "$SRC/PROTOCOL.md" "$SRC/build.rs" "$SRC/src" "$SRC/tests" "$SRC/abi" "$SRC/fixtures" "$d/"
   cp "$d/src/authority.rs" "$d/orig.rs"
   perl -0pi -e "$expr" "$d/src/authority.rs"
   if cmp -s "$d/src/authority.rs" "$d/orig.rs"; then echo "FAIL mutation_$name not_applied"; fails=$((fails+1)); return; fi
